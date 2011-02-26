@@ -89,22 +89,7 @@ public class ThreadView extends ListActivity {
     {
     	try
     	{
-    		//TODO: hit the website to get the first page of threads
-    		_threads = new ArrayList<Thread>();
-    		Thread t1 = new Thread();
-    		t1.setUserName("arhughes");
-    		t1.setContent("sample content is here with a blah blah and words words words and then there was more! can you imagine that. foo bar, buzbazz blight bright fight might pight light dwight.");
-    		Thread t2 = new Thread();
-    		t2.setUserName("ThomW");
-    		t2.setContent("blighity blah");
-    		Thread t3 = new Thread();
-    		t3.setUserName("haiku");
-    		t3.setContent("I am the best at shacknews.");
-    		_threads.add(t1);
-    		_threads.add(t2);
-    		_threads.add(t3);
-    		
-    		java.lang.Thread.sleep(2000);
+    		_threads = ShackApi.getThreads();
     		
     		Log.i("Array", "" + _threads.size());
     	} catch (Exception ex)

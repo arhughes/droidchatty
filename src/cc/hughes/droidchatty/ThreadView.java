@@ -115,7 +115,6 @@ public class ThreadView extends ListActivity {
     	try
     	{
     		_threads = ShackApi.getThreads();
-    		
     		Log.i("Array", "" + _threads.size());
     	} catch (Exception ex)
     	{
@@ -151,10 +150,13 @@ public class ThreadView extends ListActivity {
 			{
 				TextView tvUserName = (TextView)v.findViewById(R.id.textUserName);
 				TextView tvContent = (TextView)v.findViewById(R.id.textContent);
+				TextView tvPosted = (TextView)v.findViewById(R.id.textPostedTime);
 				if (tvUserName != null)
 					tvUserName.setText(t.getUserName());
 				if (tvContent != null)
 					tvContent.setText(t.getContent());
+				if (tvPosted != null)
+					tvPosted.setText(t.getPostedTime());
 			}
 			return v;
 		}

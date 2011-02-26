@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
   android:layout_height="?android:attr/listPreferredItemHeight"
@@ -7,19 +7,26 @@
   android:orientation="vertical">
      <TextView
          android:id="@+id/textUserName"
-         android:layout_width="fill_parent"
+         android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:layout_weight="1"
-         android:gravity="center_vertical"
-         android:textColor="#ffba00"
+         android:textColor="#f3e7b5"
+         android:textSize="12dip"
+     />
+     <TextView
+     	 android:id="@+id/textPostedTime"
+     	 android:layout_width="wrap_content"
+     	 android:layout_height="wrap_content"
+     	 android:layout_alignParentRight="true"
+         android:textColor="#666"
          android:textSize="12dip"
      />
      <TextView
          android:id="@+id/textContent"
          android:layout_width="fill_parent"
          android:layout_height="wrap_content"
-         android:layout_weight="1" 
+         android:layout_below="@id/textUserName"
          android:ellipsize="marquee"
          android:maxLines="2"
+         android:textSize="14dip"
      />
-</LinearLayout>
+</RelativeLayout>

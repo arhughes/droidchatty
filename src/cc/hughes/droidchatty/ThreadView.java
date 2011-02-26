@@ -40,7 +40,8 @@ public class ThreadView extends ListActivity {
     	{
     		if (_threads != null && _threads.size() > 0)
     		{
-    			_adapter.notifyDataSetChanged();
+    			// remove the elements, and add in all the new ones
+    			_adapter.clear();
     			for (Thread t : _threads)
     			{
     				_adapter.add(t);

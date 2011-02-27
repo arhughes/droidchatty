@@ -13,6 +13,15 @@
          android:textSize="12dip"
      />
      <TextView
+         android:id="@+id/textReplyCount"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_toRightOf="@id/textUserName"
+         android:paddingLeft="5dip"
+         android:textColor="#888"
+         android:textSize="12dip"
+     />
+     <TextView
      	 android:id="@+id/textPostedTime"
      	 android:layout_width="wrap_content"
      	 android:layout_height="wrap_content"

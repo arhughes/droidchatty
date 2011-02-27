@@ -39,6 +39,7 @@ public class ShackApi
 			thread.setUserName(comment.getString("author"));
 			thread.setThreadID(comment.getInt("id"));
 			thread.setPostedTime(comment.getString("date"));
+			thread.setReplyCount(comment.getInt("reply_count"));
 			
 			threads.add(thread);
 		}

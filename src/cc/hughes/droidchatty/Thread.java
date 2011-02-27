@@ -6,6 +6,7 @@ public class Thread {
 	private String _userName;
 	private String _posted;
 	private String _content;
+	private int _replyCount;
 	
 	public int getThreadID()
 	{
@@ -45,6 +46,16 @@ public class Thread {
 	public void setContent(String content)
 	{
 		_content = content;
+	}
+	
+	public int getReplyCount()
+	{
+		return _replyCount;
+	}
+	
+	public void setReplyCount(int replyCount)
+	{
+		_replyCount = replyCount;
 	}
 
 }

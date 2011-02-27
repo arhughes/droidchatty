@@ -152,12 +152,15 @@ public class ThreadView extends ListActivity {
 				TextView tvUserName = (TextView)v.findViewById(R.id.textUserName);
 				TextView tvContent = (TextView)v.findViewById(R.id.textContent);
 				TextView tvPosted = (TextView)v.findViewById(R.id.textPostedTime);
+				TextView tvReplyCount = (TextView)v.findViewById(R.id.textReplyCount);
 				if (tvUserName != null)
 					tvUserName.setText(t.getUserName());
 				if (tvContent != null)
 					tvContent.setText(t.getContent());
 				if (tvPosted != null)
 					tvPosted.setText(t.getPostedTime());
+				if (tvReplyCount != null)
+					tvReplyCount.setText("(" + t.getReplyCount() + ")");
 				
 				// special highlight for shacknews posts
 				if (t.getUserName().equalsIgnoreCase("Shacknews"))

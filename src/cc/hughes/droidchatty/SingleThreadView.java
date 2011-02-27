@@ -142,6 +142,7 @@ public class SingleThreadView extends ListActivity {
 		TextView tvPosted = (TextView)findViewById(R.id.textPostedTime);
 		
 		tvAuthor.setText(thread.getUserName());
+		tvAuthor.setTextColor(User.getColor(thread.getUserName()));
 		tvPosted.setText(thread.getPostedTime());
 		tvContent.setText(fixContent(thread.getContent()));
 		Linkify.addLinks(tvContent, Linkify.ALL);

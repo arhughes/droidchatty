@@ -177,12 +177,7 @@ public class ThreadView extends ListActivity {
 					v.setBackgroundColor(color.background_dark);
 				
 				// special highlight for employee and mod names
-				if (User.isEmployee(t.getUserName()))
-					tvUserName.setTextColor(Color.GREEN);
-				else if (User.isModerator(t.getUserName()))
-					tvUserName.setTextColor(Color.RED);
-				else
-					tvUserName.setTextColor(Color.rgb(0xf3, 0xe7, 0xb5));
+				tvUserName.setTextColor(User.getColor(t.getUserName()));
 			}
 			return v;
 		}

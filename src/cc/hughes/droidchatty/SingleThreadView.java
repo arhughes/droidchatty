@@ -147,7 +147,7 @@ public class SingleThreadView extends ListActivity {
     {
         java.lang.Thread thread = new java.lang.Thread(null, _retrieveThreads, "Background");
         thread.start();
-        _progressDialog = ProgressDialog.show(this, "Please wait...", "Retrieving threads...", true);
+        _progressDialog = ProgressDialog.show(this, "Please wait...", "Retrieving posts...", true);
     }
 	
 	private void getPosts()

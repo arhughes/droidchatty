@@ -76,24 +76,28 @@ public class SingleThreadView extends ListActivity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
 				displayPost(_posts.get(position));
-				lv.setSelection(position);
 			}
 		});
 		
 		Bundle extras = getIntent().getExtras();
 		_rootThreadId = extras.getInt(THREAD_ID);
 		
-		String content = extras.getString(THREAD_CONTENT);
-		String author = extras.getString(THREAD_AUTHOR);
-		String posted = extras.getString(THREAD_POSTED);
+		// if launched from a link, no content, author, or date is passed in
+		if (extras.containsKey(THREAD_CONTENT))
+		{
+			String content = extras.getString(THREAD_CONTENT);
+			String author = extras.getString(THREAD_AUTHOR);
+			String posted = extras.getString(THREAD_POSTED);
+			
+			Thread thread = new Thread();
+			thread.setThreadID(_rootThreadId);
+			thread.setContent(content);
+			thread.setPostedTime(posted);
+			thread.setUserName(author);
+			
+			displayPost(thread);
+		}
 		
-		Thread thread = new Thread();
-		thread.setThreadID(_rootThreadId);
-		thread.setContent(content);
-		thread.setPostedTime(posted);
-		thread.setUserName(author);
-		
-		displayPost(thread);
 		startRefresh();
 	}
 	

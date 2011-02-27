@@ -6,8 +6,11 @@ import android.R.color;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,7 +23,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class ThreadView extends ListActivity {
 	
@@ -109,7 +111,12 @@ public class ThreadView extends ListActivity {
     
     private void displayThread(Thread thread)
     {
-		Toast.makeText(getApplicationContext(), thread.getContent(), Toast.LENGTH_SHORT).show();
+    	Intent i = new Intent(this, SingleThreadView.class);
+    	i.putExtra(SingleThreadView.THREAD_ID, thread.getThreadID());
+    	i.putExtra(SingleThreadView.THREAD_AUTHOR, thread.getUserName());
+    	i.putExtra(SingleThreadView.THREAD_POSTED, thread.getPostedTime());
+    	i.putExtra(SingleThreadView.THREAD_CONTENT, thread.getContent());
+    	startActivity(i);
     }
     
     private void getThreads()
@@ -157,7 +164,7 @@ public class ThreadView extends ListActivity {
 				if (tvUserName != null)
 					tvUserName.setText(t.getUserName());
 				if (tvContent != null)
-					tvContent.setText(t.getContent());
+					tvContent.setText(fixContent(t.getContent()));
 				if (tvPosted != null)
 					tvPosted.setText(t.getPostedTime());
 				if (tvReplyCount != null)
@@ -178,6 +185,25 @@ public class ThreadView extends ListActivity {
 					tvUserName.setTextColor(Color.rgb(0xf3, 0xe7, 0xb5));
 			}
 			return v;
+		}
+		private Spanned fixContent(String content)
+		{
+			// convert shack's css into real font colors since Html.fromHtml doesn't supporty css of any kind
+			content = content.replaceAll("<span class=\"jt_red\">(.*?)</span>", "<font color=\"#ff0000\">$1</font>");
+			content = content.replaceAll("<span class=\"jt_green\">(.*?)</span>", "<font color=\"#8dc63f\">$1</font>");
+			content = content.replaceAll("<span class=\"jt_pink\">(.*?)</span>", "<font color=\"#f49ac1\">$1</font>");
+	        content = content.replaceAll("<span class=\"jt_olive\">(.*?)</span>", "<font color=\"#808000\">$1</font>");
+	        content = content.replaceAll("<span class=\"jt_fuchsia\">(.*?)</span>", "<font color=\"#c0ffc0\">$1</font>");
+	        content = content.replaceAll("<span class=\"jt_yellow\">(.*?)</span>", "<font color=\"#ffde00\">$1</font>");
+	        content = content.replaceAll("<span class=\"jt_blue\">(.*?)</span>", "<font color=\"#44aedf\">$1</font>");
+	        content = content.replaceAll("<span class=\"jt_lime\">(.*?)</span>",  "<font color=\"#c0ffc0\">$1</font>");
+	        content = content.replaceAll("<span class=\"jt_orange\">(.*?)</span>", "<font color=\"#f7941c\">$1</font>");
+	        content = content.replaceAll("<span class=\"jt_bold\">(.*?)</span>", "<b>$1</b>");
+	        content = content.replaceAll("<span class=\"jt_italic\">(.*?)</span>", "<i>$1</i>");
+	        content = content.replaceAll("<span class=\"jt_underline\">(.*?)</span>", "<u>$1</u>");
+	        content = content.replaceAll("<span class=\"jt_strike\">(.*?)</span>", "<del>1</del>");
+	        content = content.replaceAll("<br />", "&nbsp;");
+			return Html.fromHtml(content);
 		}
 	
 	}

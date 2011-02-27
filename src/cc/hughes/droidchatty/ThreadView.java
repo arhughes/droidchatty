@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -157,6 +158,16 @@ public class ThreadView extends ListActivity {
 					tvContent.setText(t.getContent());
 				if (tvPosted != null)
 					tvPosted.setText(t.getPostedTime());
+				
+				// special highlight for shacknews posts
+				if (t.getUserName().equalsIgnoreCase("Shacknews"))
+					v.setBackgroundColor(Color.rgb(0x19, 0x26, 0x35));
+				
+				// special highlight for employee and mod names
+				if (User.isEmployee(t.getUserName()))
+					tvUserName.setTextColor(Color.GREEN);
+				if (User.isModerator(t.getUserName()))
+					tvUserName.setTextColor(Color.RED);
 			}
 			return v;
 		}

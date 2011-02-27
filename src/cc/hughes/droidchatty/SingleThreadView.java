@@ -29,7 +29,7 @@ public class SingleThreadView extends ListActivity {
 	static final String THREAD_AUTHOR = "THREAD_AUTHOR";
 	static final String THREAD_POSTED = "THREAD_POSTED";
 	
-	private int _currentThreadId;
+	private int _currentThreadId = 0;
 	private int _rootThreadId;
 	private ProgressDialog _progressDialog = null;
 	private ArrayList<Thread> _posts = null;
@@ -57,6 +57,9 @@ public class SingleThreadView extends ListActivity {
     			}
     			_progressDialog.dismiss();
     			_adapter.notifyDataSetChanged();
+    			
+    			if (_currentThreadId == 0)
+    				displayPost(_posts.get(0));
     		}
     	}
     };

@@ -178,7 +178,7 @@ public class SingleThreadView extends ListActivity {
         content = content.replaceAll("<span class=\"jt_bold\">(.*?)</span>", "<b>$1</b>");
         content = content.replaceAll("<span class=\"jt_italic\">(.*?)</span>", "<i>$1</i>");
         content = content.replaceAll("<span class=\"jt_underline\">(.*?)</span>", "<u>$1</u>");
-        content = content.replaceAll("<span class=\"jt_strike\">(.*?)</span>", "<del>1</del>");
+        content = content.replaceAll("<span class=\"jt_strike\">(.*?)</span>", "<del>$1</del>");
 		return Html.fromHtml(content);
 	}
 
@@ -232,7 +232,7 @@ public class SingleThreadView extends ListActivity {
 	        content = content.replaceAll("<span class=\"jt_bold\">(.*?)</span>", "<b>$1</b>");
 	        content = content.replaceAll("<span class=\"jt_italic\">(.*?)</span>", "<i>$1</i>");
 	        content = content.replaceAll("<span class=\"jt_underline\">(.*?)</span>", "<u>$1</u>");
-	        content = content.replaceAll("<span class=\"jt_strike\">(.*?)</span>", "<del>1</del>");
+	        content = content.replaceAll("<span class=\"jt_strike\">(.*?)</span>", "<del>$1</del>");
 	        content = content.replaceAll("<br />", "&nbsp;");
 			return Html.fromHtml(content);
 		}

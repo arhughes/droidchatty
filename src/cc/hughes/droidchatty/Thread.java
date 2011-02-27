@@ -1,7 +1,5 @@
 package cc.hughes.droidchatty;
 
-import java.util.ArrayList;
-
 public class Thread {
 	
 	private int _threadId;
@@ -9,8 +7,7 @@ public class Thread {
 	private String _posted;
 	private String _content;
 	private int _replyCount;
-	
-	private ArrayList<Thread> _subThreads;
+	private int _level;
 	
 	public int getThreadID()
 	{
@@ -62,14 +59,14 @@ public class Thread {
 		_replyCount = replyCount;
 	}
 	
-	public ArrayList<Thread> getSubThreads()
+	public int getLevel()
 	{
-		return _subThreads;
+		return _level;
 	}
 	
-	public void setSubThreads(ArrayList<Thread> subThreads)
+	public void setLevel(int level)
 	{
-		_subThreads = subThreads;
+		_level = level;
 	}
 
 }

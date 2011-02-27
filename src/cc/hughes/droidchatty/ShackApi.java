@@ -47,6 +47,53 @@ public class ShackApi
 		return threads;
 	}
 	
+	public static ArrayList<Thread> getThread(int threadId) throws ClientProtocolException, IOException, JSONException
+	{
+		ArrayList<Thread> posts = new ArrayList<Thread>();
+		
+		JSONObject json = getJson(BASE_URL + "thread/" + threadId + ".json");
+		
+		// go through each of the comments and pull out the data that is used
+		JSONArray comments = json.getJSONArray("comments");
+		for (int i = 0; i < comments.length(); i++)
+		{
+			JSONObject comment = comments.getJSONObject(i);
+			
+			Thread thread = new Thread();
+			thread.setContent(comment.getString("body"));
+			thread.setUserName(comment.getString("author"));
+			thread.setThreadID(comment.getInt("id"));
+			thread.setPostedTime(comment.getString("date"));
+			thread.setLevel(0);
+			
+			posts.add(thread);
+			
+			processPosts(comment, 1, posts);
+		}
+		
+		return posts;
+	}
+	
+	private static void processPosts(JSONObject comment, int level, ArrayList<Thread> posts) throws JSONException
+	{
+		JSONArray comments = comment.getJSONArray("comments");
+		
+		for (int i = 0; i < comments.length(); i++)
+		{
+			JSONObject p = comments.getJSONObject(i);
+			
+			Thread post = new Thread();
+			post.setContent(p.getString("body"));
+			post.setUserName(p.getString("author"));
+			post.setThreadID(p.getInt("id"));
+			post.setPostedTime(p.getString("date"));
+			post.setLevel(level);
+			posts.add(post);
+			
+			processPosts(p, level + 1, posts);
+		}
+	}
+	
 	private static JSONObject getJson(String url) throws ClientProtocolException, IOException, JSONException
 	{
 		DefaultHttpClient client = new DefaultHttpClient();

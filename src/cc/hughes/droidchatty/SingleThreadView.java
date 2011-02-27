@@ -2,16 +2,13 @@ package cc.hughes.droidchatty;
 
 import java.util.ArrayList;
 
-import android.R.color;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -158,37 +155,12 @@ public class SingleThreadView extends ListActivity {
 			Thread t = items.get(position);
 			if (t != null)
 			{
-				//TextView tvUserName = (TextView)v.findViewById(R.id.textUserName);
 				TextView tvContent = (TextView)v.findViewById(R.id.textPreview);
-				//TextView tvPosted = (TextView)v.findViewById(R.id.textPostedTime);
-				//TextView tvReplyCount = (TextView)v.findViewById(R.id.textReplyCount);
-				//if (tvUserName != null)
-					//tvUserName.setText(t.getUserName());
 				if (tvContent != null)
 				{
 					tvContent.setPadding(15 * t.getLevel(), 0, 0, 0);
 					tvContent.setText(fixContent(t.getContent()));
 				}
-				//if (tvPosted != null)
-					//tvPosted.setText(t.getPostedTime());
-				//if (tvReplyCount != null)
-					//tvReplyCount.setText("(" + t.getReplyCount() + ")");
-				
-				// special highlight for shacknews posts
-				/*
-				if (t.getUserName().equalsIgnoreCase("Shacknews"))
-					v.setBackgroundColor(Color.rgb(0x19, 0x26, 0x35));
-				else
-					v.setBackgroundColor(color.background_dark);
-				
-				// special highlight for employee and mod names
-				if (User.isEmployee(t.getUserName()))
-					tvUserName.setTextColor(Color.GREEN);
-				else if (User.isModerator(t.getUserName()))
-					tvUserName.setTextColor(Color.RED);
-				else
-					tvUserName.setTextColor(Color.rgb(0xf3, 0xe7, 0xb5));
-					*/
 			}
 			return v;
 		}

@@ -6,13 +6,20 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.ClipboardManager;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class SingleThreadView extends ListActivity {
@@ -22,7 +29,8 @@ public class SingleThreadView extends ListActivity {
 	static final String THREAD_AUTHOR = "THREAD_AUTHOR";
 	static final String THREAD_POSTED = "THREAD_POSTED";
 	
-	private int _threadId;
+	private int _currentThreadId;
+	private int _rootThreadId;
 	private ProgressDialog _progressDialog = null;
 	private ArrayList<Thread> _posts = null;
 	private ThreadAdapter _adapter;
@@ -62,24 +70,65 @@ public class SingleThreadView extends ListActivity {
 		_adapter = new ThreadAdapter(this, R.layout.thread_row, _posts);
 		setListAdapter(_adapter);
 		
+		final ListView lv = getListView();
+		lv.setOnItemClickListener(new OnItemClickListener()
+		{
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+			{
+				displayPost(_posts.get(position));
+				lv.setSelection(position);
+			}
+		});
+		
 		Bundle extras = getIntent().getExtras();
-		_threadId = extras.getInt(THREAD_ID);
+		_rootThreadId = extras.getInt(THREAD_ID);
 		
 		String content = extras.getString(THREAD_CONTENT);
 		String author = extras.getString(THREAD_AUTHOR);
 		String posted = extras.getString(THREAD_POSTED);
 		
 		Thread thread = new Thread();
-		thread.setThreadID(_threadId);
+		thread.setThreadID(_rootThreadId);
 		thread.setContent(content);
 		thread.setPostedTime(posted);
 		thread.setUserName(author);
 		
-		displayThread(thread);
+		displayPost(thread);
 		startRefresh();
 	}
 	
-	private void displayThread(Thread thread)
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.thread_menu, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch(item.getItemId())
+		{
+		case R.id.refresh:
+			startRefresh();
+			return true;
+		case R.id.copyUrl:
+			copyCurrentPostUrl();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	private void copyCurrentPostUrl()
+	{
+		String url = "http://www.shacknews.com/chatty?id=" + _currentThreadId;
+		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE); 
+		clipboard.setText(url);
+	}
+	
+	private void displayPost(Thread thread)
 	{
 		TextView tvAuthor = (TextView)findViewById(R.id.textUserName);
 		TextView tvContent = (TextView)findViewById(R.id.textContent);
@@ -90,6 +139,8 @@ public class SingleThreadView extends ListActivity {
 		tvContent.setText(fixContent(thread.getContent()));
 		Linkify.addLinks(tvContent, Linkify.ALL);
 		tvContent.setClickable(false);
+		
+		_currentThreadId = thread.getThreadID();
 	}
 	
     private void startRefresh()
@@ -103,7 +154,7 @@ public class SingleThreadView extends ListActivity {
 	{
     	try
     	{
-			_posts = ShackApi.getThread(_threadId);
+			_posts = ShackApi.getThread(_rootThreadId);
     	} catch (Exception ex)
     	{
     		ex.printStackTrace();
@@ -162,6 +213,8 @@ public class SingleThreadView extends ListActivity {
 					tvContent.setText(fixContent(t.getContent()));
 				}
 			}
+			
+			
 			return v;
 		}
 		private Spanned fixContent(String content)

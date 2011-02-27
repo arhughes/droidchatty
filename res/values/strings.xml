@@ -4,4 +4,5 @@
     <string name="app_name">Droid Chatty</string>
     <string name="main_no_items">No threads to display</string>
     <string name="refresh">Refresh</string>
+    <string name="copy_url">Copy URL</string>
 </resources>

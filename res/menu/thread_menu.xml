@@ -3,4 +3,7 @@
 	<item android:id="@+id/refresh"
 		  android:icon="@drawable/menu_refresh"
 		  android:title="@string/refresh" />
+	<item android:id="@+id/copyUrl"
+		  android:icon="@drawable/ic_menu_anchor"
+		  android:title="@string/copy_url" />
 </menu>

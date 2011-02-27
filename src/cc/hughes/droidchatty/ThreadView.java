@@ -85,7 +85,7 @@ public class ThreadView extends ListActivity {
     public boolean onCreateOptionsMenu(Menu menu)
     {
     	MenuInflater inflater = getMenuInflater();
-    	inflater.inflate(R.menu.thread_menu, menu);
+    	inflater.inflate(R.menu.main_menu, menu);
     	return true;
     }
     

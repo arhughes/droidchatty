@@ -2,6 +2,7 @@ package cc.hughes.droidchatty;
 
 import java.util.ArrayList;
 
+import android.R.color;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -166,7 +167,7 @@ public class ThreadView extends ListActivity {
 				if (t.getUserName().equalsIgnoreCase("Shacknews"))
 					v.setBackgroundColor(Color.rgb(0x19, 0x26, 0x35));
 				else
-					v.setBackgroundColor(Color.BLACK);
+					v.setBackgroundColor(color.background_dark);
 				
 				// special highlight for employee and mod names
 				if (User.isEmployee(t.getUserName()))

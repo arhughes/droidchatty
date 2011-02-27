@@ -30,6 +30,8 @@
 	         android:layout_height="fill_parent"
 	         android:layout_below="@id/textUserName"
 	         android:textSize="14dip"
+	         android:scrollbars="vertical"
+	         android:textColor="@android:color/secondary_text_dark_nodisable"
 	     />
     </RelativeLayout>
     <ListView

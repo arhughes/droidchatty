@@ -7,8 +7,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.ClipboardManager;
-import android.text.Html;
-import android.text.Spanned;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -144,7 +142,7 @@ public class SingleThreadView extends ListActivity {
 		tvAuthor.setText(thread.getUserName());
 		tvAuthor.setTextColor(User.getColor(thread.getUserName()));
 		tvPosted.setText(thread.getPostedTime());
-		tvContent.setText(fixContent(thread.getContent()));
+		tvContent.setText(PostFormatter.formatContent(thread.getContent(), true));
 		Linkify.addLinks(tvContent, Linkify.ALL);
 		tvContent.setClickable(false);
 		
@@ -171,25 +169,6 @@ public class SingleThreadView extends ListActivity {
     	runOnUiThread(_displayThreads);
 	}
 	
-	private Spanned fixContent(String content)
-	{
-		// convert shack's css into real font colors since Html.fromHtml doesn't supporty css of any kind
-		content = content.replaceAll("<span class=\"jt_red\">(.*?)</span>", "<font color=\"#ff0000\">$1</font>");
-		content = content.replaceAll("<span class=\"jt_green\">(.*?)</span>", "<font color=\"#8dc63f\">$1</font>");
-		content = content.replaceAll("<span class=\"jt_pink\">(.*?)</span>", "<font color=\"#f49ac1\">$1</font>");
-        content = content.replaceAll("<span class=\"jt_olive\">(.*?)</span>", "<font color=\"#808000\">$1</font>");
-        content = content.replaceAll("<span class=\"jt_fuchsia\">(.*?)</span>", "<font color=\"#c0ffc0\">$1</font>");
-        content = content.replaceAll("<span class=\"jt_yellow\">(.*?)</span>", "<font color=\"#ffde00\">$1</font>");
-        content = content.replaceAll("<span class=\"jt_blue\">(.*?)</span>", "<font color=\"#44aedf\">$1</font>");
-        content = content.replaceAll("<span class=\"jt_lime\">(.*?)</span>",  "<font color=\"#c0ffc0\">$1</font>");
-        content = content.replaceAll("<span class=\"jt_orange\">(.*?)</span>", "<font color=\"#f7941c\">$1</font>");
-        content = content.replaceAll("<span class=\"jt_bold\">(.*?)</span>", "<b>$1</b>");
-        content = content.replaceAll("<span class=\"jt_italic\">(.*?)</span>", "<i>$1</i>");
-        content = content.replaceAll("<span class=\"jt_underline\">(.*?)</span>", "<u>$1</u>");
-        content = content.replaceAll("<span class=\"jt_strike\">(.*?)</span>", "<del>$1</del>");
-		return Html.fromHtml(content);
-	}
-
 	class ThreadAdapter extends ArrayAdapter<Thread> {
 		
 		private ArrayList<Thread> items;
@@ -218,31 +197,11 @@ public class SingleThreadView extends ListActivity {
 				if (tvContent != null)
 				{
 					tvContent.setPadding(15 * t.getLevel(), 0, 0, 0);
-					tvContent.setText(fixContent(t.getContent()));
+					tvContent.setText(t.getPostPreview());
 				}
 			}
 			
-			
 			return v;
-		}
-		private Spanned fixContent(String content)
-		{
-			// convert shack's css into real font colors since Html.fromHtml doesn't supporty css of any kind
-			content = content.replaceAll("<span class=\"jt_red\">(.*?)</span>", "<font color=\"#ff0000\">$1</font>");
-			content = content.replaceAll("<span class=\"jt_green\">(.*?)</span>", "<font color=\"#8dc63f\">$1</font>");
-			content = content.replaceAll("<span class=\"jt_pink\">(.*?)</span>", "<font color=\"#f49ac1\">$1</font>");
-	        content = content.replaceAll("<span class=\"jt_olive\">(.*?)</span>", "<font color=\"#808000\">$1</font>");
-	        content = content.replaceAll("<span class=\"jt_fuchsia\">(.*?)</span>", "<font color=\"#c0ffc0\">$1</font>");
-	        content = content.replaceAll("<span class=\"jt_yellow\">(.*?)</span>", "<font color=\"#ffde00\">$1</font>");
-	        content = content.replaceAll("<span class=\"jt_blue\">(.*?)</span>", "<font color=\"#44aedf\">$1</font>");
-	        content = content.replaceAll("<span class=\"jt_lime\">(.*?)</span>",  "<font color=\"#c0ffc0\">$1</font>");
-	        content = content.replaceAll("<span class=\"jt_orange\">(.*?)</span>", "<font color=\"#f7941c\">$1</font>");
-	        content = content.replaceAll("<span class=\"jt_bold\">(.*?)</span>", "<b>$1</b>");
-	        content = content.replaceAll("<span class=\"jt_italic\">(.*?)</span>", "<i>$1</i>");
-	        content = content.replaceAll("<span class=\"jt_underline\">(.*?)</span>", "<u>$1</u>");
-	        content = content.replaceAll("<span class=\"jt_strike\">(.*?)</span>", "<del>$1</del>");
-	        content = content.replaceAll("<br />", "&nbsp;");
-			return Html.fromHtml(content);
 		}
 	}
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.ClipboardManager;
 import android.text.util.Linkify;
@@ -18,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class SingleThreadView extends ListActivity {
@@ -57,7 +59,9 @@ public class SingleThreadView extends ListActivity {
     			_adapter.notifyDataSetChanged();
     			
     			if (_currentThreadId == 0)
-    				displayPost(_posts.get(0));
+    			{
+    				displayPost(_posts.get(0), 0);
+    			}
     		}
     	}
     };
@@ -86,7 +90,7 @@ public class SingleThreadView extends ListActivity {
 		{
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
-				displayPost(_posts.get(position));
+				displayPost(_posts.get(position), position);
 			}
 		});
 		
@@ -106,7 +110,7 @@ public class SingleThreadView extends ListActivity {
 			thread.setPostedTime(posted);
 			thread.setUserName(author);
 			
-			displayPost(thread);
+			displayPost(thread, 0);
 		}
 		
 		if (_posts.isEmpty())
@@ -144,8 +148,15 @@ public class SingleThreadView extends ListActivity {
 		clipboard.setText(url);
 	}
 	
-	private void displayPost(Thread thread)
+	private void displayPost(Thread thread, int position)
 	{
+		// unhighlight old selected, highlight new selected
+		// should be able to do this with a selector, but damned if I could get it to work
+		int previousPosition = _adapter.getSelectedPosition();
+		_adapter.setSelectedPosition(position);
+		_adapter.fixBackgroundColor(getListView(), previousPosition);
+		_adapter.fixBackgroundColor(getListView(), position);
+		
 		TextView tvAuthor = (TextView)findViewById(R.id.textUserName);
 		TextView tvContent = (TextView)findViewById(R.id.textContent);
 		TextView tvPosted = (TextView)findViewById(R.id.textPostedTime);
@@ -189,6 +200,17 @@ public class SingleThreadView extends ListActivity {
 	class ThreadAdapter extends ArrayAdapter<Thread> {
 		
 		private ArrayList<Thread> items;
+		private int selectedPosition;
+		
+		public int getSelectedPosition()
+		{
+			return selectedPosition;
+		}
+		
+		public void setSelectedPosition(int position)
+		{
+			selectedPosition = position;
+		}
 		
 		public ThreadAdapter(Context context, int textViewResourceId, ArrayList<Thread> items)
 		{
@@ -216,9 +238,28 @@ public class SingleThreadView extends ListActivity {
 					tvContent.setPadding(15 * t.getLevel(), 0, 0, 0);
 					tvContent.setText(t.getPostPreview());
 				}
+				
+				fixBackgroundColor(v, position);
 			}
 			
 			return v;
 		}
+		
+		public void fixBackgroundColor(ListView view, int position)
+		{
+			View v = view.getChildAt(position - view.getFirstVisiblePosition());
+			if (v != null)
+				fixBackgroundColor(v, position);
+		}
+		
+		public void fixBackgroundColor(View view, int position)
+		{
+			RelativeLayout preview = (RelativeLayout)view.findViewById(R.id.previewLayout);
+			if (position == selectedPosition)
+				preview.setBackgroundColor(Color.rgb(0x22, 0x55, 0xdd));
+			else
+				preview.setBackgroundColor(Color.TRANSPARENT);
+		}
+		
 	}
 }

@@ -24,15 +24,18 @@
 	         android:textColor="#666"
 	         android:textSize="12dip"
 	     />
-	     <TextView
-	         android:id="@+id/textContent"
+	     <ScrollView
 	         android:layout_width="fill_parent"
 	         android:layout_height="fill_parent"
-	         android:layout_below="@id/textUserName"
-	         android:textSize="14dip"
-	         android:scrollbars="vertical"
-	         android:textColor="@android:color/secondary_text_dark_nodisable"
-	     />
+	         android:layout_below="@id/textUserName">
+		     <TextView
+		         android:id="@+id/textContent"
+		         android:layout_width="fill_parent"
+		         android:layout_height="wrap_content"
+		         android:textSize="14dip"
+		         android:textColor="@android:color/secondary_text_dark_nodisable"
+		     />
+	     </ScrollView>
     </RelativeLayout>
     <View
     	android:layout_width="fill_parent"

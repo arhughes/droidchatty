@@ -35,13 +35,14 @@ public class ShackApi
 		{
 			JSONObject comment = comments.getJSONObject(i);
 			
-			Thread thread = new Thread();
-			thread.setUserName(comment.getString("author"));
-			thread.setContent(comment.getString("body"));
-			thread.setThreadID(comment.getInt("id"));
-			thread.setPostedTime(comment.getString("date"));
-			thread.setReplyCount(comment.getInt("reply_count"));
 			
+			int id = comment.getInt("id");
+			String userName = comment.getString("author");
+			String body = comment.getString("body");
+			String date = comment.getString("date");
+			int replyCount = comment.getInt("reply_count");
+			
+			Thread thread = new Thread(id, userName, body, date, replyCount);
 			threads.add(thread);
 		}
 		

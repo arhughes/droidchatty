@@ -9,18 +9,24 @@ public class Thread {
 	private String _posted;
 	private String _content;
 	private int _replyCount;
-	private int _replyCountNew;
-	private int _level;
+	private int _replyCountPrevious;
+	
 	private Spanned _preview;
 	
-	public int getThreadID()
+	public Thread(int threadId, String userName, String content, String posted, int replyCount)
 	{
-		return _threadId;
+		_threadId = threadId;
+		_userName = userName;
+		_content = content;
+		_posted = posted;
+		_replyCount = replyCount;
+		
+		_preview = PostFormatter.formatContent(this, false);
 	}
 	
-	public void setThreadID(int threadId)
+	public int getThreadId()
 	{
-		_threadId = threadId;	
+		return _threadId;
 	}
 	
 	public String getUserName()
@@ -28,19 +34,9 @@ public class Thread {
 		return _userName;
 	}
 	
-	public void setUserName(String userName)
-	{
-		_userName = userName;
-	}
-	
-	public String getPostedTime()
+	public String getPosted()
 	{
 		return _posted;
-	}
-	
-	public void setPostedTime(String postedTime)
-	{
-		_posted = postedTime;
 	}
 	
 	public String getContent()
@@ -48,43 +44,22 @@ public class Thread {
 		return _content;
 	}
 	
-	public void setContent(String content)
-	{
-		_content = content;
-		_preview = PostFormatter.formatContent(this, false);
-	}
-	
 	public int getReplyCount()
 	{
 		return _replyCount;
 	}
 	
-	public void setReplyCount(int replyCount)
+	public int getReplyCountPrevious()
 	{
-		_replyCount = replyCount;
+		return _replyCountPrevious;
 	}
 	
-	public int getReplyCountNew()
+	public void setReplyCountPrevious(int replyCountPrevious)
 	{
-		return _replyCountNew;
+		_replyCountPrevious = replyCountPrevious;
 	}
 	
-	public void setReplyCountNew(int replyCountNew)
-	{
-		_replyCountNew = replyCountNew;
-	}
-	
-	public int getLevel()
-	{
-		return _level;
-	}
-	
-	public void setLevel(int level)
-	{
-		_level = level;
-	}
-	
-	public Spanned getPostPreview()
+	public Spanned getPreview()
 	{
 		return _preview;
 	}

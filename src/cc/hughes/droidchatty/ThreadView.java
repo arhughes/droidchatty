@@ -137,9 +137,9 @@ public class ThreadView extends ListActivity {
     private void displayThread(Thread thread)
     {
     	Intent i = new Intent(this, SingleThreadView.class);
-    	i.putExtra(SingleThreadView.THREAD_ID, thread.getThreadID());
+    	i.putExtra(SingleThreadView.THREAD_ID, thread.getThreadId());
     	i.putExtra(SingleThreadView.THREAD_AUTHOR, thread.getUserName());
-    	i.putExtra(SingleThreadView.THREAD_POSTED, thread.getPostedTime());
+    	i.putExtra(SingleThreadView.THREAD_POSTED, thread.getPosted());
     	i.putExtra(SingleThreadView.THREAD_CONTENT, thread.getContent());
     	startActivity(i);
     }
@@ -154,8 +154,8 @@ public class ThreadView extends ListActivity {
     		Hashtable<Integer, Integer> counts = getPostCounts();
     		for (Thread t : _threads)
     		{
-    			if (counts.containsKey(t.getThreadID()))
-    				t.setReplyCountNew(t.getReplyCount() - counts.get(t.getThreadID()).intValue());
+    			if (counts.containsKey(t.getThreadId()))
+    				t.setReplyCountPrevious(counts.get(t.getThreadId()));
     		}
     		
     		storePostCounts(counts, _threads);
@@ -208,7 +208,7 @@ public class ThreadView extends ListActivity {
     {
     	// update post counts for threads viewing right now
     	for (Thread t : threads)
-    		counts.put(t.getThreadID(), t.getReplyCount());
+    		counts.put(t.getThreadId(), t.getReplyCount());
     	
     	List<Integer> postIds = Collections.list(counts.keys());
     	Collections.sort(postIds);
@@ -271,9 +271,9 @@ public class ThreadView extends ListActivity {
 				if (tvUserName != null)
 					tvUserName.setText(t.getUserName());
 				if (tvContent != null)
-					tvContent.setText(t.getPostPreview());
+					tvContent.setText(t.getPreview());
 				if (tvPosted != null)
-					tvPosted.setText(t.getPostedTime());
+					tvPosted.setText(t.getPosted());
 				if (tvReplyCount != null)
 					tvReplyCount.setText(formatReplyCount(t));
 				
@@ -295,8 +295,11 @@ public class ThreadView extends ListActivity {
 			String second = "";
 			String third = ")";
 			
-			if (thread.getReplyCountNew() > 0)
-				second = " +" + thread.getReplyCountNew();
+			if (thread.getReplyCount() > thread.getReplyCountPrevious())
+			{
+				int new_replies = thread.getReplyCount() - thread.getReplyCountPrevious();
+				second = " +" + new_replies;
+			}
 			
 			SpannableString formatted = new SpannableString(first + second + third);
 			if (second.length() > 0)

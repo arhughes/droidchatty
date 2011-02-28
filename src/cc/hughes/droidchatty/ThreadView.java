@@ -77,12 +77,7 @@ public class ThreadView extends ListActivity {
         setContentView(R.layout.main);
         
         // setup the list
-        final Object data = getLastNonConfigurationInstance();
-        if (data == null)
-	        _threads = new ArrayList<Thread>();
-        else
-        	_threads = (ArrayList<Thread>)data;
-        
+        _threads = getSavedThreads();
         _adapter = new ThreadAdapter(this, R.layout.row, _threads);
         setListAdapter(_adapter);
         
@@ -99,6 +94,15 @@ public class ThreadView extends ListActivity {
         // let's get this thing going already!
         if (_threads.isEmpty())
 	        startRefresh();
+    }
+    
+    @SuppressWarnings("unchecked")
+	private ArrayList<Thread> getSavedThreads()
+    {
+        final Object data = getLastNonConfigurationInstance();
+        if (data == null)
+	        return new ArrayList<Thread>();
+        return (ArrayList<Thread>)data;
     }
     
     public Object onRetainNonConfigurationInstance()

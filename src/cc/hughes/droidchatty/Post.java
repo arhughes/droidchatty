@@ -19,7 +19,6 @@ public class Post {
         _content = content;
         _posted = posted;
         _level = level;
-        _preview = PostFormatter.formatContent(this, false);
     }
 
     public int getPostId()
@@ -49,6 +48,8 @@ public class Post {
 
     public Spanned getPreview()
     {
+        if (_preview == null)
+            _preview = PostFormatter.formatContent(this, false);
         return _preview;
     }
 

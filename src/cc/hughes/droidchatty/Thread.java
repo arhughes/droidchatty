@@ -20,8 +20,6 @@ public class Thread {
         _content = content;
         _posted = posted;
         _replyCount = replyCount;
-
-        _preview = PostFormatter.formatContent(this, false);
     }
 
     public int getThreadId()
@@ -61,6 +59,8 @@ public class Thread {
 
     public Spanned getPreview()
     {
+        if (_preview == null)
+            _preview = PostFormatter.formatContent(this, false);
         return _preview;
     }
 

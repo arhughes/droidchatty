@@ -1,6 +1,18 @@
 package cc.hughes.droidchatty;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
 
 import android.R.color;
 import android.app.ListActivity;
@@ -9,6 +21,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -133,13 +149,95 @@ public class ThreadView extends ListActivity {
     	try
     	{
     		_threads = ShackApi.getThreads();
-    		Log.i("Array", "" + _threads.size());
+    		
+    		// set the number of replies that are new
+    		Hashtable<Integer, Integer> counts = getPostCounts();
+    		for (Thread t : _threads)
+    		{
+    			if (counts.containsKey(t.getThreadID()))
+    				t.setReplyCountNew(t.getReplyCount() - counts.get(t.getThreadID()).intValue());
+    		}
+    		
+    		storePostCounts(counts, _threads);
     	} catch (Exception ex)
     	{
-    		Log.e("Background", ex.getMessage());
+    		Log.e("Droid Chatty", ex.getMessage());
     	}
     	
     	runOnUiThread(_displayThreads);
+    }
+    
+    private Hashtable<Integer, Integer> getPostCounts()
+    {
+    	Hashtable<Integer, Integer> counts = new Hashtable<Integer, Integer>();
+    	
+    	if (getFileStreamPath("post_count.cache").exists())
+    	{
+    		// look at that, we got a file
+    		try {
+				FileInputStream input = openFileInput("post_count.cache");
+				try
+				{
+					DataInputStream in = new DataInputStream(input);
+					BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+					String line = reader.readLine();
+					while (line != null)
+					{
+						if (line.length() > 0)
+						{
+							String[] parts = line.split("=");
+							counts.put(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+						}
+						line = reader.readLine();
+					}
+				}
+				finally
+				{
+					input.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    	}
+    	
+    	return counts;
+    }
+    
+    final static int POST_CACHE_HISTORY = 1000;
+    private void storePostCounts(Hashtable<Integer, Integer> counts, ArrayList<Thread> threads)
+    {
+    	// update post counts for threads viewing right now
+    	for (Thread t : threads)
+    		counts.put(t.getThreadID(), t.getReplyCount());
+    	
+    	List<Integer> postIds = Collections.list(counts.keys());
+    	Collections.sort(postIds);
+    	
+    	// trim to last 1000 posts
+    	if (postIds.size() > POST_CACHE_HISTORY)
+    		postIds.subList(postIds.size() - POST_CACHE_HISTORY, postIds.size() - 1);
+    	
+    	try {
+			FileOutputStream output = openFileOutput("post_count.cache", MODE_PRIVATE);
+			try
+			{
+				DataOutputStream out = new DataOutputStream(output);
+				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+				
+				for (Integer postId : postIds)
+				{
+					writer.write(postId + "=" + counts.get(postId));
+					writer.newLine();
+				}
+				writer.flush();
+			}
+			finally
+			{
+				output.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
     
 	class ThreadAdapter extends ArrayAdapter<Thread> {
@@ -177,7 +275,7 @@ public class ThreadView extends ListActivity {
 				if (tvPosted != null)
 					tvPosted.setText(t.getPostedTime());
 				if (tvReplyCount != null)
-					tvReplyCount.setText("(" + t.getReplyCount() + ")");
+					tvReplyCount.setText(formatReplyCount(t));
 				
 				// special highlight for shacknews posts
 				if (t.getUserName().equalsIgnoreCase("Shacknews"))
@@ -189,6 +287,21 @@ public class ThreadView extends ListActivity {
 				tvUserName.setTextColor(User.getColor(t.getUserName()));
 			}
 			return v;
+		}
+		
+		private Spanned formatReplyCount(Thread thread)
+		{
+			String first = "(" + thread.getReplyCount();
+			String second = "";
+			String third = ")";
+			
+			if (thread.getReplyCountNew() > 0)
+				second = " +" + thread.getReplyCountNew();
+			
+			SpannableString formatted = new SpannableString(first + second + third);
+			if (second.length() > 0)
+				formatted.setSpan(new ForegroundColorSpan(Color.GREEN), first.length(), first.length() + second.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			return formatted;
 		}
 	}
 }

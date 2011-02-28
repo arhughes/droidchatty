@@ -9,6 +9,7 @@ public class Thread {
 	private String _posted;
 	private String _content;
 	private int _replyCount;
+	private int _replyCountNew;
 	private int _level;
 	private Spanned _preview;
 	
@@ -61,6 +62,16 @@ public class Thread {
 	public void setReplyCount(int replyCount)
 	{
 		_replyCount = replyCount;
+	}
+	
+	public int getReplyCountNew()
+	{
+		return _replyCountNew;
+	}
+	
+	public void setReplyCountNew(int replyCountNew)
+	{
+		_replyCountNew = replyCountNew;
 	}
 	
 	public int getLevel()

@@ -18,6 +18,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 public class ShackApi
 {
 	static final String BASE_URL = "http://shackapi.stonedonkey.com/";
@@ -85,10 +87,10 @@ public class ShackApi
 		{
 			JSONObject p = comments.getJSONObject(i);
 			
-			int postId = comment.getInt("id");
-			String userName = comment.getString("author");
-			String body = comment.getString("body");
-			String date = comment.getString("date");
+			int postId = p.getInt("id");
+			String userName = p.getString("author");
+			String body = p.getString("body");
+			String date = p.getString("date");
 			
 			// only add this post if we haven't seen this post before
 			// fixes duplicate posts coming back from the API
@@ -97,6 +99,10 @@ public class ShackApi
 			{
 				Post post = new Post(postId, userName, body, date, level);
 				posts.add(post);
+			}
+			else
+			{
+				Log.w("ShackAPI", "Skipped duplicate post #" + postId);
 			}
 			
 			processPosts(p, level + 1, posts, post_tracker);

@@ -32,7 +32,7 @@ public class SingleThreadView extends ListActivity {
 	private int _currentThreadId = 0;
 	private int _rootThreadId;
 	private ProgressDialog _progressDialog = null;
-	private ArrayList<Thread> _posts = null;
+	private ArrayList<Post> _posts = null;
 	private ThreadAdapter _adapter;
 	
 	private Runnable _retrieveThreads = new Runnable()
@@ -51,7 +51,7 @@ public class SingleThreadView extends ListActivity {
     		{
     			// remove the elements, and add in all the new ones
     			_adapter.clear();
-    			for (Thread t : _posts)
+    			for (Post t : _posts)
     			{
     				_adapter.add(t);
     			}
@@ -65,22 +65,13 @@ public class SingleThreadView extends ListActivity {
     		}
     	}
     };
-
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.thread_view);
 		
-		final Object data = getLastNonConfigurationInstance();
-		
-		if (data == null)
-		{
-			_posts = new ArrayList<Thread>();
-		}
-		else
-		{
-			_posts = (ArrayList<Thread>)data;
-		}
+		_posts = getSavedPosts();
 			
 		_adapter = new ThreadAdapter(this, R.layout.thread_row, _posts);
 		setListAdapter(_adapter);
@@ -104,18 +95,23 @@ public class SingleThreadView extends ListActivity {
 			String author = extras.getString(THREAD_AUTHOR);
 			String posted = extras.getString(THREAD_POSTED);
 			
-			Thread thread = new Thread();
-			thread.setThreadID(_rootThreadId);
-			thread.setPostedTime(posted);
-			thread.setUserName(author);
-			thread.setContent(content);
-			
-			displayPost(thread, 0);
+			Post post = new Post(_rootThreadId, author, content, posted, 0);
+			displayPost(post, 0);
 		}
 		
 		if (_posts.isEmpty())
 			startRefresh();
 	}
+	
+    @SuppressWarnings("unchecked")
+	private ArrayList<Post> getSavedPosts()
+    {
+		final Object data = getLastNonConfigurationInstance();
+		
+		if (data == null)
+			return new ArrayList<Post>();
+		return (ArrayList<Post>)data;
+    }
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -148,7 +144,7 @@ public class SingleThreadView extends ListActivity {
 		clipboard.setText(url);
 	}
 	
-	private void displayPost(Thread thread, int position)
+	private void displayPost(Post post, int position)
 	{
 		// unhighlight old selected, highlight new selected
 		// should be able to do this with a selector, but damned if I could get it to work
@@ -161,15 +157,15 @@ public class SingleThreadView extends ListActivity {
 		TextView tvContent = (TextView)findViewById(R.id.textContent);
 		TextView tvPosted = (TextView)findViewById(R.id.textPostedTime);
 		
-		tvAuthor.setText(thread.getUserName());
-		tvAuthor.setTextColor(User.getColor(thread.getUserName()));
-		tvPosted.setText(thread.getPostedTime());
-		tvContent.setText(PostFormatter.formatContent(thread, true));
+		tvAuthor.setText(post.getUserName());
+		tvAuthor.setTextColor(User.getColor(post.getUserName()));
+		tvPosted.setText(post.getPosted());
+		tvContent.setText(PostFormatter.formatContent(post, true));
 		Linkify.addLinks(tvContent, Linkify.ALL);
 		tvContent.setClickable(false);
 		tvContent.scrollTo(0, 0);
 		
-		_currentThreadId = thread.getThreadID();
+		_currentThreadId = post.getPostId();
 	}
 	
 	@Override
@@ -189,7 +185,7 @@ public class SingleThreadView extends ListActivity {
 	{
     	try
     	{
-			_posts = ShackApi.getThread(_rootThreadId);
+			_posts = ShackApi.getPosts(_rootThreadId);
     	} catch (Exception ex)
     	{
     		ex.printStackTrace();
@@ -198,9 +194,9 @@ public class SingleThreadView extends ListActivity {
     	runOnUiThread(_displayThreads);
 	}
 	
-	class ThreadAdapter extends ArrayAdapter<Thread> {
+	class ThreadAdapter extends ArrayAdapter<Post> {
 		
-		private ArrayList<Thread> items;
+		private ArrayList<Post> items;
 		private int selectedPosition;
 		
 		public int getSelectedPosition()
@@ -213,7 +209,7 @@ public class SingleThreadView extends ListActivity {
 			selectedPosition = position;
 		}
 		
-		public ThreadAdapter(Context context, int textViewResourceId, ArrayList<Thread> items)
+		public ThreadAdapter(Context context, int textViewResourceId, ArrayList<Post> items)
 		{
 			super(context, textViewResourceId, items);
 			this.items = items;
@@ -230,14 +226,14 @@ public class SingleThreadView extends ListActivity {
 			}
 			
 			// get the thread to display and populate all the data into the layout
-			Thread t = items.get(position);
+			Post t = items.get(position);
 			if (t != null)
 			{
 				TextView tvContent = (TextView)v.findViewById(R.id.textPreview);
 				if (tvContent != null)
 				{
 					tvContent.setPadding(15 * t.getLevel(), 0, 0, 0);
-					tvContent.setText(t.getPostPreview());
+					tvContent.setText(t.getPreview());
 				}
 				
 				fixBackgroundColor(v, position);

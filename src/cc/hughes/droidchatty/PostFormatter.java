@@ -5,12 +5,20 @@ import android.text.Spanned;
 
 public class PostFormatter {
 	
+	public static Spanned formatContent(Post post, boolean multiLine)
+	{
+		return formatContent(post.getUserName(), post.getContent(), multiLine);
+	}
+	
 	public static Spanned formatContent(Thread thread, boolean multiLine)
 	{
-		String content = thread.getContent();
-
+		return formatContent(thread.getUserName(), thread.getContent(), multiLine);
+	}
+	
+	public static Spanned formatContent(String userName, String content, boolean multiLine)
+	{
 		// special case fix for shacknews links
-		if (thread.getUserName().equalsIgnoreCase("shacknews"))
+		if (userName.equalsIgnoreCase("shacknews"))
 			content = content.replaceAll("&lt;(/?)a(.*?)&gt;", "<$1a$2>");
 		
 		// convert shack's css into real font colors since Html.fromHtml doesn't supporty css of any kind

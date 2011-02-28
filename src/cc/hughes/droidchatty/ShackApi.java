@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.Header;
@@ -47,9 +48,10 @@ public class ShackApi
 		return threads;
 	}
 	
-	public static ArrayList<Thread> getThread(int threadId) throws ClientProtocolException, IOException, JSONException
+	public static ArrayList<Post> getPosts(int threadId) throws ClientProtocolException, IOException, JSONException
 	{
-		ArrayList<Thread> posts = new ArrayList<Thread>();
+		ArrayList<Post> posts = new ArrayList<Post>();
+		HashSet<Integer> post_tracker = new HashSet<Integer>();
 		
 		JSONObject json = getJson(BASE_URL + "thread/" + threadId + ".json");
 		
@@ -59,22 +61,22 @@ public class ShackApi
 		{
 			JSONObject comment = comments.getJSONObject(i);
 			
-			Thread thread = new Thread();
-			thread.setUserName(comment.getString("author"));
-			thread.setContent(comment.getString("body"));
-			thread.setThreadID(comment.getInt("id"));
-			thread.setPostedTime(comment.getString("date"));
-			thread.setLevel(0);
+			int postId = comment.getInt("id");
+			String userName = comment.getString("author");
+			String body = comment.getString("body");
+			String date = comment.getString("date");
 			
-			posts.add(thread);
+			Post post = new Post(postId, userName, body, date, 0);
+			posts.add(post);
+			post_tracker.add(postId);
 			
-			processPosts(comment, 1, posts);
+			processPosts(comment, 1, posts, post_tracker);
 		}
 		
 		return posts;
 	}
 	
-	private static void processPosts(JSONObject comment, int level, ArrayList<Thread> posts) throws JSONException
+	private static void processPosts(JSONObject comment, int level, ArrayList<Post> posts, HashSet<Integer> post_tracker) throws JSONException
 	{
 		JSONArray comments = comment.getJSONArray("comments");
 		
@@ -82,15 +84,21 @@ public class ShackApi
 		{
 			JSONObject p = comments.getJSONObject(i);
 			
-			Thread post = new Thread();
-			post.setUserName(p.getString("author"));
-			post.setContent(p.getString("body"));
-			post.setThreadID(p.getInt("id"));
-			post.setPostedTime(p.getString("date"));
-			post.setLevel(level);
-			posts.add(post);
+			int postId = comment.getInt("id");
+			String userName = comment.getString("author");
+			String body = comment.getString("body");
+			String date = comment.getString("date");
 			
-			processPosts(p, level + 1, posts);
+			// only add this post if we haven't seen this post before
+			// fixes duplicate posts coming back from the API
+			// the duplicate post could end up in the wrong place though maybe?
+			if (post_tracker.add(postId))
+			{
+				Post post = new Post(postId, userName, body, date, level);
+				posts.add(post);
+			}
+			
+			processPosts(p, level + 1, posts, post_tracker);
 		}
 	}
 	

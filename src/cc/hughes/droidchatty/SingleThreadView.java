@@ -167,6 +167,7 @@ public class SingleThreadView extends ListActivity {
 		tvContent.setText(PostFormatter.formatContent(thread.getContent(), true));
 		Linkify.addLinks(tvContent, Linkify.ALL);
 		tvContent.setClickable(false);
+		tvContent.scrollTo(0, 0);
 		
 		_currentThreadId = thread.getThreadID();
 	}

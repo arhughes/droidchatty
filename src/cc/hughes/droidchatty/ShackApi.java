@@ -35,8 +35,8 @@ public class ShackApi
 			JSONObject comment = comments.getJSONObject(i);
 			
 			Thread thread = new Thread();
-			thread.setContent(comment.getString("body"));
 			thread.setUserName(comment.getString("author"));
+			thread.setContent(comment.getString("body"));
 			thread.setThreadID(comment.getInt("id"));
 			thread.setPostedTime(comment.getString("date"));
 			thread.setReplyCount(comment.getInt("reply_count"));
@@ -60,8 +60,8 @@ public class ShackApi
 			JSONObject comment = comments.getJSONObject(i);
 			
 			Thread thread = new Thread();
-			thread.setContent(comment.getString("body"));
 			thread.setUserName(comment.getString("author"));
+			thread.setContent(comment.getString("body"));
 			thread.setThreadID(comment.getInt("id"));
 			thread.setPostedTime(comment.getString("date"));
 			thread.setLevel(0);
@@ -83,8 +83,8 @@ public class ShackApi
 			JSONObject p = comments.getJSONObject(i);
 			
 			Thread post = new Thread();
-			post.setContent(p.getString("body"));
 			post.setUserName(p.getString("author"));
+			post.setContent(p.getString("body"));
 			post.setThreadID(p.getInt("id"));
 			post.setPostedTime(p.getString("date"));
 			post.setLevel(level);

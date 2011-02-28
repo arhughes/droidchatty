@@ -51,7 +51,7 @@ public class Thread {
 	public void setContent(String content)
 	{
 		_content = content;
-		_preview = PostFormatter.formatContent(content, false);
+		_preview = PostFormatter.formatContent(this, false);
 	}
 	
 	public int getReplyCount()

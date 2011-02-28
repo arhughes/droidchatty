@@ -106,9 +106,9 @@ public class SingleThreadView extends ListActivity {
 			
 			Thread thread = new Thread();
 			thread.setThreadID(_rootThreadId);
-			thread.setContent(content);
 			thread.setPostedTime(posted);
 			thread.setUserName(author);
+			thread.setContent(content);
 			
 			displayPost(thread, 0);
 		}
@@ -164,7 +164,7 @@ public class SingleThreadView extends ListActivity {
 		tvAuthor.setText(thread.getUserName());
 		tvAuthor.setTextColor(User.getColor(thread.getUserName()));
 		tvPosted.setText(thread.getPostedTime());
-		tvContent.setText(PostFormatter.formatContent(thread.getContent(), true));
+		tvContent.setText(PostFormatter.formatContent(thread, true));
 		Linkify.addLinks(tvContent, Linkify.ALL);
 		tvContent.setClickable(false);
 		tvContent.scrollTo(0, 0);

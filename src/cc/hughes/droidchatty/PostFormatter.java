@@ -5,8 +5,14 @@ import android.text.Spanned;
 
 public class PostFormatter {
 	
-	public static Spanned formatContent(String content, boolean multiLine)
+	public static Spanned formatContent(Thread thread, boolean multiLine)
 	{
+		String content = thread.getContent();
+
+		// special case fix for shacknews links
+		if (thread.getUserName().equalsIgnoreCase("shacknews"))
+			content = content.replaceAll("&lt;(/?)a(.*?)&gt;", "<$1a$2>");
+		
 		// convert shack's css into real font colors since Html.fromHtml doesn't supporty css of any kind
 		content = content.replaceAll("<span class=\"jt_red\">(.*?)</span>", "<font color=\"#ff0000\">$1</font>");
 		content = content.replaceAll("<span class=\"jt_green\">(.*?)</span>", "<font color=\"#8dc63f\">$1</font>");

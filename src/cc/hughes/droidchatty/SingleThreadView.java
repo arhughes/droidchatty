@@ -67,7 +67,17 @@ public class SingleThreadView extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.thread_view);
 		
-		_posts = new ArrayList<Thread>();
+		final Object data = getLastNonConfigurationInstance();
+		
+		if (data == null)
+		{
+			_posts = new ArrayList<Thread>();
+		}
+		else
+		{
+			_posts = (ArrayList<Thread>)data;
+		}
+			
 		_adapter = new ThreadAdapter(this, R.layout.thread_row, _posts);
 		setListAdapter(_adapter);
 		
@@ -99,7 +109,8 @@ public class SingleThreadView extends ListActivity {
 			displayPost(thread);
 		}
 		
-		startRefresh();
+		if (_posts.isEmpty())
+			startRefresh();
 	}
 	
 	@Override
@@ -147,6 +158,12 @@ public class SingleThreadView extends ListActivity {
 		tvContent.setClickable(false);
 		
 		_currentThreadId = thread.getThreadID();
+	}
+	
+	@Override
+	public Object onRetainNonConfigurationInstance()
+	{
+		return _posts;
 	}
 	
     private void startRefresh()

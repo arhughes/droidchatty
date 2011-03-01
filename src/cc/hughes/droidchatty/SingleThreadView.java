@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.ClipboardManager;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -60,22 +63,39 @@ public class SingleThreadView extends ListActivity {
 
                 if (_currentThreadId == 0)
                 {
-                    displayPost(_posts.get(0), 0);
+                    int index = findPostIndex(_posts, _rootThreadId);
+                    displayPost(_posts.get(index), index);
                 }
             }
         }
+        
+        private int findPostIndex(ArrayList<Post> posts, int threadId)
+        {
+            int len = posts.size();
+            for (int i = 0; i < len; i++)
+            {
+                if (posts.get(i).getPostId() == threadId)
+                    return i;
+            }
+            
+            // uh, what?
+            Log.w("DroidChatty", "Couldn't find post matching thread id #" + threadId);
+            return 0;
+        }
+        
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.thread_view);
-
+        
+        // setup the lists and adapters
         _posts = getSavedPosts();
-
         _adapter = new ThreadAdapter(this, R.layout.thread_row, _posts);
         setListAdapter(_adapter);
-
+        
+        // setup listening for clicks
         final ListView lv = getListView();
         lv.setOnItemClickListener(new OnItemClickListener()
         {
@@ -85,12 +105,15 @@ public class SingleThreadView extends ListActivity {
             }
         });
 
-        Bundle extras = getIntent().getExtras();
-        _rootThreadId = extras.getInt(THREAD_ID);
-
-        // if launched from a link, no content, author, or date is passed in
-        if (extras.containsKey(THREAD_CONTENT))
+        // find out why this thing was launched and load the required data
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        String action = intent.getAction();
+        Uri uri = intent.getData();
+        
+        if (extras != null) // launched from another activity, load all the info
         {
+            _rootThreadId = extras.getInt(THREAD_ID);
             String content = extras.getString(THREAD_CONTENT);
             String author = extras.getString(THREAD_AUTHOR);
             String posted = extras.getString(THREAD_POSTED);
@@ -98,7 +121,21 @@ public class SingleThreadView extends ListActivity {
             Post post = new Post(_rootThreadId, author, content, posted, 0);
             displayPost(post, 0);
         }
+        else if (action != null && action.equals(Intent.ACTION_VIEW) && uri != null) // launched from URI
+        {
+            String id = uri.getQueryParameter("id");
+            if (id == null)
+            {
+                ErrorDialog.display(this, "Error", "Invalid URL found.");
+                finish();
+                return;
+            }
+            
+            _currentThreadId = 0;
+            _rootThreadId = Integer.parseInt(id);
+        }
 
+        // if we don't already have the list of posts, fetch them now
         if (_posts.isEmpty())
             startRefresh();
     }
@@ -149,10 +186,11 @@ public class SingleThreadView extends ListActivity {
         // unhighlight old selected, highlight new selected
         // should be able to do this with a selector, but damned if I could get it to work
         int previousPosition = _adapter.getSelectedPosition();
+        ListView lv = getListView();
         _adapter.setSelectedPosition(position);
-        _adapter.fixBackgroundColor(getListView(), previousPosition);
-        _adapter.fixBackgroundColor(getListView(), position);
-
+        _adapter.fixBackgroundColor(lv, previousPosition);
+        _adapter.fixBackgroundColor(lv, position);
+        
         TextView tvAuthor = (TextView)findViewById(R.id.textUserName);
         TextView tvContent = (TextView)findViewById(R.id.textContent);
         TextView tvPosted = (TextView)findViewById(R.id.textPostedTime);
@@ -164,6 +202,10 @@ public class SingleThreadView extends ListActivity {
         Linkify.addLinks(tvContent, Linkify.ALL);
         tvContent.setClickable(false);
         tvContent.scrollTo(0, 0);
+        
+        // if this is the first time loaded, make sure the post being displayed is visible
+        if (_currentThreadId == 0)
+            lv.setSelection(position);
 
         _currentThreadId = post.getPostId();
     }

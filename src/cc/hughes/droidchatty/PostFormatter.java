@@ -46,7 +46,7 @@ public class PostFormatter {
         content = content.replaceAll("<span class=\"jt_bold\">(.*?)</span>", "<b>$1</b>");
         content = content.replaceAll("<span class=\"jt_italic\">(.*?)</span>", "<i>$1</i>");
         content = content.replaceAll("<span class=\"jt_underline\">(.*?)</span>", "<u>$1</u>");
-        content = content.replaceAll("<span class=\"jt_strike\">(.*?)</span>", "<del>$1</del>");
+        content = content.replaceAll("<span class=\"jt_strike\">(.*?)</span>", "<strike>$1</strike>");
         content = content.replaceAll("<span class=\"jt_spoiler\".*?>(.*?)</span>", "<spoiler>$1</spoiler>");
 
         // if this is for a preview, change newlines into spaces

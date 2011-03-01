@@ -34,7 +34,7 @@
 		         android:layout_height="wrap_content"
 		         android:textSize="14dip"
 		         android:padding="6dip"
-		         android:textColor="@android:color/secondary_text_dark_nodisable"
+		         android:textColorHighlight="@android:color/transparent"
 		     />
 	     </ScrollView>
     </RelativeLayout>

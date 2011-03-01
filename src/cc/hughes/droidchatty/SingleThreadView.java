@@ -10,7 +10,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.ClipboardManager;
-import android.text.util.Linkify;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -134,7 +134,10 @@ public class SingleThreadView extends ListActivity {
             _currentThreadId = 0;
             _rootThreadId = Integer.parseInt(id);
         }
-
+        
+        TextView tvContent = (TextView)findViewById(R.id.textContent);
+        tvContent.setMovementMethod(LinkMovementMethod.getInstance());
+        
         // if we don't already have the list of posts, fetch them now
         if (_posts.isEmpty())
             startRefresh();
@@ -199,9 +202,6 @@ public class SingleThreadView extends ListActivity {
         tvAuthor.setTextColor(User.getColor(post.getUserName()));
         tvPosted.setText(post.getPosted());
         tvContent.setText(PostFormatter.formatContent(post, tvContent, true));
-        Linkify.addLinks(tvContent, Linkify.ALL);
-        tvContent.setClickable(false);
-        tvContent.scrollTo(0, 0);
         
         // if this is the first time loaded, make sure the post being displayed is visible
         if (_currentThreadId == 0)

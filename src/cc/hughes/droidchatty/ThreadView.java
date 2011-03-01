@@ -165,7 +165,10 @@ public class ThreadView extends ListActivity {
             storePostCounts(counts, _threads);
         } catch (Exception ex)
         {
-            Log.e("Droid Chatty", ex.getMessage());
+            Log.e("DroidChatty", ex.getMessage());
+            _progressDialog.dismiss();
+            runOnUiThread(new ErrorDialog(this, "Error", "Error fetching threads."));
+            return;
         }
 
         runOnUiThread(_displayThreads);
@@ -208,7 +211,7 @@ public class ThreadView extends ListActivity {
     }
 
     final static int POST_CACHE_HISTORY = 1000;
-    private void storePostCounts(Hashtable<Integer, Integer> counts, ArrayList<Thread> threads)
+    private void storePostCounts(Hashtable<Integer, Integer> counts, ArrayList<Thread> threads) throws IOException
     {
         // update post counts for threads viewing right now
         for (Thread t : threads)
@@ -221,26 +224,22 @@ public class ThreadView extends ListActivity {
         if (postIds.size() > POST_CACHE_HISTORY)
             postIds.subList(postIds.size() - POST_CACHE_HISTORY, postIds.size() - 1);
 
-        try {
-            FileOutputStream output = openFileOutput("post_count.cache", MODE_PRIVATE);
-            try
-            {
-                DataOutputStream out = new DataOutputStream(output);
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+        FileOutputStream output = openFileOutput("post_count.cache", MODE_PRIVATE);
+        try
+        {
+            DataOutputStream out = new DataOutputStream(output);
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
 
-                for (Integer postId : postIds)
-                {
-                    writer.write(postId + "=" + counts.get(postId));
-                    writer.newLine();
-                }
-                writer.flush();
-            }
-            finally
+            for (Integer postId : postIds)
             {
-                output.close();
+                writer.write(postId + "=" + counts.get(postId));
+                writer.newLine();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            writer.flush();
+        }
+        finally
+        {
+            output.close();
         }
     }
 

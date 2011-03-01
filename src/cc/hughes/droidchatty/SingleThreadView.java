@@ -188,7 +188,10 @@ public class SingleThreadView extends ListActivity {
             _posts = ShackApi.getPosts(_rootThreadId);
         } catch (Exception ex)
         {
-            ex.printStackTrace();
+            Log.e("DroidChatty", ex.getMessage());
+            _progressDialog.dismiss();
+            runOnUiThread(new ErrorDialog(this, "Error", "Error fetching posts."));
+            return;
         }
 
         runOnUiThread(_displayThreads);

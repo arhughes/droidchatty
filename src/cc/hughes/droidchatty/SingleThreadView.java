@@ -198,7 +198,7 @@ public class SingleThreadView extends ListActivity {
         tvAuthor.setText(post.getUserName());
         tvAuthor.setTextColor(User.getColor(post.getUserName()));
         tvPosted.setText(post.getPosted());
-        tvContent.setText(PostFormatter.formatContent(post, true));
+        tvContent.setText(PostFormatter.formatContent(post, tvContent, true));
         Linkify.addLinks(tvContent, Linkify.ALL);
         tvContent.setClickable(false);
         tvContent.scrollTo(0, 0);

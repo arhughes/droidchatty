@@ -5,4 +5,9 @@
     <string name="main_no_items">No threads to display</string>
     <string name="refresh">Refresh</string>
     <string name="copy_url">Copy URL</string>
+    <string name="new_post">New Post</string>
+    <string name="cancel">Cancel</string>
+    <string name="reply">Reply</string>
+    <string name="post">Post</string>
+    <string name="reply_text_hint">Type your pointless drivel in here</string>
 </resources>

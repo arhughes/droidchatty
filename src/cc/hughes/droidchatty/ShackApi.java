@@ -24,6 +24,11 @@ public class ShackApi
 {
     static final String BASE_URL = "http://shackapi.stonedonkey.com/";
     static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+    
+    public static int postReply(int replyToThreadId, String content)
+    {
+        return 12345;
+    }
 
     public static ArrayList<Thread> getThreads() throws ClientProtocolException, IOException, JSONException
     {
@@ -143,7 +148,7 @@ public class ShackApi
         // well, that shouldn't happen
         throw new IOException("No response from website found.");
     }
-
+    
     private static String readStream(InputStream stream) throws IOException
     {
         StringWriter output = new StringWriter();

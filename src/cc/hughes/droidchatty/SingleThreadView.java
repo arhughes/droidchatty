@@ -31,6 +31,8 @@ public class SingleThreadView extends ListActivity {
     static final String THREAD_CONTENT = "THREAD_CONTENT";
     static final String THREAD_AUTHOR = "THREAD_AUTHOR";
     static final String THREAD_POSTED = "THREAD_POSTED";
+    
+    static final int POST_REPLY = 1;
 
     private int _currentThreadId = 0;
     private int _rootThreadId;
@@ -172,8 +174,41 @@ public class SingleThreadView extends ListActivity {
             case R.id.copyUrl:
                 copyCurrentPostUrl();
                 return true;
+            case R.id.reply:
+            	postReply();
+            	return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+    
+    private void postReply()
+    {
+        Intent i = new Intent(this, ComposePostView.class);
+        i.putExtra(SingleThreadView.THREAD_ID, _currentThreadId);
+        startActivityForResult(i, POST_REPLY);
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        switch (requestCode)
+        {
+            case POST_REPLY:
+                if (resultCode == RESULT_OK)
+                {
+                    // read the resulting thread id from the post
+                    int postId = data.getExtras().getInt(THREAD_ID);
+                    
+                    // reset the current thread, force root post to be our new post
+                    // and re-pull this thread
+                    _currentThreadId = 0;
+                    _rootThreadId = postId;
+                    startRefresh();
+                }
+                break;
+            default:
+                break;
         }
     }
 

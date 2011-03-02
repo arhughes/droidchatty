@@ -23,7 +23,8 @@
         		<data android:scheme="http" android:host="www.shacknews.com" android:path="/laryn.x"></data>
         	</intent-filter>
         </activity>
-        <activity android:name="ComposePostView" android:windowSoftInputMode="stateVisible|adjustResize"></activity>
+        <activity android:name=".ComposePostView" android:windowSoftInputMode="stateVisible|adjustResize"></activity>
+        <activity android:name=".PreferenceView"></activity>
     </application>
     
 </manifest>

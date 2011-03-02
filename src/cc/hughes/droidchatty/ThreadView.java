@@ -131,6 +131,9 @@ public class ThreadView extends ListActivity {
             case R.id.add:
                 post();
                 return true;
+            case R.id.settings:
+                showSettings();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -140,6 +143,12 @@ public class ThreadView extends ListActivity {
     {
         Intent i = new Intent(this, ComposePostView.class);
         startActivityForResult(i, POST_THREAD);
+    }
+    
+    private void showSettings()
+    {
+        Intent i = new Intent(this, PreferenceView.class);
+        startActivity(i);
     }
     
     @Override

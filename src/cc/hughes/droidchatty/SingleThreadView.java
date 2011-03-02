@@ -116,12 +116,17 @@ public class SingleThreadView extends ListActivity {
         if (extras != null) // launched from another activity, load all the info
         {
             _rootThreadId = extras.getInt(THREAD_ID);
-            String content = extras.getString(THREAD_CONTENT);
-            String author = extras.getString(THREAD_AUTHOR);
-            String posted = extras.getString(THREAD_POSTED);
-
-            Post post = new Post(_rootThreadId, author, content, posted, 0);
-            displayPost(post, 0);
+            
+            // if there is no content don't display anything at first, just refresh the data
+            if (extras.containsKey(THREAD_CONTENT))
+            {
+                String content = extras.getString(THREAD_CONTENT);
+                String author = extras.getString(THREAD_AUTHOR);
+                String posted = extras.getString(THREAD_POSTED);
+    
+                Post post = new Post(_rootThreadId, author, content, posted, 0);
+                displayPost(post, 0);
+            }
         }
         else if (action != null && action.equals(Intent.ACTION_VIEW) && uri != null) // launched from URI
         {

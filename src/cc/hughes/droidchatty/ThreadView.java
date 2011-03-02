@@ -40,6 +40,8 @@ import android.widget.TextView;
 
 public class ThreadView extends ListActivity {
 
+    static final int POST_THREAD = 1;
+    
     private ProgressDialog _progressDialog = null;
     private ArrayList<Thread> _threads = null;
     private ThreadAdapter _adapter;
@@ -126,8 +128,39 @@ public class ThreadView extends ListActivity {
             case R.id.refresh:
                 startRefresh();
                 return true;
+            case R.id.add:
+                post();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void post()
+    {
+        Intent i = new Intent(this, ComposePostView.class);
+        startActivityForResult(i, POST_THREAD);
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        switch (requestCode)
+        {
+            case POST_THREAD:
+                if (resultCode == RESULT_OK)
+                {
+                    // read the resulting thread id from the post
+                    int postId = data.getExtras().getInt(SingleThreadView.THREAD_ID);
+                    
+                    // hey, thats the same thing I just wrote!
+                    Intent i = new Intent(this, SingleThreadView.class);
+                    i.putExtra(SingleThreadView.THREAD_ID, postId);
+                    startActivity(i);
+                }
+                break;
+            default:
+                break;
         }
     }
 

@@ -10,7 +10,7 @@ import android.widget.EditText;
 
 public class ComposePostView extends Activity {
 
-	private int _replyToPostId;
+	private int _replyToPostId = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -18,11 +18,18 @@ public class ComposePostView extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_post);
         
-        // grab the post being replied to
-        _replyToPostId = getIntent().getExtras().getInt(SingleThreadView.THREAD_ID);
+        // grab the post being replied to, if this is a reply
+        Bundle extras = getIntent().getExtras();
+        if (extras != null && extras.containsKey(SingleThreadView.THREAD_ID))
+            _replyToPostId = getIntent().getExtras().getInt(SingleThreadView.THREAD_ID);
         
         Button reply_button = (Button)findViewById(R.id.replyButton);
         Button cancel_button = (Button)findViewById(R.id.cancelButton);
+        
+        if (_replyToPostId == 0)
+            setTitle(getTitle() + " - New Post");
+        else
+            setTitle(getTitle() + " - Reply");
         
         reply_button.setOnClickListener(onButtonClick);
         cancel_button.setOnClickListener(new OnClickListener()
@@ -56,5 +63,4 @@ public class ComposePostView extends Activity {
 		    finish();
 		}
 	};
-	
 }

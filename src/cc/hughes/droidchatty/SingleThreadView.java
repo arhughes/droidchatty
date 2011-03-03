@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.text.ClipboardManager;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -144,10 +146,34 @@ public class SingleThreadView extends ListActivity {
         
         TextView tvContent = (TextView)findViewById(R.id.textContent);
         tvContent.setMovementMethod(LinkMovementMethod.getInstance());
+        registerForContextMenu(tvContent);
         
         // if we don't already have the list of posts, fetch them now
         if (_posts.isEmpty())
             startRefresh();
+    }
+    
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+            ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.post_context, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.copyUrl:
+                copyCurrentPostUrl();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -175,9 +201,6 @@ public class SingleThreadView extends ListActivity {
         {
             case R.id.refresh:
                 startRefresh();
-                return true;
-            case R.id.copyUrl:
-                copyCurrentPostUrl();
                 return true;
             case R.id.reply:
             	postReply();

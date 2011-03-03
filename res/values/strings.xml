@@ -11,6 +11,7 @@
     <string name="post">Post</string>
     <string name="reply_text_hint">Type your pointless drivel in here</string>
     <string name="settings">Settings</string>
+    <string name="search">Search</string>
     
     <string name="preferences_login">Account Information</string>
     <string name="preference_username_title">Username</string>

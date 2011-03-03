@@ -134,6 +134,9 @@ public class ThreadView extends ListActivity {
             case R.id.settings:
                 showSettings();
                 return true;
+            case R.id.search:
+                showSearch();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -148,6 +151,12 @@ public class ThreadView extends ListActivity {
     private void showSettings()
     {
         Intent i = new Intent(this, PreferenceView.class);
+        startActivity(i);
+    }
+    
+    private void showSearch()
+    {
+        Intent i = new Intent(this, SearchView.class);
         startActivity(i);
     }
     

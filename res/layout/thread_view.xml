@@ -16,7 +16,7 @@
 	         android:textColor="#f3e7b5"
 	         android:textSize="14dip"
 	         android:textStyle="bold"
-	         android:padding="6dip"
+	         android:paddingLeft="6dip"
 	     />
 	     <TextView
 	     	 android:id="@+id/textPostedTime"
@@ -25,7 +25,7 @@
 	     	 android:layout_alignParentRight="true"
 	         android:textColor="#666"
 	         android:textSize="14dip"
-	         android:padding="6dip"
+	         android:paddingRight="6dip"
 	     />
 	     <ScrollView
 	         android:layout_width="fill_parent"

@@ -207,7 +207,7 @@ public class ThreadView extends ListActivity {
             storePostCounts(counts, _threads);
         } catch (Exception ex)
         {
-            Log.e("DroidChatty", ex.getMessage());
+            Log.e("DroidChatty", "Error fetching threds",ex);
             _progressDialog.dismiss();
             runOnUiThread(new ErrorDialog(this, "Error", "Error fetching threads."));
             return;

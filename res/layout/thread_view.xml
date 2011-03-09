@@ -28,6 +28,7 @@
 	         android:paddingRight="6dip"
 	     />
 	     <ScrollView
+	         android:id="@+id/scroll"
 	         android:layout_width="fill_parent"
 	         android:layout_height="fill_parent"
 	         android:layout_below="@id/textUserName">

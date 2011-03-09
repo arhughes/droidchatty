@@ -25,6 +25,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class SingleThreadView extends ListActivity {
@@ -260,11 +261,13 @@ public class SingleThreadView extends ListActivity {
         TextView tvAuthor = (TextView)findViewById(R.id.textUserName);
         TextView tvContent = (TextView)findViewById(R.id.textContent);
         TextView tvPosted = (TextView)findViewById(R.id.textPostedTime);
+        ScrollView sv = (ScrollView)findViewById(R.id.scroll);
 
         tvAuthor.setText(post.getUserName());
         tvAuthor.setTextColor(User.getColor(post.getUserName()));
         tvPosted.setText(post.getPosted());
         tvContent.setText(PostFormatter.formatContent(post, tvContent, true));
+        sv.scrollTo(0, 0);
         
         // if this is the first time loaded, make sure the post being displayed is visible
         if (_currentThreadId == 0)

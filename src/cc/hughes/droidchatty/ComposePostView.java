@@ -56,7 +56,7 @@ public class ComposePostView extends Activity {
 		    String result = null;
 		    try
             {
-                result = ShackApi.postReply(_replyToPostId, content);
+                result = ShackApi.postReply(ComposePostView.this, _replyToPostId, content);
             } catch (Exception e)
             {
                 Log.e("DroidChatty", "Error posting reply", e);

@@ -14,19 +14,16 @@ import java.util.zip.GZIPInputStream;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -60,9 +57,9 @@ public class ShackApi
         return results;
     }
     
-    public static String postReply(int replyToThreadId, String content) throws Exception
+    public static String postReply(Context context, int replyToThreadId, String content) throws Exception
     {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(null);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String userName = prefs.getString("userName", null);
         String password = prefs.getString("password", null);
         
@@ -198,18 +195,15 @@ public class ShackApi
     
     private static String postJson(String url, String userName, String password, HashMap<String, String> values) throws Exception
     {
-        CredentialsProvider cred = new BasicCredentialsProvider();
-        cred.setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), new UsernamePasswordCredentials(userName, password));
-        
         DefaultHttpClient client = new DefaultHttpClient();
-        client.setCredentialsProvider(cred);
         
         String data = "";
         for (Map.Entry<String, String> v : values.entrySet())
-            data += v.getKey() + "=" + v.getValue();
+            data += v.getKey() + "=" + URLEncoder.encode(v.getValue(), "UTF8") + "&";
         Log.d("postJson", "data=" + data);
         
         HttpPut put = new HttpPut(url);
+        put.setHeader("Authorization", "Basic " + Base64.encodeBytes((userName + ":" + password).getBytes()));
         put.setHeader("Accept-Encoding", "gzip");
         put.setEntity(new StringEntity(data, "UTF8"));
         

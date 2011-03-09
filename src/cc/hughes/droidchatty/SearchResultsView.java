@@ -2,7 +2,6 @@ package cc.hughes.droidchatty;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -103,6 +102,8 @@ public class SearchResultsView extends ListActivity
                     tvUserName.setText(t.getAuthor());
                 if (tvContent != null)
                     tvContent.setText(t.getContent());
+                if (tvPosted != null)
+                    tvPosted.setText(t.getPosted());
             }
             return v;
         }

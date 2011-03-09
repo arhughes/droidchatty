@@ -37,6 +37,26 @@ public class ShackApi
     static final String BASE_URL = "http://shackapi.stonedonkey.com/";
     static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     
+    public static ArrayList<SearchResult> search(String term) throws Exception
+    {
+        ArrayList<SearchResult> results = new ArrayList<SearchResult>();
+        JSONObject result = getJson(BASE_URL + "Search.json?SearchTerm=" + term);
+        
+        JSONArray comments = result.getJSONArray("comments");
+        for (int i = 0; i < comments.length(); i++)
+        {
+            JSONObject comment = comments.getJSONObject(i);
+
+            int id = comment.getInt("id");
+            String userName = comment.getString("author");
+            String body = comment.getString("preview");
+            
+            results.add(new SearchResult(id, userName, body));
+        }
+        
+        return results;
+    }
+    
     public static String postReply(int replyToThreadId, String content) throws Exception
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(null);
@@ -157,6 +177,7 @@ public class ShackApi
                     inStream = new GZIPInputStream(inStream);
 
                 content = readStream(inStream);
+                Log.d("DroidChatty", "Response: " + content);
             }
             finally
             {

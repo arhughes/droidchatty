@@ -25,6 +25,7 @@
         </activity>
         <activity android:name=".ComposePostView" android:windowSoftInputMode="stateVisible|adjustResize"></activity>
         <activity android:name=".SearchView" android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".SearchResultsView"></activity>
         <activity android:name=".PreferenceView"></activity>
     </application>
     

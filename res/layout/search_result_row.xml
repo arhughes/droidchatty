@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="?android:attr/listPreferredItemHeight"
+  android:padding="6dip"
+  android:orientation="vertical">
+     <TextView
+         android:id="@+id/textUserName"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:textColor="#f3e7b5"
+         android:textSize="12dip"
+     />
+     <TextView
+         android:id="@+id/textReplyCount"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_toRightOf="@id/textUserName"
+         android:paddingLeft="5dip"
+         android:textColor="#888"
+         android:textSize="12dip"
+     />
+     <TextView
+     	 android:id="@+id/textPostedTime"
+     	 android:layout_width="wrap_content"
+     	 android:layout_height="wrap_content"
+     	 android:layout_alignParentRight="true"
+         android:textColor="#666"
+         android:textSize="12dip"
+     />
+     <TextView
+         android:id="@+id/textContent"
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+         android:layout_below="@id/textUserName"
+         android:ellipsize="marquee"
+         android:maxLines="2"
+         android:textSize="14dip"
+     />
+</RelativeLayout>

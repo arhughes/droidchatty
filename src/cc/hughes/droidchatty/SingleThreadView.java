@@ -329,28 +329,30 @@ public class SingleThreadView extends ListActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent)
         {
-            View v = convertView;
-            if (v == null)
+            TextView content;
+            
+            if (convertView == null)
             {
                 LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                v = vi.inflate(R.layout.thread_row, null);
+                convertView = vi.inflate(R.layout.thread_row, null);
+                
+                content = (TextView)convertView.findViewById(R.id.textPreview);
+                
+                convertView.setTag(content);
+            }
+            else
+            {
+                content = (TextView)convertView.getTag();
             }
 
             // get the thread to display and populate all the data into the layout
             Post t = items.get(position);
-            if (t != null)
-            {
-                TextView tvContent = (TextView)v.findViewById(R.id.textPreview);
-                if (tvContent != null)
-                {
-                    tvContent.setPadding(15 * t.getLevel(), 0, 0, 0);
-                    tvContent.setText(t.getPreview());
-                }
+            content.setPadding(15 * t.getLevel(), 0, 0, 0);
+            content.setText(t.getPreview());
 
-                fixBackgroundColor(v, position);
-            }
+            fixBackgroundColor(convertView, position);
 
-            return v;
+            return convertView;
         }
 
         public void fixBackgroundColor(ListView view, int position)

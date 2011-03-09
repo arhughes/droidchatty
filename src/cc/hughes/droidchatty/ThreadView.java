@@ -273,43 +273,43 @@ public class ThreadView extends ListActivity {
         @Override
         protected View createView(int position, View convertView, ViewGroup parent)
         {
-            View v = convertView;
-            if (v == null)
+            ViewHolder holder;
+            
+            if (convertView == null)
             {
                 LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                v = vi.inflate(R.layout.row, null);
+                convertView = vi.inflate(R.layout.row, null);
+                
+                holder = new ViewHolder();
+                holder.userName = (TextView)convertView.findViewById(R.id.textUserName);
+                holder.content = (TextView)convertView.findViewById(R.id.textContent);
+                holder.posted = (TextView)convertView.findViewById(R.id.textPostedTime);
+                holder.replyCount = (TextView)convertView.findViewById(R.id.textReplyCount);
+                
+                convertView.setTag(holder);
             }
-            
-            TextView tvUserName = (TextView)v.findViewById(R.id.textUserName);
-            TextView tvContent = (TextView)v.findViewById(R.id.textContent);
-            TextView tvPosted = (TextView)v.findViewById(R.id.textPostedTime);
-            TextView tvReplyCount = (TextView)v.findViewById(R.id.textReplyCount);
+            else
+            {
+                holder = (ViewHolder)convertView.getTag();
+            }
             
             // get the thread to display and populate all the data into the layout
             Thread t = getItem(position);
-            
-            if (t != null)
-            {
-                if (tvUserName != null)
-                    tvUserName.setText(t.getUserName());
-                if (tvContent != null)
-                    tvContent.setText(t.getPreview());
-                if (tvPosted != null)
-                    tvPosted.setText(t.getPosted());
-                if (tvReplyCount != null)
-                    tvReplyCount.setText(formatReplyCount(t));
+            holder.userName.setText(t.getUserName());
+            holder.content.setText(t.getPreview());
+            holder.posted.setText(t.getPosted());
+            holder.replyCount.setText(formatReplyCount(t));
 
-                // special highlight for shacknews posts
-                if (t.getUserName().equalsIgnoreCase("Shacknews"))
-                    v.setBackgroundColor(Color.rgb(0x19, 0x26, 0x35));
-                else
-                    v.setBackgroundColor(color.background_dark);
+            // special highlight for shacknews posts
+            if (t.getUserName().equalsIgnoreCase("Shacknews"))
+                convertView.setBackgroundColor(Color.rgb(0x19, 0x26, 0x35));
+            else
+                convertView.setBackgroundColor(color.background_dark);
 
-                // special highlight for employee and mod names
-                tvUserName.setTextColor(User.getColor(t.getUserName()));
-            }
+            // special highlight for employee and mod names
+            holder.userName.setTextColor(User.getColor(t.getUserName()));
             
-            return v;
+            return convertView;
         }
         
         private Spanned formatReplyCount(Thread thread)
@@ -349,6 +349,15 @@ public class ThreadView extends ListActivity {
             
             return new_threads;
         }
+        
+        private class ViewHolder
+        {
+            TextView userName;
+            TextView content;
+            TextView posted;
+            TextView replyCount;
+        }
+        
         
     }
 }

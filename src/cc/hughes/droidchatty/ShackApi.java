@@ -177,7 +177,6 @@ public class ShackApi
         
         HttpPut put = new HttpPut(url);
         put.setHeader("Authorization", "Basic " + Base64.encodeBytes((userName + ":" + password).getBytes()));
-        put.setHeader("Accept-Encoding", "gzip");
         put.setEntity(new UrlEncodedFormEntity(values));
         
         String content = client.execute(put, response_handler);

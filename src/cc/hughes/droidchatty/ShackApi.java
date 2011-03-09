@@ -1,24 +1,19 @@
 package cc.hughes.droidchatty;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.zip.GZIPInputStream;
+import java.util.List;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,12 +59,12 @@ public class ShackApi
         String userName = prefs.getString("userName", null);
         String password = prefs.getString("password", null);
         
-        HashMap<String, String> values = new HashMap<String, String>();
-        values.put("content_type_id", "17");
-        values.put("content_id", "");
-        values.put("body", content);
+        List<NameValuePair> values = new ArrayList<NameValuePair>();
+        values.add(new BasicNameValuePair("content_type_id", "17"));
+        values.add(new BasicNameValuePair("content_id", FAKE_STORY_ID));
+        values.add(new BasicNameValuePair("body", content));
         if (replyToThreadId > 0)
-            values.put("parent_id", Integer.toString(replyToThreadId));
+            values.add(new BasicNameValuePair("parent_id", Integer.toString(replyToThreadId)));
         
         return postJson(POST_URL, userName, password, values);
     }
@@ -164,92 +159,29 @@ public class ShackApi
     private static JSONObject getJson(String url) throws ClientProtocolException, IOException, JSONException
     {
         Log.d("DroidChatty", "Requested: " + url);
+        
+        BasicResponseHandler response_handler = new BasicResponseHandler();
         DefaultHttpClient client = new DefaultHttpClient();
         HttpGet get = new HttpGet(url);
-        get.setHeader("Accept-Encoding", "gzip");
 
-        HttpResponse response = (HttpResponse)client.execute(get);
-        HttpEntity entity = response.getEntity();
-
-        if (entity != null)
-        {
-            String content = null;
-            InputStream inStream = entity.getContent();
-            try
-            {
-                // check for gzip'ed content
-                Header encoding = response.getFirstHeader("Content-Encoding");
-                if (encoding != null && encoding.getValue().equalsIgnoreCase("gzip"))
-                    inStream = new GZIPInputStream(inStream);
-
-                content = readStream(inStream);
-                Log.d("DroidChatty", "Response: " + content);
-            }
-            finally
-            {
-                inStream.close();
-            }
-
-            // parse the darn thing
-            return new JSONObject(content);
-        }
-
-        // well, that shouldn't happen
-        throw new IOException("No response from website found.");
+        String content = client.execute(get, response_handler);
+        Log.d("DroidChatty", "Response: " + content);
+        
+        return new JSONObject(content);
     }
     
-    private static String postJson(String url, String userName, String password, HashMap<String, String> values) throws Exception
+    private static String postJson(String url, String userName, String password, List<NameValuePair> values) throws Exception
     {
         DefaultHttpClient client = new DefaultHttpClient();
-        
-        String data = "";
-        for (Map.Entry<String, String> v : values.entrySet())
-            data += v.getKey() + "=" + URLEncoder.encode(v.getValue(), "UTF8") + "&";
-        Log.d("postJson", "data=" + data);
+        BasicResponseHandler response_handler = new BasicResponseHandler();
         
         HttpPut put = new HttpPut(url);
         put.setHeader("Authorization", "Basic " + Base64.encodeBytes((userName + ":" + password).getBytes()));
         put.setHeader("Accept-Encoding", "gzip");
-        put.setEntity(new StringEntity(data, "UTF8"));
+        put.setEntity(new UrlEncodedFormEntity(values));
         
-        HttpResponse response = client.execute(put);
-        HttpEntity entity = response.getEntity();
-
-        if (entity != null)
-        {
-            InputStream inStream = entity.getContent();
-            try
-            {
-                // check for gzip'ed content
-                Header encoding = response.getFirstHeader("Content-Encoding");
-                if (encoding != null && encoding.getValue().equalsIgnoreCase("gzip"))
-                    inStream = new GZIPInputStream(inStream);
-
-                String content = readStream(inStream);
-                Log.d("postJson", "response=" + content);
-                return content;
-            }
-            finally
-            {
-                inStream.close();
-            }
-        }
-        
-        throw new Exception("No response from website.");
-    }
-    
-    private static String readStream(InputStream stream) throws IOException
-    {
-        StringWriter output = new StringWriter();
-        InputStreamReader input = new InputStreamReader(stream);
-
-        char[] buffer = new char[DEFAULT_BUFFER_SIZE];
-        int count = 0;
-        int n = 0;
-        while (-1 != (n = input.read(buffer))) {
-            output.write(buffer, 0, n);
-            count += n;
-        }
-        return output.toString();
+        String content = client.execute(put, response_handler);
+        Log.d("postJson", "response=" + content);
+        return content;
     }
 }

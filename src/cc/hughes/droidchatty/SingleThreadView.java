@@ -115,7 +115,7 @@ public class SingleThreadView extends ListActivity {
         String action = intent.getAction();
         Uri uri = intent.getData();
         
-        if (extras != null) // launched from another activity, load all the info
+        if (extras != null && extras.containsKey(THREAD_ID)) // launched from another activity, load all the info
         {
             _rootThreadId = extras.getInt(THREAD_ID);
             

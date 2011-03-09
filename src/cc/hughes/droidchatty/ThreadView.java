@@ -14,9 +14,6 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.apache.http.client.ClientProtocolException;
-import org.json.JSONException;
-
 import android.R.color;
 import android.app.ListActivity;
 import android.content.Context;

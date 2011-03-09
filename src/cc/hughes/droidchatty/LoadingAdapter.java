@@ -30,6 +30,14 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
     {
         return _items;
     }
+    
+    @Override
+    public T getItem(int position)
+    {
+        if (position == super.getCount())
+            return null;
+        return super.getItem(position);
+    }
 
     @Override
     public int getItemViewType(int position)

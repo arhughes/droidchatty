@@ -60,7 +60,8 @@ public class ThreadView extends ListActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 Thread thread = _adapter.getItem(position);
-                displayThread(thread);
+                if (thread != null)
+                    displayThread(thread);
             }
         });
     }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,10 +38,11 @@ public class ShackApi
     static final String BASE_URL = "http://shackapi.stonedonkey.com/";
     static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     
-    public static ArrayList<SearchResult> search(String term) throws Exception
+    public static ArrayList<SearchResult> search(String term, String author, String parentAuthor) throws Exception
     {
+        String url = BASE_URL + "Search/?json=true&SearchTerm=" + URLEncoder.encode(term, "UTF8") + "&Author=" + URLEncoder.encode(author, "UTF8") + "&ParentAuthor=" + URLEncoder.encode(parentAuthor, "UTF8");
         ArrayList<SearchResult> results = new ArrayList<SearchResult>();
-        JSONObject result = getJson(BASE_URL + "Search.json?SearchTerm=" + term);
+        JSONObject result = getJson(url);
         
         JSONArray comments = result.getJSONArray("comments");
         for (int i = 0; i < comments.length(); i++)
@@ -50,8 +52,9 @@ public class ShackApi
             int id = comment.getInt("id");
             String userName = comment.getString("author");
             String body = comment.getString("preview");
+            String posted = comment.getString("date");
             
-            results.add(new SearchResult(id, userName, body));
+            results.add(new SearchResult(id, userName, body, posted));
         }
         
         return results;
@@ -158,6 +161,7 @@ public class ShackApi
 
     private static JSONObject getJson(String url) throws ClientProtocolException, IOException, JSONException
     {
+        Log.d("DroidChatty", "Requested: " + url);
         DefaultHttpClient client = new DefaultHttpClient();
         HttpGet get = new HttpGet(url);
         get.setHeader("Accept-Encoding", "gzip");

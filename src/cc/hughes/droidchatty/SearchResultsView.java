@@ -50,11 +50,12 @@ public class SearchResultsView extends ListActivity
     private ArrayList<SearchResult> doSearch()
     {
         String term = getIntent().getExtras().getString("terms");
-        Log.d("DroidChatty", "Search Terms = " + term);
+        String author = getIntent().getExtras().getString("author");
+        String parentAuthor = getIntent().getExtras().getString("parentAuthor");
         
         try
         {
-            return ShackApi.search(term);
+            return ShackApi.search(term, author, parentAuthor);
         } catch (Exception e)
         {
             Log.e("DroidChatty", "Error fetching search results", e);

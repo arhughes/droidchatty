@@ -13,6 +13,24 @@
   	android:layout_height="wrap_content"
   	android:layout_width="fill_parent"
   	/>
+  <TextView
+  	android:layout_height="wrap_content"
+  	android:layout_width="wrap_content"
+  	android:text="Author:" />
+  <EditText
+  	android:id="@+id/searchAuthor"
+  	android:layout_height="wrap_content"
+  	android:layout_width="fill_parent"
+  	/>
+  <TextView
+  	android:layout_height="wrap_content"
+  	android:layout_width="wrap_content"
+  	android:text="Parent Author:" />
+  <EditText
+  	android:id="@+id/searchParentAuthor"
+  	android:layout_height="wrap_content"
+  	android:layout_width="fill_parent"
+  	/>
   <Button
   	android:id="@+id/search"
   	android:layout_height="wrap_content"

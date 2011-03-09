@@ -28,10 +28,16 @@ public class SearchView extends Activity
         public void onClick(View v)
         {
             EditText termEditor = (EditText)findViewById(R.id.searchTerm);
+            EditText authorEditor = (EditText)findViewById(R.id.searchAuthor);
+            EditText parentEditor = (EditText)findViewById(R.id.searchParentAuthor);
             String term = termEditor.getText().toString();
+            String author = authorEditor.getText().toString();
+            String parentAuthor = parentEditor.getText().toString();
             
             Intent i = new Intent(SearchView.this, SearchResultsView.class);
             i.putExtra("terms", term);
+            i.putExtra("author", author);
+            i.putExtra("parentAuthor", parentAuthor);
             startActivity(i);
         }
     };

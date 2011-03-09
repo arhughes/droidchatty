@@ -53,25 +53,15 @@ public class ComposePostView extends Activity {
 		    String content = et.getText().toString();
 		    
 		    // post that junk
-		    String result = null;
 		    try
             {
-                result = ShackApi.postReply(ComposePostView.this, _replyToPostId, content);
+                ShackApi.postReply(ComposePostView.this, _replyToPostId, content);
             } catch (Exception e)
             {
                 Log.e("DroidChatty", "Error posting reply", e);
                 ErrorDialog.display(ComposePostView.this, "Error", "An error occured while posting:\n" + e.getMessage());
             }
             
-            // give the server a second to process
-            try
-            {
-                java.lang.Thread.sleep(1500);
-            } catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-		    
 		    // inform the calling activity that we posted
 		    Intent reply = new Intent();
 		    reply.putExtra(SingleThreadView.THREAD_ID, _replyToPostId);

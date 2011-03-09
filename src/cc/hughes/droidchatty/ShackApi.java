@@ -5,29 +5,52 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class ShackApi
 {
+    static final String POST_URL = "http://new.shacknews.com/api/chat/create/17.json";
+    
     static final String BASE_URL = "http://shackapi.stonedonkey.com/";
     static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     
-    public static int postReply(int replyToThreadId, String content)
+    public static String postReply(int replyToThreadId, String content) throws Exception
     {
-        return 12345;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(null);
+        String userName = prefs.getString("userName", null);
+        String password = prefs.getString("password", null);
+        
+        HashMap<String, String> values = new HashMap<String, String>();
+        values.put("content_type_id", "17");
+        values.put("content_id", "");
+        values.put("body", content);
+        if (replyToThreadId > 0)
+            values.put("parent_id", Integer.toString(replyToThreadId));
+        
+        return postJson(POST_URL, userName, password, values);
     }
 
     public static ArrayList<Thread> getThreads() throws ClientProtocolException, IOException, JSONException
@@ -41,7 +64,6 @@ public class ShackApi
         for (int i = 0; i < comments.length(); i++)
         {
             JSONObject comment = comments.getJSONObject(i);
-
 
             int id = comment.getInt("id");
             String userName = comment.getString("author");
@@ -147,6 +169,49 @@ public class ShackApi
 
         // well, that shouldn't happen
         throw new IOException("No response from website found.");
+    }
+    
+    private static String postJson(String url, String userName, String password, HashMap<String, String> values) throws Exception
+    {
+        CredentialsProvider cred = new BasicCredentialsProvider();
+        cred.setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), new UsernamePasswordCredentials(userName, password));
+        
+        DefaultHttpClient client = new DefaultHttpClient();
+        client.setCredentialsProvider(cred);
+        
+        String data = "";
+        for (Map.Entry<String, String> v : values.entrySet())
+            data += v.getKey() + "=" + v.getValue();
+        Log.d("postJson", "data=" + data);
+        
+        HttpPut put = new HttpPut(url);
+        put.setHeader("Accept-Encoding", "gzip");
+        put.setEntity(new StringEntity(data, "UTF8"));
+        
+        HttpResponse response = client.execute(put);
+        HttpEntity entity = response.getEntity();
+
+        if (entity != null)
+        {
+            InputStream inStream = entity.getContent();
+            try
+            {
+                // check for gzip'ed content
+                Header encoding = response.getFirstHeader("Content-Encoding");
+                if (encoding != null && encoding.getValue().equalsIgnoreCase("gzip"))
+                    inStream = new GZIPInputStream(inStream);
+
+                String content = readStream(inStream);
+                Log.d("postJson", "response=" + content);
+                return content;
+            }
+            finally
+            {
+                inStream.close();
+            }
+        }
+        
+        throw new Exception("No response from website.");
     }
     
     private static String readStream(InputStream stream) throws IOException

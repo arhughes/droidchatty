@@ -3,6 +3,7 @@ package cc.hughes.droidchatty;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -52,11 +53,28 @@ public class ComposePostView extends Activity {
 		    String content = et.getText().toString();
 		    
 		    // post that junk
-		    int postId = ShackApi.postReply(_replyToPostId, content);
+		    String result = null;
+		    try
+            {
+                result = ShackApi.postReply(_replyToPostId, content);
+            } catch (Exception e)
+            {
+                Log.e("DroidChatty", "Error posting reply", e);
+                ErrorDialog.display(ComposePostView.this, "Error", "An error occured while posting:\n" + e.getMessage());
+            }
+            
+            // give the server a second to process
+            try
+            {
+                java.lang.Thread.sleep(1500);
+            } catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
 		    
-		    // inform the calling activity that we posted, and what our new post id is
+		    // inform the calling activity that we posted
 		    Intent reply = new Intent();
-		    reply.putExtra(SingleThreadView.THREAD_ID, postId);
+		    reply.putExtra(SingleThreadView.THREAD_ID, _replyToPostId);
 		    setResult(RESULT_OK, reply);
 		    
 		    // lets get the hell out of here!

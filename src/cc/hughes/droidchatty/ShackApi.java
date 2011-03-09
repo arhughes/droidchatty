@@ -33,6 +33,7 @@ public class ShackApi
     static final String POST_URL = "http://new.shacknews.com/api/chat/create/17.json";
     
     static final String BASE_URL = "http://shackapi.stonedonkey.com/";
+    static final String FAKE_STORY_ID = "17";
     static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     
     public static ArrayList<SearchResult> search(String term, String author, String parentAuthor) throws Exception
@@ -72,12 +73,16 @@ public class ShackApi
         
         return postJson(POST_URL, userName, password, values);
     }
-
-    public static ArrayList<Thread> getThreads() throws ClientProtocolException, IOException, JSONException
+    
+    public static ArrayList<Thread> getThreads(int pageNumber) throws ClientProtocolException, IOException, JSONException
+    {
+        JSONObject json = getJson(BASE_URL + FAKE_STORY_ID + "." + Integer.toString(pageNumber) + ".json");
+        return processThreads(json);
+    }
+    
+    private static ArrayList<Thread> processThreads(JSONObject json) throws ClientProtocolException, IOException, JSONException
     {
         ArrayList<Thread> threads = new ArrayList<Thread>();
-
-        JSONObject json = getJson(BASE_URL + "index.json");
 
         // go through each of the comments and pull out the data that is used
         JSONArray comments = json.getJSONArray("comments");

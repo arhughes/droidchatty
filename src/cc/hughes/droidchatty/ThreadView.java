@@ -16,7 +16,6 @@ import java.util.List;
 
 import android.R.color;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -34,7 +33,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -42,35 +40,7 @@ public class ThreadView extends ListActivity {
 
     static final int POST_THREAD = 1;
     
-    private ProgressDialog _progressDialog = null;
-    private ArrayList<Thread> _threads = null;
-    private ThreadAdapter _adapter;
-
-    private Runnable _retrieveThreads = new Runnable()
-    {
-        public void run()
-        {
-            getThreads();
-        }
-    };
-
-    private Runnable _displayThreads = new Runnable()
-    {
-        public void run()
-        {
-            if (_threads != null && _threads.size() > 0)
-            {
-                // remove the elements, and add in all the new ones
-                _adapter.clear();
-                for (Thread t : _threads)
-                {
-                    _adapter.add(t);
-                }
-                _progressDialog.dismiss();
-                _adapter.notifyDataSetChanged();
-            }
-        }
-    };
+    private LoadingThreadAdapter _adapter;
 
     /** Called when the activity is first created. */
     @Override
@@ -79,8 +49,8 @@ public class ThreadView extends ListActivity {
         setContentView(R.layout.main);
 
         // setup the list
-        _threads = getSavedThreads();
-        _adapter = new ThreadAdapter(this, R.layout.row, _threads);
+        ArrayList<Thread> threads = getSavedThreads();
+        _adapter = new LoadingThreadAdapter(this, threads);
         setListAdapter(_adapter);
 
         // listen for clicks
@@ -89,13 +59,10 @@ public class ThreadView extends ListActivity {
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                displayThread(_threads.get(position));
+                Thread thread = _adapter.getItem(position);
+                displayThread(thread);
             }
         });
-
-        // let's get this thing going already!
-        if (_threads.isEmpty())
-            startRefresh();
     }
 
     @SuppressWarnings("unchecked")
@@ -109,7 +76,7 @@ public class ThreadView extends ListActivity {
 
     public Object onRetainNonConfigurationInstance()
     {
-        return _threads;
+        return _adapter.getItems();
     }
 
     @Override
@@ -184,9 +151,7 @@ public class ThreadView extends ListActivity {
 
     private void startRefresh()
     {
-        java.lang.Thread thread = new java.lang.Thread(null, _retrieveThreads, "Backgroundl");
-        thread.start();
-        _progressDialog = ProgressDialog.show(this, "Please wait...", "Retrieving threads...", true, true);
+        _adapter.clear();
     }
 
     private void displayThread(Thread thread)
@@ -199,30 +164,24 @@ public class ThreadView extends ListActivity {
         startActivity(i);
     }
 
-    private void getThreads()
+    private void updatePostCounts(ArrayList<Thread> threads)
     {
-        try
+        // set the number of replies that are new
+        Hashtable<Integer, Integer> counts = getPostCounts();
+        for (Thread t : threads)
         {
-            _threads = ShackApi.getThreads();
-
-            // set the number of replies that are new
-            Hashtable<Integer, Integer> counts = getPostCounts();
-            for (Thread t : _threads)
-            {
-                if (counts.containsKey(t.getThreadId()))
-                    t.setReplyCountPrevious(counts.get(t.getThreadId()));
-            }
-
-            storePostCounts(counts, _threads);
-        } catch (Exception ex)
-        {
-            Log.e("DroidChatty", "Error fetching threds",ex);
-            _progressDialog.dismiss();
-            runOnUiThread(new ErrorDialog(this, "Error", "Error fetching threads."));
-            return;
+            if (counts.containsKey(t.getThreadId()))
+                t.setReplyCountPrevious(counts.get(t.getThreadId()));
         }
 
-        runOnUiThread(_displayThreads);
+        try
+        {
+            storePostCounts(counts, threads);
+        } catch (IOException e)
+        {
+            // yeah, who cares
+            Log.e("ThreadView", "Error storing post counts.", e);
+        }
     }
 
     private Hashtable<Integer, Integer> getPostCounts()
@@ -293,19 +252,25 @@ public class ThreadView extends ListActivity {
             output.close();
         }
     }
-
-    class ThreadAdapter extends ArrayAdapter<Thread> {
-
-        private ArrayList<Thread> items;
-
-        public ThreadAdapter(Context context, int textViewResourceId, ArrayList<Thread> items)
+    
+    class LoadingThreadAdapter extends LoadingAdapter<Thread>
+    {
+        private int _pageNumber = 0;
+        
+        public LoadingThreadAdapter(Context context, List<Thread> objects)
         {
-            super(context, textViewResourceId, items);
-            this.items = items;
+            super(context, R.layout.row, R.layout.row_loading, objects);
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent)
+        public void clear()
+        {
+            _pageNumber = 0;
+            super.clear();
+        }
+
+        @Override
+        protected View createView(int position, View convertView, ViewGroup parent)
         {
             View v = convertView;
             if (v == null)
@@ -313,15 +278,17 @@ public class ThreadView extends ListActivity {
                 LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 v = vi.inflate(R.layout.row, null);
             }
-
+            
+            TextView tvUserName = (TextView)v.findViewById(R.id.textUserName);
+            TextView tvContent = (TextView)v.findViewById(R.id.textContent);
+            TextView tvPosted = (TextView)v.findViewById(R.id.textPostedTime);
+            TextView tvReplyCount = (TextView)v.findViewById(R.id.textReplyCount);
+            
             // get the thread to display and populate all the data into the layout
-            Thread t = items.get(position);
+            Thread t = getItem(position);
+            
             if (t != null)
             {
-                TextView tvUserName = (TextView)v.findViewById(R.id.textUserName);
-                TextView tvContent = (TextView)v.findViewById(R.id.textContent);
-                TextView tvPosted = (TextView)v.findViewById(R.id.textPostedTime);
-                TextView tvReplyCount = (TextView)v.findViewById(R.id.textReplyCount);
                 if (tvUserName != null)
                     tvUserName.setText(t.getUserName());
                 if (tvContent != null)
@@ -340,9 +307,10 @@ public class ThreadView extends ListActivity {
                 // special highlight for employee and mod names
                 tvUserName.setTextColor(User.getColor(t.getUserName()));
             }
+            
             return v;
         }
-
+        
         private Spanned formatReplyCount(Thread thread)
         {
             String first = "(" + thread.getReplyCount();
@@ -360,5 +328,26 @@ public class ThreadView extends ListActivity {
                 formatted.setSpan(new ForegroundColorSpan(Color.GREEN), first.length(), first.length() + second.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             return formatted;
         }
+
+        @Override
+        protected ArrayList<Thread> loadData()
+        {
+            ArrayList<Thread> new_threads = null;
+            try
+            {
+                // grab threads from the api
+                new_threads = ShackApi.getThreads(_pageNumber + 1);
+                _pageNumber++;
+                
+                // update the "new" post counts
+                updatePostCounts(new_threads);
+            } catch (Exception e)
+            {
+                Log.e("ThreadView", "Error loading next page.", e);
+            }
+            
+            return new_threads;
+        }
+        
     }
 }

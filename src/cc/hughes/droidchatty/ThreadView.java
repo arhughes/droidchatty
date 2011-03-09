@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.http.client.ClientProtocolException;
+import org.json.JSONException;
+
 import android.R.color;
 import android.app.ListActivity;
 import android.content.Context;
@@ -331,21 +334,14 @@ public class ThreadView extends ListActivity {
         }
 
         @Override
-        protected ArrayList<Thread> loadData()
+        protected ArrayList<Thread> loadData() throws Exception
         {
-            ArrayList<Thread> new_threads = null;
-            try
-            {
-                // grab threads from the api
-                new_threads = ShackApi.getThreads(_pageNumber + 1);
-                _pageNumber++;
-                
-                // update the "new" post counts
-                updatePostCounts(new_threads);
-            } catch (Exception e)
-            {
-                Log.e("ThreadView", "Error loading next page.", e);
-            }
+            // grab threads from the api
+            ArrayList<Thread> new_threads = ShackApi.getThreads(_pageNumber + 1);
+            _pageNumber++;
+            
+            // update the "new" post counts
+            updatePostCounts(new_threads);
             
             return new_threads;
         }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,7 @@ import android.widget.ArrayAdapter;
 public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
 {
     protected abstract View createView(int position, View convertView, ViewGroup parent);
-    protected abstract ArrayList<T> loadData();
+    protected abstract ArrayList<T> loadData() throws Exception;
     
     private List<T> _items;
     private int _loadingResource;
@@ -98,20 +99,39 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
     
     class LoadAndAppendTask extends AsyncTask<Void, Void, ArrayList<T>>
     {
+        Exception _exception;
+        
         @Override
         protected ArrayList<T> doInBackground(Void... arg0)
         {
-            return loadData();
+            try
+            {
+                return loadData();
+            }
+            catch (Exception e)
+            {
+                Log.e("DroidChatty", "Error loading data.", e);
+                _exception = e;
+            }
+            
+            return null;
         }
 
         @Override
         protected void onPostExecute(ArrayList<T> result)
         {
-            for (T item : result)
-                add(item);
-            
-            _loadingView = null;
-            notifyDataSetChanged();
+            if (_exception != null)
+            {
+               ErrorDialog.display(getContext(), "Error", "Error loading data."); 
+            }
+            else if (result != null)
+            {
+                for (T item : result)
+                    add(item);
+                
+                _loadingView = null;
+                notifyDataSetChanged();
+            }
         }
     }
     

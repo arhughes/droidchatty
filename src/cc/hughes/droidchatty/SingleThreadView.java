@@ -67,8 +67,7 @@ public class SingleThreadView extends ListActivity {
                 if (_currentThreadId == 0)
                 {
                     int index = findPostIndex(_posts, _rootThreadId);
-                    displayPost(_posts.get(index));
-                    getListView().setItemChecked(index, true);
+                    displayPost(_posts.get(index), index);
                 }
             }
         }
@@ -106,8 +105,7 @@ public class SingleThreadView extends ListActivity {
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                lv.setItemChecked(position, true);
-                displayPost(_posts.get(position));
+                displayPost(_posts.get(position), position);
             }
         });
 
@@ -129,10 +127,7 @@ public class SingleThreadView extends ListActivity {
                 String posted = extras.getString(THREAD_POSTED);
     
                 Post post = new Post(_rootThreadId, author, content, posted, 0);
-                displayPost(post);
-                
-                // reset this back to zero so the post will get checked once all the posts are loaded
-                _currentThreadId = 0;
+                displayPost(post, 0);
             }
         }
         else if (action != null && action.equals(Intent.ACTION_VIEW) && uri != null) // launched from URI
@@ -252,8 +247,10 @@ public class SingleThreadView extends ListActivity {
         clipboard.setText(url);
     }
 
-    private void displayPost(Post post)
+    private void displayPost(Post post, int position)
     {
+        ListView lv = getListView();
+        lv.setItemChecked(position, true);
         TextView tvAuthor = (TextView)findViewById(R.id.textUserName);
         TextView tvContent = (TextView)findViewById(R.id.textContent);
         TextView tvPosted = (TextView)findViewById(R.id.textPostedTime);
@@ -264,6 +261,9 @@ public class SingleThreadView extends ListActivity {
         tvPosted.setText(post.getPosted());
         tvContent.setText(PostFormatter.formatContent(post, tvContent, true));
         sv.scrollTo(0, 0);
+        
+        if (_currentThreadId == 0)
+            lv.setSelection(position);
         
         _currentThreadId = post.getPostId();
     }

@@ -33,9 +33,9 @@ public class ShackApi
     static final String FAKE_STORY_ID = "17";
     static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     
-    public static ArrayList<SearchResult> search(String term, String author, String parentAuthor) throws Exception
+    public static ArrayList<SearchResult> search(String term, String author, String parentAuthor, int pageNumber) throws Exception
     {
-        String url = BASE_URL + "Search/?json=true&SearchTerm=" + URLEncoder.encode(term, "UTF8") + "&Author=" + URLEncoder.encode(author, "UTF8") + "&ParentAuthor=" + URLEncoder.encode(parentAuthor, "UTF8");
+        String url = BASE_URL + "Search/?json=true&SearchTerm=" + URLEncoder.encode(term, "UTF8") + "&Author=" + URLEncoder.encode(author, "UTF8") + "&ParentAuthor=" + URLEncoder.encode(parentAuthor, "UTF8") + "&Page=" + URLEncoder.encode(Integer.toString(pageNumber), "UTF-8");
         ArrayList<SearchResult> results = new ArrayList<SearchResult>();
         JSONObject result = getJson(url);
         

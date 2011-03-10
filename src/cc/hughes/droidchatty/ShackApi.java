@@ -1,6 +1,9 @@
 package cc.hughes.droidchatty;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,7 +13,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -25,7 +27,7 @@ import android.util.Log;
 
 public class ShackApi
 {
-    static final String POST_URL = "http://new.shacknews.com/api/chat/create/17.json";
+    static final String POST_URL = "http://www.shacknews.com/api/chat/create/17.json";
     
     static final String BASE_URL = "http://shackapi.stonedonkey.com/";
     static final String FAKE_STORY_ID = "17";
@@ -53,7 +55,7 @@ public class ShackApi
         return results;
     }
     
-    public static String postReply(Context context, int replyToThreadId, String content) throws Exception
+    public static int postReply(Context context, int replyToThreadId, String content) throws Exception
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String userName = prefs.getString("userName", null);
@@ -66,7 +68,13 @@ public class ShackApi
         if (replyToThreadId > 0)
             values.add(new BasicNameValuePair("parent_id", Integer.toString(replyToThreadId)));
         
-        return postJson(POST_URL, userName, password, values);
+        JSONObject result = postJson(POST_URL, userName, password, values);
+        
+        if (!result.has("data"))
+            throw new Exception("Missing response data.");
+        
+        JSONObject data = result.getJSONObject("data");
+        return data.getInt("post_insert_id");
     }
     
     public static ArrayList<Thread> getThreads(int pageNumber) throws ClientProtocolException, IOException, JSONException
@@ -170,17 +178,53 @@ public class ShackApi
         return new JSONObject(content);
     }
     
-    private static String postJson(String url, String userName, String password, List<NameValuePair> values) throws Exception
+    private static JSONObject postJson(String url, String userName, String password, List<NameValuePair> values) throws Exception
     {
-        DefaultHttpClient client = new DefaultHttpClient();
-        BasicResponseHandler response_handler = new BasicResponseHandler();
+        UrlEncodedFormEntity e = new UrlEncodedFormEntity(values);
         
-        HttpPut put = new HttpPut(url);
-        put.setHeader("Authorization", "Basic " + Base64.encodeBytes((userName + ":" + password).getBytes()));
-        put.setEntity(new UrlEncodedFormEntity(values));
+        URL post_url = new URL(url);
+        URLConnection con = post_url.openConnection();
+        con.setRequestProperty("Authorization", "Basic " + Base64.encodeBytes((userName + ":" + password).getBytes()));
         
-        String content = client.execute(put, response_handler);
-        Log.d("postJson", "response=" + content);
-        return content;
+        // write our request
+        con.setDoOutput(true);
+        java.io.OutputStream os = con.getOutputStream();
+        try
+        {
+            e.writeTo(os);
+            os.flush();
+        }
+        finally
+        {
+            os.close();
+        }
+        
+        // read the response
+        java.io.InputStream input = con.getInputStream();
+        try
+        {
+            String content = readStream(input);
+            Log.d("DroidChatty", "response=" + content);
+            return new JSONObject(content);
+        }
+        finally
+        {
+            input.close();
+        }
+    }
+    
+    private static String readStream(java.io.InputStream stream) throws IOException
+    {
+        StringBuilder output = new StringBuilder();
+        InputStreamReader input = new InputStreamReader(stream);
+
+        char[] buffer = new char[DEFAULT_BUFFER_SIZE];
+        int count = 0;
+        int n = 0;
+        while (-1 != (n = input.read(buffer))) {
+            output.append(buffer, 0, n);
+            count += n;
+        }
+        return output.toString();
     }
 }

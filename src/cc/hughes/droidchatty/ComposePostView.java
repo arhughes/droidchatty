@@ -53,9 +53,10 @@ public class ComposePostView extends Activity {
 		    String content = et.getText().toString();
 		    
 		    // post that junk
+		    int reply_id = -1;
 		    try
             {
-                ShackApi.postReply(ComposePostView.this, _replyToPostId, content);
+                reply_id = ShackApi.postReply(ComposePostView.this, _replyToPostId, content);
             } catch (Exception e)
             {
                 Log.e("DroidChatty", "Error posting reply", e);
@@ -64,7 +65,8 @@ public class ComposePostView extends Activity {
             
 		    // inform the calling activity that we posted
 		    Intent reply = new Intent();
-		    reply.putExtra(SingleThreadView.THREAD_ID, _replyToPostId);
+		    if (reply_id > 0)
+    		    reply.putExtra(SingleThreadView.THREAD_ID, reply_id);
 		    setResult(RESULT_OK, reply);
 		    
 		    // lets get the hell out of here!

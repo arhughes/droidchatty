@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<cc.hughes.CheckableRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
    android:id="@+id/previewLayout"
    android:orientation="vertical"
    android:layout_width="fill_parent" 
    android:layout_height="fill_parent"
    android:padding="6dip"
+   android:background="@color/thread_selector"
    >
     <TextView
        android:id="@+id/textPreview"
@@ -13,4 +14,4 @@
        android:ellipsize="end"
        android:singleLine="true"
     />
-</RelativeLayout>
+</cc.hughes.CheckableRelativeLayout>

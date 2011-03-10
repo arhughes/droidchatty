@@ -6,7 +6,6 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.ClipboardManager;
@@ -24,7 +23,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -69,7 +67,8 @@ public class SingleThreadView extends ListActivity {
                 if (_currentThreadId == 0)
                 {
                     int index = findPostIndex(_posts, _rootThreadId);
-                    displayPost(_posts.get(index), index);
+                    displayPost(_posts.get(index));
+                    getListView().setItemChecked(index, true);
                 }
             }
         }
@@ -102,11 +101,13 @@ public class SingleThreadView extends ListActivity {
         
         // setup listening for clicks
         final ListView lv = getListView();
+        lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         lv.setOnItemClickListener(new OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                displayPost(_posts.get(position), position);
+                lv.setItemChecked(position, true);
+                displayPost(_posts.get(position));
             }
         });
 
@@ -128,7 +129,10 @@ public class SingleThreadView extends ListActivity {
                 String posted = extras.getString(THREAD_POSTED);
     
                 Post post = new Post(_rootThreadId, author, content, posted, 0);
-                displayPost(post, 0);
+                displayPost(post);
+                
+                // reset this back to zero so the post will get checked once all the posts are loaded
+                _currentThreadId = 0;
             }
         }
         else if (action != null && action.equals(Intent.ACTION_VIEW) && uri != null) // launched from URI
@@ -248,16 +252,8 @@ public class SingleThreadView extends ListActivity {
         clipboard.setText(url);
     }
 
-    private void displayPost(Post post, int position)
+    private void displayPost(Post post)
     {
-        // unhighlight old selected, highlight new selected
-        // should be able to do this with a selector, but damned if I could get it to work
-        int previousPosition = _adapter.getSelectedPosition();
-        ListView lv = getListView();
-        _adapter.setSelectedPosition(position);
-        _adapter.fixBackgroundColor(lv, previousPosition);
-        _adapter.fixBackgroundColor(lv, position);
-        
         TextView tvAuthor = (TextView)findViewById(R.id.textUserName);
         TextView tvContent = (TextView)findViewById(R.id.textContent);
         TextView tvPosted = (TextView)findViewById(R.id.textPostedTime);
@@ -269,10 +265,6 @@ public class SingleThreadView extends ListActivity {
         tvContent.setText(PostFormatter.formatContent(post, tvContent, true));
         sv.scrollTo(0, 0);
         
-        // if this is the first time loaded, make sure the post being displayed is visible
-        if (_currentThreadId == 0)
-            lv.setSelection(position);
-
         _currentThreadId = post.getPostId();
     }
 
@@ -308,17 +300,6 @@ public class SingleThreadView extends ListActivity {
     class ThreadAdapter extends ArrayAdapter<Post> {
 
         private ArrayList<Post> items;
-        private int selectedPosition;
-
-        public int getSelectedPosition()
-        {
-            return selectedPosition;
-        }
-
-        public void setSelectedPosition(int position)
-        {
-            selectedPosition = position;
-        }
 
         public ThreadAdapter(Context context, int textViewResourceId, ArrayList<Post> items)
         {
@@ -350,25 +331,7 @@ public class SingleThreadView extends ListActivity {
             content.setPadding(15 * t.getLevel(), 0, 0, 0);
             content.setText(t.getPreview());
 
-            fixBackgroundColor(convertView, position);
-
             return convertView;
-        }
-
-        public void fixBackgroundColor(ListView view, int position)
-        {
-            View v = view.getChildAt(position - view.getFirstVisiblePosition());
-            if (v != null)
-                fixBackgroundColor(v, position);
-        }
-
-        public void fixBackgroundColor(View view, int position)
-        {
-            RelativeLayout preview = (RelativeLayout)view.findViewById(R.id.previewLayout);
-            if (position == selectedPosition)
-                preview.setBackgroundColor(Color.rgb(0x22, 0x55, 0xdd));
-            else
-                preview.setBackgroundColor(Color.TRANSPARENT);
         }
 
     }

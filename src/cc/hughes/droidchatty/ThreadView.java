@@ -25,7 +25,6 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -273,13 +272,9 @@ public class ThreadView extends ListActivity {
         @Override
         protected View createView(int position, View convertView, ViewGroup parent)
         {
-            ViewHolder holder;
-            
-            if (convertView == null)
+            ViewHolder holder = (ViewHolder)convertView.getTag();
+            if (holder == null)
             {
-                LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = vi.inflate(R.layout.row, null);
-                
                 holder = new ViewHolder();
                 holder.userName = (TextView)convertView.findViewById(R.id.textUserName);
                 holder.content = (TextView)convertView.findViewById(R.id.textContent);
@@ -287,10 +282,6 @@ public class ThreadView extends ListActivity {
                 holder.replyCount = (TextView)convertView.findViewById(R.id.textReplyCount);
                 
                 convertView.setTag(holder);
-            }
-            else
-            {
-                holder = (ViewHolder)convertView.getTag();
             }
             
             // get the thread to display and populate all the data into the layout

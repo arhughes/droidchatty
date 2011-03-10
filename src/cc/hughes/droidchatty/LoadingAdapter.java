@@ -17,13 +17,18 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
     protected abstract ArrayList<T> loadData() throws Exception;
     
     private List<T> _items;
+    private int _normalResource;
     private int _loadingResource;
     private View _loadingView;
     private boolean _moreToLoad = true;
     
+    LayoutInflater _inflater;
+    
     public LoadingAdapter(Context context, int resource, int loadingResource, List<T> objects)
     {
-        super(context, resource, 0, objects);
+        super(context, 0, 0, objects);
+        _inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        _normalResource = resource;
         _loadingResource = loadingResource;
         _items = objects;
     }
@@ -91,13 +96,15 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
             return _loadingView;
         }
         
+        if (convertView == null)
+            convertView = _inflater.inflate(_normalResource, null);
+        
         return createView(position, convertView, parent);
     }
     
     private View getLoadingView(ViewGroup parent)
     {
-        LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        return inflater.inflate(_loadingResource, parent, false);
+        return _inflater.inflate(_loadingResource, parent, false);
     }
     
     class LoadAndAppendTask extends AsyncTask<Void, Void, ArrayList<T>>

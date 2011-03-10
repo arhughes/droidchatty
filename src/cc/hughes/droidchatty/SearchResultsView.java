@@ -68,23 +68,15 @@ public class SearchResultsView extends ListActivity
         @Override
         protected View createView(int position, View convertView, ViewGroup parent)
         {
-            ViewHolder holder;
+            ViewHolder holder = (ViewHolder)convertView.getTag();
             
-            if (convertView == null)
+            if (holder == null)
             {
-                LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = vi.inflate(R.layout.search_result_row, null);
-                
                 holder = new ViewHolder();
                 holder.userName = (TextView)convertView.findViewById(R.id.textUserName);
                 holder.content = (TextView)convertView.findViewById(R.id.textContent);
                 holder.posted = (TextView)convertView.findViewById(R.id.textPostedTime);
-                
                 convertView.setTag(holder);
-            }
-            else
-            {
-                holder = (ViewHolder)convertView.getTag();
             }
 
             // get the thread to display and populate all the data into the layout

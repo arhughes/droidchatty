@@ -19,6 +19,7 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
     private List<T> _items;
     private int _loadingResource;
     private View _loadingView;
+    private boolean _moreToLoad = true;
     
     public LoadingAdapter(Context context, int resource, int loadingResource, List<T> objects)
     {
@@ -59,7 +60,9 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
     @Override
     public int getCount()
     {
-        return super.getCount() + 1;
+        if (_moreToLoad)
+            return super.getCount() + 1;
+        return super.getCount();
     }
     
     @Override
@@ -122,16 +125,25 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
         {
             if (_exception != null)
             {
+               _moreToLoad = false;
                ErrorDialog.display(getContext(), "Error", "Error loading data."); 
             }
             else if (result != null)
             {
-                for (T item : result)
-                    add(item);
-                
-                _loadingView = null;
-                notifyDataSetChanged();
+                if (result.size() == 0)
+                {
+                    _moreToLoad = false;
+                }
+                else
+                {
+                    for (T item : result)
+                        add(item);
+                }
             }
+            
+            // dataset changed, either there are new items, or the count went down (no more "Loading")
+            notifyDataSetChanged();
+            _loadingView = null;
         }
     }
     

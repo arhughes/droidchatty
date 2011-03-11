@@ -18,6 +18,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -42,8 +43,14 @@ public class ThreadListFragment extends ListFragment
         _adapter = new ThreadLoadingAdapter(getActivity(), new ArrayList<Thread>());
         setListAdapter(_adapter);
         
-        View singleThread = getActivity().findViewById(R.id.add);
+        View singleThread = getActivity().findViewById(R.id.singleThread);
         _dualPane = singleThread != null && singleThread.getVisibility() == View.VISIBLE;
+        
+        if (_dualPane)
+        {
+            getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        }
+        
     }
     
     @Override
@@ -58,7 +65,18 @@ public class ThreadListFragment extends ListFragment
         
         if (_dualPane)
         {
-            // do something later
+            getListView().setItemChecked(index, true);
+            
+            ThreadViewFragment view = (ThreadViewFragment)getFragmentManager().findFragmentById(R.id.singleThread);
+            if (view == null || view.getPostId() != thread.getThreadId())
+            {
+                view = ThreadViewFragment.newInstance(thread.getThreadId(), thread.getUserName(), thread.getPosted(), thread.getContent());
+                
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.singleThread, view);
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                ft.commit();
+            }
         }
         else
         {

@@ -31,6 +31,11 @@ public class ThreadViewFragment extends ListFragment
     
     PostLoadingAdapter _adapter;
     int _rootPostId;
+    
+    public int getPostId()
+    {
+       return getArguments().getInt("postId"); 
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)

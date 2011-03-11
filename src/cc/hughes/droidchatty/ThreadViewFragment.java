@@ -9,16 +9,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class ThreadViewFragment extends ListFragment
 {
-    public static ThreadViewFragment newInstance(int postId)
+    public static ThreadViewFragment newInstance(int postId, String userName, String posted, String content)
     {
         ThreadViewFragment f = new ThreadViewFragment();
         
         Bundle args = new Bundle();
         args.putInt("postId", postId);
+        args.putString("userName", userName);
+        args.putString("posted", posted);
+        args.putString("content", content);
+        
         f.setArguments(args);
         
         return f;
@@ -33,13 +38,44 @@ public class ThreadViewFragment extends ListFragment
         _adapter = new PostLoadingAdapter(getActivity(), new ArrayList<Post>());
         setListAdapter(_adapter);
         
-        _rootPostId = getArguments().getInt("postId");
+        Bundle args = getArguments();
+        _rootPostId = args.getInt("postId");
         
         // inflate our view and keep track of it
         View view = inflater.inflate(R.layout.thread_view, null);
-        TextView user = (TextView)view.findViewById(R.id.textUserName);
-        user.setText(Integer.toString(_rootPostId));
+        
+        ListView listView = (ListView)view.findViewById(android.R.id.list);
+        listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        
+        if (args.containsKey("content"))
+        {
+            String userName = args.getString("userName");
+            String content = args.getString("content");
+            String posted = args.getString("posted");
+            Post post = new Post(_rootPostId, userName, content, posted, 0);
+            displayPost(view, post);
+        }
+        
         return view;
+    }
+    
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id)
+    {
+        l.setItemChecked(position, true);
+        Post post = _adapter.getItem(position);
+        displayPost(getView(), post);
+    }
+
+    private void displayPost(View view, Post post)
+    {
+        TextView userName = (TextView)view.findViewById(R.id.textUserName);
+        TextView posted = (TextView)view.findViewById(R.id.textPostedTime);
+        TextView content = (TextView)view.findViewById(R.id.textContent);
+        
+        userName.setText(post.getUserName());
+        posted.setText(post.getPosted());
+        content.setText(post.getContent());
     }
     
     private class PostLoadingAdapter extends LoadingAdapter<Post>

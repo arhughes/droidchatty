@@ -65,6 +65,9 @@ public class ThreadListFragment extends ListFragment
             Intent intent = new Intent();
             intent.setClass(getActivity(), SingleThreadView.class);
             intent.putExtra("postId", thread.getThreadId());
+            intent.putExtra("userName", thread.getUserName());
+            intent.putExtra("posted", thread.getPosted());
+            intent.putExtra("content", thread.getContent());
             startActivity(intent);
         }
     }

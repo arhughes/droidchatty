@@ -80,7 +80,7 @@ public class ThreadViewFragment extends ListFragment
         
         userName.setText(post.getUserName());
         posted.setText(post.getPosted());
-        content.setText(post.getContent());
+        content.setText(PostFormatter.formatContent(post, content, true));
     }
     
     private class PostLoadingAdapter extends LoadingAdapter<Post>

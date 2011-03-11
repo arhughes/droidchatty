@@ -16,6 +16,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.text.Spannable;
@@ -25,10 +26,12 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class ThreadListFragment extends ListFragment
 {
+    private boolean _dualPane;
     ThreadLoadingAdapter _adapter;
     
     @Override
@@ -38,8 +41,34 @@ public class ThreadListFragment extends ListFragment
         
         _adapter = new ThreadLoadingAdapter(getActivity(), new ArrayList<Thread>());
         setListAdapter(_adapter);
+        
+        View singleThread = getActivity().findViewById(R.id.add);
+        _dualPane = singleThread != null && singleThread.getVisibility() == View.VISIBLE;
     }
     
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id)
+    {
+        showDetails(position);
+    }
+    
+    void showDetails(int index)
+    {
+        Thread thread = _adapter.getItem(index);
+        
+        if (_dualPane)
+        {
+            // do something later
+        }
+        else
+        {
+            Intent intent = new Intent();
+            intent.setClass(getActivity(), SingleThreadView.class);
+            intent.putExtra("postId", thread.getThreadId());
+            startActivity(intent);
+        }
+    }
+
     private void updatePostCounts(ArrayList<Thread> threads)
     {
         // set the number of replies that are new

@@ -5,52 +5,52 @@
     android:layout_height="fill_parent"
     >
     <RelativeLayout
-	    android:layout_width="fill_parent" 
-	    android:layout_height="fill_parent" 
-	    android:layout_weight="1"
-	    >
-	     <TextView
-	         android:id="@+id/textUserName"
-	         android:layout_width="wrap_content"
-	         android:layout_height="wrap_content"
-	         android:textColor="#f3e7b5"
-	         android:textSize="14dip"
-	         android:textStyle="bold"
-	         android:paddingLeft="6dip"
-	     />
-	     <TextView
-	     	 android:id="@+id/textPostedTime"
-	     	 android:layout_width="wrap_content"
-	     	 android:layout_height="wrap_content"
-	     	 android:layout_alignParentRight="true"
-	         android:textColor="#666"
-	         android:textSize="14dip"
-	         android:paddingRight="6dip"
-	     />
-	     <ScrollView
-	         android:id="@+id/scroll"
-	         android:layout_width="fill_parent"
-	         android:layout_height="fill_parent"
-	         android:layout_below="@id/textUserName">
-		     <TextView
-		         android:id="@+id/textContent"
-		         android:layout_width="fill_parent"
-		         android:layout_height="wrap_content"
-		         android:textSize="14dip"
-		         android:padding="6dip"
-		         android:textColorHighlight="@android:color/transparent"
-		     />
-	     </ScrollView>
+        android:layout_width="fill_parent" 
+        android:layout_height="fill_parent" 
+        android:layout_weight="1"
+        >
+         <TextView
+             android:id="@+id/textUserName"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:textColor="#f3e7b5"
+             android:textSize="14dip"
+             android:textStyle="bold"
+             android:paddingLeft="6dip"
+         />
+         <TextView
+             android:id="@+id/textPostedTime"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignParentRight="true"
+             android:textColor="#666"
+             android:textSize="14dip"
+             android:paddingRight="6dip"
+         />
+         <ScrollView
+             android:id="@+id/scroll"
+             android:layout_width="fill_parent"
+             android:layout_height="fill_parent"
+             android:layout_below="@id/textUserName">
+             <TextView
+                 android:id="@+id/textContent"
+                 android:layout_width="fill_parent"
+                 android:layout_height="wrap_content"
+                 android:textSize="14dip"
+                 android:padding="6dip"
+                 android:textColorHighlight="@android:color/transparent"
+             />
+         </ScrollView>
     </RelativeLayout>
     <View
-    	android:layout_width="fill_parent"
-    	android:layout_height="2px"
-    	android:background="#333"
+        android:layout_width="fill_parent"
+        android:layout_height="2px"
+        android:background="#333"
      />
     <ListView
-    	android:id="@+id/android:list"
-    	android:layout_width="fill_parent"
-    	android:layout_height="fill_parent"
-	    android:layout_weight="1"
-    	/>
+        android:id="@+id/android:list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        />
 </LinearLayout>

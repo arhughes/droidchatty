@@ -15,6 +15,7 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
 {
     protected abstract View createView(int position, View convertView, ViewGroup parent);
     protected abstract ArrayList<T> loadData() throws Exception;
+    protected void afterDisplay() { }
     
     private List<T> _items;
     private int _normalResource;
@@ -65,7 +66,7 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
     @Override
     public int getCount()
     {
-        if (_moreToLoad)
+        if (getMoreToLoad())
             return super.getCount() + 1;
         return super.getCount();
     }
@@ -81,6 +82,13 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
     {
         _items.clear();
         super.clear();
+        _moreToLoad = true;
+        _loadingView = null;
+    }
+    
+    protected boolean getMoreToLoad()
+    {
+        return _moreToLoad;
     }
 
     @Override
@@ -151,6 +159,7 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
             // dataset changed, either there are new items, or the count went down (no more "Loading")
             notifyDataSetChanged();
             _loadingView = null;
+            afterDisplay();
         }
     }
     

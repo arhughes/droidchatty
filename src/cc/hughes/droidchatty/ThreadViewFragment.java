@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,7 +70,7 @@ public class ThreadViewFragment extends ListFragment
         Post post = _adapter.getItem(position);
         displayPost(getView(), post);
     }
-
+    
     private void displayPost(View view, Post post)
     {
         TextView userName = (TextView)view.findViewById(R.id.textUserName);
@@ -85,9 +84,24 @@ public class ThreadViewFragment extends ListFragment
     
     private class PostLoadingAdapter extends LoadingAdapter<Post>
     {
+        private boolean _loaded = false;
+        
         public PostLoadingAdapter(Context context, ArrayList<Post> items)
         {
             super(context, R.layout.thread_row, R.layout.row_loading, items);
+        }
+        
+        @Override
+        public void clear()
+        {
+            _loaded = false;
+            super.clear();
+        }
+        
+        @Override
+        protected boolean getMoreToLoad()
+        {
+            return !_loaded;
         }
 
         @Override
@@ -111,7 +125,9 @@ public class ThreadViewFragment extends ListFragment
         @Override
         protected ArrayList<Post> loadData() throws Exception
         {
-            return ShackApi.getPosts(_rootPostId);
+            ArrayList<Post> posts = ShackApi.getPosts(_rootPostId);
+            _loaded = true;
+            return posts;
         }
     }
     

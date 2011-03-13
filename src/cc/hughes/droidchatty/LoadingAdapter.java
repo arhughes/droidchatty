@@ -65,7 +65,7 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
     @Override
     public int getCount()
     {
-        if (_moreToLoad)
+        if (getMoreToLoad())
             return super.getCount() + 1;
         return super.getCount();
     }
@@ -81,6 +81,12 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
     {
         _items.clear();
         super.clear();
+        _loadingView = null;
+    }
+    
+    protected boolean getMoreToLoad()
+    {
+        return _moreToLoad;
     }
 
     @Override

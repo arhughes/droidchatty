@@ -133,6 +133,21 @@ public class ThreadViewFragment extends ListFragment
             _loaded = true;
             return posts;
         }
+        
+        @Override
+        protected void afterDisplay()
+        {
+            int length = getCount();
+            for (int i = 0; i < length; i++)
+            {
+                if (getItem(i).getPostId() == _rootPostId)
+                {
+                    getListView().setItemChecked(i, true);
+                    break;
+                }
+            }
+            
+        }
     }
     
 }

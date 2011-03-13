@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class ThreadViewFragment extends ListFragment
@@ -140,10 +141,12 @@ public class ThreadViewFragment extends ListFragment
         TextView userName = (TextView)view.findViewById(R.id.textUserName);
         TextView posted = (TextView)view.findViewById(R.id.textPostedTime);
         TextView content = (TextView)view.findViewById(R.id.textContent);
+        ScrollView scroll = (ScrollView)view.findViewById(R.id.scroll);
         
         userName.setText(post.getUserName());
         posted.setText(post.getPosted());
         content.setText(PostFormatter.formatContent(post, content, true));
+        scroll.scrollTo(0, 0);
         
         _currentPostId = post.getPostId();
     }

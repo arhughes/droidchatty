@@ -93,7 +93,7 @@ public class ThreadViewFragment extends ListFragment
     {
         switch(item.getItemId())
         {
-            case R.id.refresh:
+            case R.id.refreshThread:
                 _adapter.clear();
                 return true;
             case R.id.reply:

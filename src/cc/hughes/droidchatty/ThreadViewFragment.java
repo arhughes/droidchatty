@@ -2,10 +2,15 @@ package cc.hughes.droidchatty;
 
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -30,6 +35,7 @@ public class ThreadViewFragment extends ListFragment
     
     PostLoadingAdapter _adapter;
     int _rootPostId;
+    int _currentPostId;
     
     public int getPostId()
     {
@@ -40,6 +46,7 @@ public class ThreadViewFragment extends ListFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         _rootPostId = getArguments().getInt("postId");
+        _currentPostId = _rootPostId;
         
         _adapter = new PostLoadingAdapter(getActivity(), new ArrayList<Post>());
         setListAdapter(_adapter);
@@ -63,6 +70,8 @@ public class ThreadViewFragment extends ListFragment
             Post post = new Post(_rootPostId, userName, content, posted, 0);
             displayPost(post);
         }
+        
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -73,6 +82,57 @@ public class ThreadViewFragment extends ListFragment
         displayPost(post);
     }
     
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.thread_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch(item.getItemId())
+        {
+            case R.id.refresh:
+                _adapter.clear();
+                return true;
+            case R.id.reply:
+                postReply();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    
+    private static final int POST_REPLY = 1;
+    private void postReply()
+    {
+        Intent i = new Intent(getActivity(), ComposePostView.class);
+        i.putExtra(SingleThreadView.THREAD_ID, _currentPostId);
+        startActivityForResult(i, POST_REPLY);
+    }
+    
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        switch (requestCode)
+        {
+            case POST_REPLY:
+                if (resultCode == Activity.RESULT_OK)
+                {
+                    // read the resulting thread id from the post
+                    int postId = data.getExtras().getInt(SingleThreadView.THREAD_ID);
+                    
+                    _rootPostId = postId;
+                    _currentPostId = postId;
+                    _adapter.clear();
+                }
+                break;
+            default:
+                break;
+        }
+    } 
+
     private void displayPost(Post post)
     {
         View view = getView();
@@ -84,6 +144,8 @@ public class ThreadViewFragment extends ListFragment
         userName.setText(post.getUserName());
         posted.setText(post.getPosted());
         content.setText(PostFormatter.formatContent(post, content, true));
+        
+        _currentPostId = post.getPostId();
     }
     
     private class PostLoadingAdapter extends LoadingAdapter<Post>
@@ -140,9 +202,10 @@ public class ThreadViewFragment extends ListFragment
             int length = getCount();
             for (int i = 0; i < length; i++)
             {
-                if (getItem(i).getPostId() == _rootPostId)
+                if (getItem(i).getPostId() == _currentPostId)
                 {
                     getListView().setItemChecked(i, true);
+                    getListView().setSelection(i);
                     break;
                 }
             }

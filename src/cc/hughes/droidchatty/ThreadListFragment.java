@@ -25,6 +25,9 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -51,6 +54,7 @@ public class ThreadListFragment extends ListFragment
             getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         }
         
+        setHasOptionsMenu(true);
     }
     
     @Override
@@ -58,6 +62,76 @@ public class ThreadListFragment extends ListFragment
     {
         showDetails(position);
     }
+    
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.main_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.refresh:
+                _adapter.clear();
+                return true;
+            case R.id.add:
+                post();
+                return true;
+            case R.id.settings:
+                showSettings();
+                return true;
+            case R.id.search:
+                showSearch();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    
+    private static final int POST_THREAD = 1;
+    private void post()
+    {
+        Intent i = new Intent(getActivity(), ComposePostView.class);
+        startActivityForResult(i, POST_THREAD);
+    }
+    
+    private void showSettings()
+    {
+        Intent i = new Intent(getActivity(), PreferenceView.class);
+        startActivity(i);
+    }
+    
+    private void showSearch()
+    {
+        Intent i = new Intent(getActivity(), SearchView.class);
+        startActivity(i);
+    }
+    
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        switch (requestCode)
+        {
+            case POST_THREAD:
+                if (resultCode == Activity.RESULT_OK)
+                {
+                    // read the resulting thread id from the post
+                    int postId = data.getExtras().getInt(SingleThreadView.THREAD_ID);
+                    
+                    // hey, thats the same thing I just wrote!
+                    Intent i = new Intent(getActivity(), SingleThreadView.class);
+                    i.putExtra(SingleThreadView.THREAD_ID, postId);
+                    startActivity(i);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     
     void showDetails(int index)
     {

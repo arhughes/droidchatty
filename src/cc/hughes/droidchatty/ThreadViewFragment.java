@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -72,6 +73,10 @@ public class ThreadViewFragment extends ListFragment
             Post post = new Post(_rootPostId, userName, content, posted, 0);
             displayPost(post);
         }
+        
+        // makes links actually clickable
+        TextView content = (TextView)getView().findViewById(R.id.textContent);
+        content.setMovementMethod(new LinkMovementMethod());
         
         setHasOptionsMenu(true);
     }

@@ -82,6 +82,7 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
     {
         _items.clear();
         super.clear();
+        _moreToLoad = true;
         _loadingView = null;
     }
     

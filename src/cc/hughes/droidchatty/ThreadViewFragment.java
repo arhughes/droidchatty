@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -202,15 +203,21 @@ public class ThreadViewFragment extends ListFragment
         @Override
         protected void afterDisplay()
         {
-            int length = getCount();
-            for (int i = 0; i < length; i++)
+            try
             {
-                if (getItem(i).getPostId() == _currentPostId)
+                int length = getCount();
+                for (int i = 0; i < length; i++)
                 {
-                    getListView().setItemChecked(i, true);
-                    getListView().setSelection(i);
-                    break;
+                    if (getItem(i).getPostId() == _currentPostId)
+                    {
+                        getListView().setItemChecked(i, true);
+                        getListView().setSelection(i);
+                        break;
+                    }
                 }
+            } catch (Exception e)
+            {
+                Log.w("DroidChatty", "Error selecting root post", e);
             }
             
         }

@@ -39,40 +39,44 @@ public class ThreadViewFragment extends ListFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        _rootPostId = getArguments().getInt("postId");
+        
         _adapter = new PostLoadingAdapter(getActivity(), new ArrayList<Post>());
         setListAdapter(_adapter);
         
+        return inflater.inflate(R.layout.thread_view, null);
+    }
+    
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        
+        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        
         Bundle args = getArguments();
-        _rootPostId = args.getInt("postId");
-        
-        // inflate our view and keep track of it
-        View view = inflater.inflate(R.layout.thread_view, null);
-        
-        ListView listView = (ListView)view.findViewById(android.R.id.list);
-        listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        
         if (args.containsKey("content"))
         {
             String userName = args.getString("userName");
             String content = args.getString("content");
             String posted = args.getString("posted");
             Post post = new Post(_rootPostId, userName, content, posted, 0);
-            displayPost(view, post);
+            displayPost(post);
         }
-        
-        return view;
     }
-    
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
         l.setItemChecked(position, true);
         Post post = _adapter.getItem(position);
-        displayPost(getView(), post);
+        displayPost(post);
     }
     
-    private void displayPost(View view, Post post)
+    private void displayPost(Post post)
     {
+        View view = getView();
+        
         TextView userName = (TextView)view.findViewById(R.id.textUserName);
         TextView posted = (TextView)view.findViewById(R.id.textPostedTime);
         TextView content = (TextView)view.findViewById(R.id.textContent);

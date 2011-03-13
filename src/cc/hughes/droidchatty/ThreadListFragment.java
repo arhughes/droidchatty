@@ -292,11 +292,10 @@ public class ThreadListFragment extends ListFragment
             holder.posted.setText(t.getPosted());
             holder.replyCount.setText(formatReplyCount(t));
 
-            // special highlight for shacknews posts
+            // special highlight for shacknews posts, hopefully the thread_selector color thing will
+            // reset the background to transparent when scrolling
             if (t.getUserName().equalsIgnoreCase("Shacknews"))
                 convertView.setBackgroundColor(getResources().getColor(R.color.news_post_background));
-            else
-                convertView.setBackgroundColor(android.R.color.background_dark);
 
             // special highlight for employee and mod names
             holder.userName.setTextColor(User.getColor(t.getUserName()));

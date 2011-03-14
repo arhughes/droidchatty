@@ -10,7 +10,6 @@
 	  android:layout_weight="1"
 	  android:gravity="top"
 	  android:hint="@string/reply_text_hint"
-	  android:inputType="textCapSentences|textMultiLine|textAutoCorrect|textAutoComplete|textLongMessage"
 	  android:imeOptions="actionDone"
    />
   <LinearLayout

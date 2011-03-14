@@ -143,6 +143,10 @@ public class ThreadViewFragment extends ListFragment
     {
         getListView().setItemChecked(position, true);
         Post post = _adapter.getItem(position);
+        
+        if (!_postDisplayed)
+            getListView().setSelection(position);
+        
         displayPost(post);
     }
 
@@ -222,9 +226,6 @@ public class ThreadViewFragment extends ListFragment
                 {
                     if (getItem(i).getPostId() == _currentPostId)
                     {
-                        getListView().setItemChecked(i, true);
-                        getListView().setSelection(i);
-                        
                         if (!_postDisplayed)
                             displayPost(i);
                         break;

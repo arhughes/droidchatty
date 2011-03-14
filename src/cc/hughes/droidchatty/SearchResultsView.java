@@ -53,7 +53,7 @@ public class SearchResultsView extends ListActivity
     private void displayThread(SearchResult result)
     {
         Intent i = new Intent(this, SingleThreadView.class);
-        i.putExtra(SingleThreadView.THREAD_ID, result.getPostId());
+        i.putExtra("postId", result.getPostId());
         startActivity(i);
     }
     

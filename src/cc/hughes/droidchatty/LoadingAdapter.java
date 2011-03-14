@@ -153,13 +153,13 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
                 {
                     for (T item : result)
                         add(item);
+                    afterDisplay();
                 }
             }
             
             // dataset changed, either there are new items, or the count went down (no more "Loading")
             notifyDataSetChanged();
             _loadingView = null;
-            afterDisplay();
         }
     }
     

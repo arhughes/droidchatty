@@ -3,6 +3,7 @@ package cc.hughes.droidchatty;
 import java.util.ArrayList;
 
 import android.app.ListActivity;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,9 +31,19 @@ public class SearchResultsView extends ListActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_results);
         
-        _term = getIntent().getExtras().getString("terms");
-        _author = getIntent().getExtras().getString("author");
-        _parentAuthor = getIntent().getExtras().getString("parentAuthor");
+        
+        if (Intent.ACTION_SEARCH.equals(getIntent().getAction()))
+        {
+            _term = getIntent().getStringExtra(SearchManager.QUERY);
+            _author = "";
+            _parentAuthor = "";
+        }
+        else
+        {
+            _term = getIntent().getExtras().getString("terms");
+            _author = getIntent().getExtras().getString("author");
+            _parentAuthor = getIntent().getExtras().getString("parentAuthor");
+        }
         
         _results = new ArrayList<SearchResult>();
         _adapter = new SearchResultsAdapter(this, _results);

@@ -25,8 +25,14 @@
         </activity>
         <activity android:name=".ComposePostView" android:windowSoftInputMode="stateVisible|adjustResize"></activity>
         <activity android:name=".SearchView" android:windowSoftInputMode="adjustResize"></activity>
-        <activity android:name=".SearchResultsView"></activity>
+        <activity android:name=".SearchResultsView">
+        	<intent-filter>
+        		<action android:name="android.intent.action.SEARCH" />
+        	</intent-filter>
+        	<meta-data android:name="android.app.searchable" android:resource="@xml/searchable" />
+        </activity>
         <activity android:name=".PreferenceView"></activity>
+        <meta-data android:name="android.app.default_searchable" android:value=".SearchResultsView" />
     </application>
     
 </manifest>

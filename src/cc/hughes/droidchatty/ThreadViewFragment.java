@@ -39,6 +39,7 @@ public class ThreadViewFragment extends ListFragment
     PostLoadingAdapter _adapter;
     int _rootPostId;
     int _currentPostId;
+    boolean _postDisplayed = false;
     
     public int getPostId()
     {
@@ -84,9 +85,7 @@ public class ThreadViewFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
-        l.setItemChecked(position, true);
-        Post post = _adapter.getItem(position);
-        displayPost(post);
+        displayPost(position);
     }
     
     @Override
@@ -139,6 +138,13 @@ public class ThreadViewFragment extends ListFragment
                 break;
         }
     } 
+    
+    private void displayPost(int position)
+    {
+        getListView().setItemChecked(position, true);
+        Post post = _adapter.getItem(position);
+        displayPost(post);
+    }
 
     private void displayPost(Post post)
     {
@@ -155,6 +161,7 @@ public class ThreadViewFragment extends ListFragment
         scroll.scrollTo(0, 0);
         
         _currentPostId = post.getPostId();
+        _postDisplayed = true;
     }
     
     private class PostLoadingAdapter extends LoadingAdapter<Post>
@@ -217,6 +224,9 @@ public class ThreadViewFragment extends ListFragment
                     {
                         getListView().setItemChecked(i, true);
                         getListView().setSelection(i);
+                        
+                        if (!_postDisplayed)
+                            displayPost(i);
                         break;
                     }
                 }

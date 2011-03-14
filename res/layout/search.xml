@@ -1,40 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<TableLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
-  android:orientation="vertical">
-  <TextView
-  	android:layout_height="wrap_content"
-  	android:layout_width="wrap_content"
-  	android:text="Search:" />
-  <EditText
-  	android:id="@+id/searchTerm"
-  	android:layout_height="wrap_content"
-  	android:layout_width="fill_parent"
-  	/>
-  <TextView
-  	android:layout_height="wrap_content"
-  	android:layout_width="wrap_content"
-  	android:text="Author:" />
-  <EditText
-  	android:id="@+id/searchAuthor"
-  	android:layout_height="wrap_content"
-  	android:layout_width="fill_parent"
-  	/>
-  <TextView
-  	android:layout_height="wrap_content"
-  	android:layout_width="wrap_content"
-  	android:text="Parent Author:" />
-  <EditText
-  	android:id="@+id/searchParentAuthor"
-  	android:layout_height="wrap_content"
-  	android:layout_width="fill_parent"
-  	/>
+  android:stretchColumns="0"
+  android:shrinkColumns="1"
+  >
+  <TableRow>
+	  <TextView
+	  	android:id="@+id/searchLabel"
+	  	android:layout_height="wrap_content"
+	  	android:layout_width="wrap_content"
+	  	android:text="Search:" />
+	  </TableRow>
+  <TableRow>
+	  <EditText
+	  	android:id="@+id/searchTerm"
+	  	android:layout_height="wrap_content"
+	  	android:layout_width="fill_parent"
+	  	/>
+	  <Button
+	    android:layout_height="wrap_content"
+	    android:layout_width="wrap_content"
+	    android:text="Me"
+	    android:onClick="vanitySearch"
+	   />
+  </TableRow>
+  <TableRow>
+	  <TextView
+	    android:id="@+id/searchAuthorLabel"
+	  	android:layout_height="wrap_content"
+	  	android:layout_width="wrap_content"
+	  	android:text="Author:"
+	  	 />
+  </TableRow>
+  <TableRow>
+	  <EditText
+	  	android:id="@+id/searchAuthor"
+	  	android:layout_height="wrap_content"
+	  	android:layout_width="fill_parent"
+	  	/>
+	  <Button
+	    android:layout_height="wrap_content"
+	    android:layout_width="wrap_content"
+	    android:text="Me"
+	    android:onClick="ownSearch"
+	   />
+  </TableRow>
+  <TableRow>
+	  <TextView
+	  	android:id="@+id/searchParentAuthorLabel"
+	  	android:layout_height="wrap_content"
+	  	android:layout_width="wrap_content"
+	  	android:text="Parent Author:"
+	  	 />
+  </TableRow>
+  <TableRow>
+	  <EditText
+	  	android:id="@+id/searchParentAuthor"
+	  	android:layout_height="wrap_content"
+	  	android:layout_width="fill_parent"
+	  	/>
+	  <Button
+	    android:layout_height="wrap_content"
+	    android:layout_width="wrap_content"
+	    android:text="Me"
+	    android:onClick="parentSearch"
+	   />
+  </TableRow>
+  <TableRow>
   <Button
   	android:id="@+id/search"
   	android:layout_height="wrap_content"
   	android:layout_width="wrap_content"
   	android:text="Search"
+  	android:layout_below="@id/searchParentAuthor"
   />
-</LinearLayout>
+  </TableRow>
+</TableLayout>

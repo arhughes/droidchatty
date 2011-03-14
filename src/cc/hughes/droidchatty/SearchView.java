@@ -2,7 +2,9 @@ package cc.hughes.droidchatty;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -40,5 +42,26 @@ public class SearchView extends Activity
             startActivity(i);
         }
     };
+    
+    public void vanitySearch(View view)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        EditText term = (EditText)findViewById(R.id.searchTerm);
+        term.setText(prefs.getString("userName", null));
+    }
+    
+    public void ownSearch(View view)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        EditText author = (EditText)findViewById(R.id.searchAuthor);
+        author.setText(prefs.getString("userName", null));
+    }
+    
+    public void parentSearch(View view)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        EditText parent = (EditText)findViewById(R.id.searchParentAuthor);
+        parent.setText(prefs.getString("userName", null));
+    }
 
 }

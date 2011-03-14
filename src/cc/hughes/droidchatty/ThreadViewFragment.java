@@ -111,7 +111,7 @@ public class ThreadViewFragment extends ListFragment
         }
     }
     
-    private static final int POST_REPLY = 1;
+    private static final int POST_REPLY = 0;
     private void postReply()
     {
         Intent i = new Intent(getActivity(), ComposePostView.class);
@@ -128,7 +128,7 @@ public class ThreadViewFragment extends ListFragment
                 if (resultCode == Activity.RESULT_OK)
                 {
                     // read the resulting thread id from the post
-                    int postId = data.getExtras().getInt(SingleThreadView.THREAD_ID);
+                    int postId = data.getExtras().getInt("postId");
                     
                     _rootPostId = postId;
                     _currentPostId = postId;

@@ -92,7 +92,7 @@ public class SearchResultsView extends ListActivity
             // get the thread to display and populate all the data into the layout
             SearchResult t = getItem(position);
             holder.userName.setText(t.getAuthor());
-            holder.content.setText(t.getContent());
+            holder.content.setText(PostFormatter.formatContent(t.getAuthor(), t.getContent(), null, false));
             holder.posted.setText(t.getPosted());
                     
             return convertView;

@@ -296,6 +296,8 @@ public class ThreadListFragment extends ListFragment
             // reset the background to transparent when scrolling
             if (t.getUserName().equalsIgnoreCase("Shacknews"))
                 convertView.setBackgroundColor(getResources().getColor(R.color.news_post_background));
+            else
+                convertView.setBackgroundResource(R.color.thread_selector);
 
             // special highlight for employee and mod names
             holder.userName.setTextColor(User.getColor(t.getUserName()));

@@ -89,7 +89,6 @@ public class ThreadViewFragment extends ListFragment
             
             _currentPostId = Integer.parseInt(id);
             _rootPostId = _currentPostId;
-                
         }
         
         // makes links actually clickable

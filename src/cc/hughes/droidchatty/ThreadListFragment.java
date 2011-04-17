@@ -49,10 +49,7 @@ public class ThreadListFragment extends ListFragment
         View singleThread = getActivity().findViewById(R.id.singleThread);
         _dualPane = singleThread != null && singleThread.getVisibility() == View.VISIBLE;
         
-        if (_dualPane)
-        {
-            getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        }
+        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         
         setHasOptionsMenu(true);
     }
@@ -136,20 +133,15 @@ public class ThreadListFragment extends ListFragment
     void showDetails(int index)
     {
         Thread thread = _adapter.getItem(index);
+        getListView().setItemChecked(index, true);
         
         if (_dualPane)
         {
-            getListView().setItemChecked(index, true);
-            
             ThreadViewFragment view = (ThreadViewFragment)getFragmentManager().findFragmentById(R.id.singleThread);
             if (view == null || view.getPostId() != thread.getThreadId())
             {
                 view = ThreadViewFragment.newInstance(thread.getThreadId(), thread.getUserName(), thread.getPosted(), thread.getContent());
-                
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.singleThread, view);
-                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                ft.commit();
+                getFragmentManager().beginTransaction().replace(R.id.singleThread, view).commit();
             }
         }
         else

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.text.method.LinkMovementMethod;
@@ -66,6 +67,9 @@ public class ThreadViewFragment extends ListFragment
         getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         
         Bundle args = getArguments();
+        String action = getActivity().getIntent().getAction();
+        Uri uri = getActivity().getIntent().getData();
+        
         if (args.containsKey("content"))
         {
             String userName = args.getString("userName");
@@ -73,6 +77,19 @@ public class ThreadViewFragment extends ListFragment
             String posted = args.getString("posted");
             Post post = new Post(_rootPostId, userName, content, posted, 0);
             displayPost(post);
+        }
+        else if (action != null && action.equals(Intent.ACTION_VIEW) && uri != null)
+        {
+            String id = uri.getQueryParameter("id");
+            if (id == null)
+            {
+                ErrorDialog.display(getActivity(), "Error", "Invalid URL Found");
+                return;
+            }
+            
+            _currentPostId = Integer.parseInt(id);
+            _rootPostId = _currentPostId;
+                
         }
         
         // makes links actually clickable

@@ -110,6 +110,12 @@ public class ShackApi
     {
         ArrayList<Post> posts = new ArrayList<Post>();
         HashSet<Integer> post_tracker = new HashSet<Integer>();
+        
+        if (threadId == 0)
+        {
+            posts.add(new Post(0, "Error", "No post here dude.", "Error", 0)); 
+            return posts;
+        }
 
         JSONObject json = getJson(BASE_URL + "thread/" + threadId + ".json");
 

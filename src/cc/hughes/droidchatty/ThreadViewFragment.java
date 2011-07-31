@@ -230,8 +230,14 @@ public class ThreadViewFragment extends ListFragment
 
             // get the thread to display and populate all the data into the layout
             Post t = getItem(position);
+            
+            // highlight newer posts
+            int color = 255 - (12 * Math.min(t.getOrder(), 10));
+            holder.content.setTextColor(Color.argb(255, color, color, color));
+            
             holder.content.setPadding(15 * t.getLevel(), 0, 0, 0);
             holder.content.setText(t.getPreview());
+            
             
             if (t.getModeration().equalsIgnoreCase("nws"))
                 holder.moderation.setBackgroundColor(Color.RED);

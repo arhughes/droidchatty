@@ -10,6 +10,7 @@ public class Post {
     private String _posted;
     private int _level;
     private String _moderation;
+    private int _order = Integer.MAX_VALUE;
 
     private Spanned _preview;
 
@@ -51,6 +52,16 @@ public class Post {
     public String getModeration()
     {
         return _moderation;
+    }
+    
+    public void setOrder(int value)
+    {
+        _order = value;
+    }
+    
+    public int getOrder()
+    {
+        return _order;
     }
 
     public Spanned getPreview()

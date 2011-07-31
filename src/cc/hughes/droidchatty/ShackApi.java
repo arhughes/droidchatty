@@ -6,6 +6,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -123,6 +124,8 @@ public class ShackApi
         {
             //JSONObject json = getJson(BASE_URL + "thread/" + threadId + ".json");
             JSONObject json = getJson(BASE_URL + "thread.php?id=" + threadId);
+            
+            ArrayList<Integer> ids = new ArrayList<Integer>();
     
             // go through each of the comments and pull out the data that is used
             JSONArray comments = json.getJSONArray("replies");
@@ -139,9 +142,18 @@ public class ShackApi
     
                 Post post = new Post(postId, userName, body, date, depth, category);
                 posts.add(post);
-    
-                //processPosts(comment, 1, posts, post_tracker);
+                
+                ids.add(postId);
             }
+            
+            // set the order on the first 10 posts, so they can be highlighted
+            Collections.sort(ids, Collections.reverseOrder());
+            for (int i = 0; i < Math.min(posts.size(), 10); i++)
+            {
+                Post post = posts.get(i);
+                post.setOrder(ids.indexOf(post.getPostId()));
+            }
+            
         }
         catch (Exception ex)
         {

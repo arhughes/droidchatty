@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -197,10 +199,14 @@ public class ThreadViewFragment extends ListFragment
     private class PostLoadingAdapter extends LoadingAdapter<Post>
     {
         private boolean _loaded = false;
+        private String _userName = "";
         
         public PostLoadingAdapter(Context context, ArrayList<Post> items)
         {
             super(context, R.layout.thread_row, R.layout.row_loading, items);
+            
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ThreadViewFragment.this.getActivity());
+            _userName = prefs.getString("userName", "");
         }
         
         @Override
@@ -225,6 +231,7 @@ public class ThreadViewFragment extends ListFragment
                 holder = new ViewHolder();
                 holder.content = (TextView)convertView.findViewById(R.id.textPreview);
                 holder.moderation = (View)convertView.findViewById(R.id.postModeration);
+                holder.defaultTextColor = holder.content.getTextColors().getDefaultColor();
                 convertView.setTag(holder);
             }
 
@@ -238,12 +245,16 @@ public class ThreadViewFragment extends ListFragment
             holder.content.setPadding(15 * t.getLevel(), 0, 0, 0);
             holder.content.setText(t.getPreview());
             
-            
             if (t.getModeration().equalsIgnoreCase("nws"))
                 holder.moderation.setBackgroundColor(Color.RED);
             else
                 holder.moderation.setBackgroundColor(Color.TRANSPARENT);
 
+            if (t.getUserName().equalsIgnoreCase(_userName))
+                holder.content.setTextColor(getResources().getColor(R.color.user_paricipated));
+            else
+                holder.content.setTextColor(holder.defaultTextColor);
+            
             return convertView;
         }
 
@@ -281,6 +292,7 @@ public class ThreadViewFragment extends ListFragment
         {
             TextView content;
             View moderation;
+            int defaultTextColor;
         }
         
     }

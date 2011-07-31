@@ -9,16 +9,18 @@ public class Post {
     private String _content;
     private String _posted;
     private int _level;
+    private String _moderation;
 
     private Spanned _preview;
 
-    public Post(int postId, String userName, String content, String posted, int level)
+    public Post(int postId, String userName, String content, String posted, int level, String moderation)
     {
         _postId = postId;
         _userName = userName;
         _content = content;
         _posted = posted;
         _level = level;
+        _moderation = moderation;
     }
 
     public int getPostId()
@@ -44,6 +46,11 @@ public class Post {
     public int getLevel()
     {
         return _level;
+    }
+    
+    public String getModeration()
+    {
+        return _moderation;
     }
 
     public Spanned getPreview()

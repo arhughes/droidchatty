@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -22,7 +23,7 @@ import android.widget.TextView;
 
 public class ThreadViewFragment extends ListFragment
 {
-    public static ThreadViewFragment newInstance(int postId, String userName, String posted, String content)
+    public static ThreadViewFragment newInstance(int postId, String userName, String posted, String content, String moderation)
     {
         ThreadViewFragment f = new ThreadViewFragment();
         
@@ -31,6 +32,7 @@ public class ThreadViewFragment extends ListFragment
         args.putString("userName", userName);
         args.putString("posted", posted);
         args.putString("content", content);
+        args.putString("moderation", moderation);
         
         f.setArguments(args);
         
@@ -75,7 +77,8 @@ public class ThreadViewFragment extends ListFragment
             String userName = args.getString("userName");
             String content = args.getString("content");
             String posted = args.getString("posted");
-            Post post = new Post(_rootPostId, userName, content, posted, 0);
+            String moderation = args.containsKey("moderation") ? args.getString("moderation") : "";
+            Post post = new Post(_rootPostId, userName, content, posted, 0, moderation);
             displayPost(post);
         }
         else if (action != null && action.equals(Intent.ACTION_VIEW) && uri != null)
@@ -174,10 +177,17 @@ public class ThreadViewFragment extends ListFragment
         TextView posted = (TextView)view.findViewById(R.id.textPostedTime);
         TextView content = (TextView)view.findViewById(R.id.textContent);
         ScrollView scroll = (ScrollView)view.findViewById(R.id.scroll);
+        View moderation = (View)view.findViewById(R.id.threadModeration);
         
         userName.setText(post.getUserName());
         posted.setText(post.getPosted());
         content.setText(PostFormatter.formatContent(post, content, true));
+        
+        if (post.getModeration().equalsIgnoreCase("nws"))
+            moderation.setBackgroundColor(Color.RED);
+        else
+            moderation.setBackgroundColor(Color.TRANSPARENT);
+        
         scroll.scrollTo(0, 0);
         
         _currentPostId = post.getPostId();
@@ -209,17 +219,24 @@ public class ThreadViewFragment extends ListFragment
         @Override
         protected View createView(int position, View convertView, ViewGroup parent)
         {
-            TextView content = (TextView)convertView.getTag();
-            if (content == null)
+            ViewHolder holder = (ViewHolder)convertView.getTag();
+            if (holder == null)
             {
-                content = (TextView)convertView.findViewById(R.id.textPreview);
-                convertView.setTag(content);
+                holder = new ViewHolder();
+                holder.content = (TextView)convertView.findViewById(R.id.textPreview);
+                holder.moderation = (View)convertView.findViewById(R.id.postModeration);
+                convertView.setTag(holder);
             }
 
             // get the thread to display and populate all the data into the layout
             Post t = getItem(position);
-            content.setPadding(15 * t.getLevel(), 0, 0, 0);
-            content.setText(t.getPreview());
+            holder.content.setPadding(15 * t.getLevel(), 0, 0, 0);
+            holder.content.setText(t.getPreview());
+            
+            if (t.getModeration().equalsIgnoreCase("nws"))
+                holder.moderation.setBackgroundColor(Color.RED);
+            else
+                holder.moderation.setBackgroundColor(Color.TRANSPARENT);
 
             return convertView;
         }
@@ -253,6 +270,13 @@ public class ThreadViewFragment extends ListFragment
             }
             
         }
+        
+        private class ViewHolder
+        {
+            TextView content;
+            View moderation;
+        }
+        
     }
     
 }

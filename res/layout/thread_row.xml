@@ -4,14 +4,25 @@
    android:orientation="vertical"
    android:layout_width="fill_parent" 
    android:layout_height="fill_parent"
-   android:padding="6dip"
+   android:paddingTop="6dip"
+   android:paddingRight="6dip"
+   android:paddingBottom="6dip"
    android:background="@color/thread_selector"
    >
+    <TextView
+       android:id="@+id/postModeration"
+	   android:layout_width="4dip" 
+	   android:layout_height="wrap_content"
+	   android:background="@color/news_post_background"
+	   android:text= " "
+    />
     <TextView
        android:id="@+id/textPreview"
 	   android:layout_width="fill_parent" 
 	   android:layout_height="wrap_content" 
        android:ellipsize="end"
        android:singleLine="true"
+       android:layout_toRightOf="@id/postModeration"
+       android:paddingLeft="2dip"
     />
 </cc.hughes.CheckableRelativeLayout>

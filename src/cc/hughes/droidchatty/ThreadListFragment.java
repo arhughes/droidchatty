@@ -17,8 +17,8 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -146,7 +146,7 @@ public class ThreadListFragment extends ListFragment
             ThreadViewFragment view = (ThreadViewFragment)getFragmentManager().findFragmentById(R.id.singleThread);
             if (view == null || view.getPostId() != thread.getThreadId())
             {
-                view = ThreadViewFragment.newInstance(thread.getThreadId(), thread.getUserName(), thread.getPosted(), thread.getContent());
+                view = ThreadViewFragment.newInstance(thread.getThreadId(), thread.getUserName(), thread.getPosted(), thread.getContent(), thread.getModeration());
                 getFragmentManager().beginTransaction().replace(R.id.singleThread, view).commit();
             }
         }
@@ -158,6 +158,7 @@ public class ThreadListFragment extends ListFragment
             intent.putExtra("userName", thread.getUserName());
             intent.putExtra("posted", thread.getPosted());
             intent.putExtra("content", thread.getContent());
+            intent.putExtra("moderation", thread.getModeration());
             startActivity(intent);
         }
     }
@@ -275,6 +276,7 @@ public class ThreadListFragment extends ListFragment
             if (holder == null)
             {
                 holder = new ViewHolder();
+                holder.moderation = (View)convertView.findViewById(R.id.threadModeration);
                 holder.userName = (TextView)convertView.findViewById(R.id.textUserName);
                 holder.content = (TextView)convertView.findViewById(R.id.textContent);
                 holder.posted = (TextView)convertView.findViewById(R.id.textPostedTime);
@@ -296,6 +298,11 @@ public class ThreadListFragment extends ListFragment
                 convertView.setBackgroundColor(getResources().getColor(R.color.news_post_background));
             else
                 convertView.setBackgroundResource(R.color.thread_selector);
+            
+            if (t.getModeration().equalsIgnoreCase("nws"))
+                holder.moderation.setBackgroundColor(Color.RED);
+            else
+                holder.moderation.setBackgroundColor(Color.TRANSPARENT);
 
             // special highlight for employee and mod names
             holder.userName.setTextColor(User.getColor(t.getUserName()));
@@ -336,6 +343,7 @@ public class ThreadListFragment extends ListFragment
         
         private class ViewHolder
         {
+            View moderation;
             TextView userName;
             TextView content;
             TextView posted;

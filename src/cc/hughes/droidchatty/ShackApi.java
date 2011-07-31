@@ -6,7 +6,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -25,17 +24,18 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+
 public class ShackApi
 {
     static final String POST_URL = "http://www.shacknews.com/api/chat/create/17.json";
     
-    static final String BASE_URL = "http://shackapi.stonedonkey.com/";
+    static final String BASE_URL = "http://shackapi.hughes.cc/";
     static final String FAKE_STORY_ID = "17";
     static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     
     public static ArrayList<SearchResult> search(String term, String author, String parentAuthor, int pageNumber) throws Exception
     {
-        String url = BASE_URL + "Search/?json=true&SearchTerm=" + URLEncoder.encode(term, "UTF8") + "&Author=" + URLEncoder.encode(author, "UTF8") + "&ParentAuthor=" + URLEncoder.encode(parentAuthor, "UTF8") + "&Page=" + URLEncoder.encode(Integer.toString(pageNumber), "UTF-8");
+        String url = BASE_URL + "search.php/?terms=" + URLEncoder.encode(term, "UTF8") + "&author=" + URLEncoder.encode(author, "UTF8") + "&parentAuthor=" + URLEncoder.encode(parentAuthor, "UTF8") + "&page=" + URLEncoder.encode(Integer.toString(pageNumber), "UTF-8");
         ArrayList<SearchResult> results = new ArrayList<SearchResult>();
         JSONObject result = getJson(url);
         
@@ -79,7 +79,7 @@ public class ShackApi
     
     public static ArrayList<Thread> getThreads(int pageNumber) throws ClientProtocolException, IOException, JSONException
     {
-        JSONObject json = getJson(BASE_URL + FAKE_STORY_ID + "." + Integer.toString(pageNumber) + ".json");
+        JSONObject json = getJson(BASE_URL + "page.php?page=" + Integer.toString(pageNumber));
         return processThreads(json);
     }
     
@@ -98,8 +98,11 @@ public class ShackApi
             String body = comment.getString("body");
             String date = comment.getString("date");
             int replyCount = comment.getInt("reply_count");
-
-            Thread thread = new Thread(id, userName, body, date, replyCount);
+            String category = comment.getString("category");
+            
+            Log.d("Processing", "User: " + userName + " - Category: " + category);
+            
+            Thread thread = new Thread(id, userName, body, date, replyCount, category);
             threads.add(thread);
         }
 
@@ -109,65 +112,43 @@ public class ShackApi
     public static ArrayList<Post> getPosts(int threadId) throws ClientProtocolException, IOException, JSONException
     {
         ArrayList<Post> posts = new ArrayList<Post>();
-        HashSet<Integer> post_tracker = new HashSet<Integer>();
         
         if (threadId == 0)
         {
-            posts.add(new Post(0, "Error", "No post here dude.", "Error", 0)); 
+            posts.add(new Post(0, "Error", "No post here dude.", "Error", 0, "")); 
             return posts;
         }
 
-        JSONObject json = getJson(BASE_URL + "thread/" + threadId + ".json");
-
-        // go through each of the comments and pull out the data that is used
-        JSONArray comments = json.getJSONArray("comments");
-        for (int i = 0; i < comments.length(); i++)
+        try
         {
-            JSONObject comment = comments.getJSONObject(i);
-
-            int postId = comment.getInt("id");
-            String userName = comment.getString("author");
-            String body = comment.getString("body");
-            String date = comment.getString("date");
-
-            Post post = new Post(postId, userName, body, date, 0);
-            posts.add(post);
-            post_tracker.add(postId);
-
-            processPosts(comment, 1, posts, post_tracker);
+            //JSONObject json = getJson(BASE_URL + "thread/" + threadId + ".json");
+            JSONObject json = getJson(BASE_URL + "thread.php?id=" + threadId);
+    
+            // go through each of the comments and pull out the data that is used
+            JSONArray comments = json.getJSONArray("replies");
+            for (int i = 0; i < comments.length(); i++)
+            {
+                JSONObject comment = comments.getJSONObject(i);
+    
+                int postId = comment.getInt("id");
+                String userName = comment.getString("author");
+                String body = comment.getString("body");
+                String date = comment.getString("date");
+                String category = comment.getString("category");
+                int depth = comment.getInt("depth");
+    
+                Post post = new Post(postId, userName, body, date, depth, category);
+                posts.add(post);
+    
+                //processPosts(comment, 1, posts, post_tracker);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.e("DroidChatty", "Error getting posts.", ex);
         }
 
         return posts;
-    }
-
-    private static void processPosts(JSONObject comment, int level, ArrayList<Post> posts, HashSet<Integer> post_tracker) throws JSONException
-    {
-        JSONArray comments = comment.getJSONArray("comments");
-
-        for (int i = 0; i < comments.length(); i++)
-        {
-            JSONObject p = comments.getJSONObject(i);
-
-            int postId = p.getInt("id");
-            String userName = p.getString("author");
-            String body = p.getString("body");
-            String date = p.getString("date");
-
-            // only add this post if we haven't seen this post before
-            // fixes duplicate posts coming back from the API
-            // the duplicate post could end up in the wrong place though maybe?
-            if (post_tracker.add(postId))
-            {
-                Post post = new Post(postId, userName, body, date, level);
-                posts.add(post);
-            }
-            else
-            {
-                Log.w("ShackAPI", "Skipped duplicate post #" + postId);
-            }
-
-            processPosts(p, level + 1, posts, post_tracker);
-        }
     }
 
     private static JSONObject getJson(String url) throws ClientProtocolException, IOException, JSONException

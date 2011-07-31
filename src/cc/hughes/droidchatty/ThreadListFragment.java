@@ -72,7 +72,7 @@ public class ThreadListFragment extends ListFragment
         switch (item.getItemId())
         {
             case R.id.refresh:
-                _adapter.clear();
+                refreshThreads();
                 return true;
             case R.id.add:
                 post();
@@ -86,6 +86,12 @@ public class ThreadListFragment extends ListFragment
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+    
+    private void refreshThreads()
+    {
+        getListView().clearChoices();
+        _adapter.clear();
     }
     
     private static final int POST_THREAD = 0;

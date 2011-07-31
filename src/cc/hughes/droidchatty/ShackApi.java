@@ -78,9 +78,9 @@ public class ShackApi
         return data.getInt("post_insert_id");
     }
     
-    public static ArrayList<Thread> getThreads(int pageNumber) throws ClientProtocolException, IOException, JSONException
+    public static ArrayList<Thread> getThreads(int pageNumber, String userName) throws ClientProtocolException, IOException, JSONException
     {
-        JSONObject json = getJson(BASE_URL + "page.php?page=" + Integer.toString(pageNumber));
+        JSONObject json = getJson(BASE_URL + "page.php?page=" + Integer.toString(pageNumber) + "&user=" + URLEncoder.encode(userName, "UTF8"));
         return processThreads(json);
     }
     
@@ -100,10 +100,9 @@ public class ShackApi
             String date = comment.getString("date");
             int replyCount = comment.getInt("reply_count");
             String category = comment.getString("category");
+            boolean replied = comment.getBoolean("replied");
             
-            Log.d("Processing", "User: " + userName + " - Category: " + category);
-            
-            Thread thread = new Thread(id, userName, body, date, replyCount, category);
+            Thread thread = new Thread(id, userName, body, date, replyCount, category, replied);
             threads.add(thread);
         }
 

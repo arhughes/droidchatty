@@ -11,10 +11,11 @@ public class Thread {
     private int _replyCount;
     private int _replyCountPrevious;
     private String _moderation;
+    private boolean _replied;
 
     private Spanned _preview;
 
-    public Thread(int threadId, String userName, String content, String posted, int replyCount, String moderation)
+    public Thread(int threadId, String userName, String content, String posted, int replyCount, String moderation, boolean replied)
     {
         _threadId = threadId;
         _userName = userName;
@@ -22,6 +23,7 @@ public class Thread {
         _posted = posted;
         _replyCount = replyCount;
         _moderation = moderation;
+        _replied = replied;
     }
 
     public int getThreadId()
@@ -62,6 +64,11 @@ public class Thread {
     public String getModeration()
     {
         return _moderation;
+    }
+    
+    public boolean getReplied()
+    {
+        return _replied;
     }
 
     public Spanned getPreview()

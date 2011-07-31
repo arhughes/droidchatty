@@ -17,8 +17,10 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -303,6 +305,11 @@ public class ThreadListFragment extends ListFragment
                 holder.moderation.setBackgroundColor(Color.RED);
             else
                 holder.moderation.setBackgroundColor(Color.TRANSPARENT);
+            
+            if (t.getReplied())
+                holder.posted.setTextColor(getResources().getColor(R.color.user_paricipated));
+            else
+                holder.posted.setTextColor(holder.content.getTextColors().getDefaultColor());
 
             // special highlight for employee and mod names
             holder.userName.setTextColor(User.getColor(t.getUserName()));
@@ -331,8 +338,11 @@ public class ThreadListFragment extends ListFragment
         @Override
         protected ArrayList<Thread> loadData() throws Exception
         {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ThreadListFragment.this.getActivity());
+            String userName = prefs.getString("userName", "");
+            
             // grab threads from the api
-            ArrayList<Thread> new_threads = ShackApi.getThreads(_pageNumber + 1);
+            ArrayList<Thread> new_threads = ShackApi.getThreads(_pageNumber + 1, userName);
             _pageNumber++;
             
             // update the "new" post counts

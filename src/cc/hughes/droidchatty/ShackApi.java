@@ -171,7 +171,6 @@ public class ShackApi
         HttpGet get = new HttpGet(url);
 
         String content = client.execute(get, response_handler);
-        Log.d("DroidChatty", "Response: " + content);
         
         return new JSONObject(content);
     }
@@ -202,7 +201,6 @@ public class ShackApi
         try
         {
             String content = readStream(input);
-            Log.d("DroidChatty", "response=" + content);
             return new JSONObject(content);
         }
         finally

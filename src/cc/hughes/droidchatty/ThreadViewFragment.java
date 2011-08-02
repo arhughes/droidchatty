@@ -238,9 +238,6 @@ public class ThreadViewFragment extends ListFragment
             // get the thread to display and populate all the data into the layout
             Post t = getItem(position);
             
-            // highlight newer posts
-            int color = 255 - (12 * Math.min(t.getOrder(), 10));
-            holder.content.setTextColor(Color.argb(255, color, color, color));
             
             holder.content.setPadding(15 * t.getLevel(), 0, 0, 0);
             holder.content.setText(t.getPreview());
@@ -251,9 +248,16 @@ public class ThreadViewFragment extends ListFragment
                 holder.moderation.setBackgroundColor(Color.TRANSPARENT);
 
             if (t.getUserName().equalsIgnoreCase(_userName))
+            {
+                // highlight your own posts
                 holder.content.setTextColor(getResources().getColor(R.color.user_paricipated));
+            }
             else
-                holder.content.setTextColor(holder.defaultTextColor);
+            {
+                // highlight newer posts
+                int color = 255 - (12 * Math.min(t.getOrder(), 10));
+                holder.content.setTextColor(Color.argb(255, color, color, color));
+            }
             
             return convertView;
         }

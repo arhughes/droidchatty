@@ -7,7 +7,9 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Vector;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -124,8 +126,8 @@ public class ShackApi
             //JSONObject json = getJson(BASE_URL + "thread/" + threadId + ".json");
             JSONObject json = getJson(BASE_URL + "thread.php?id=" + threadId);
             
-            ArrayList<Integer> ids = new ArrayList<Integer>();
-    
+            Hashtable<Integer, Post> post_map = new Hashtable<Integer, Post>();
+            
             // go through each of the comments and pull out the data that is used
             JSONArray comments = json.getJSONArray("replies");
             for (int i = 0; i < comments.length(); i++)
@@ -142,15 +144,17 @@ public class ShackApi
                 Post post = new Post(postId, userName, body, date, depth, category);
                 posts.add(post);
                 
-                ids.add(postId);
+                post_map.put(postId, post);
             }
             
-            // set the order on the first 10 posts, so they can be highlighted
+            Vector<Integer> ids = new Vector<Integer>(post_map.keySet());
             Collections.sort(ids, Collections.reverseOrder());
+            
+            // set the order on the first 10 posts, so they can be highlighted
             for (int i = 0; i < Math.min(posts.size(), 10); i++)
             {
-                Post post = posts.get(i);
-                post.setOrder(ids.indexOf(post.getPostId()));
+                Post post = post_map.get(ids.get(i));
+                post.setOrder(i);
             }
             
         }

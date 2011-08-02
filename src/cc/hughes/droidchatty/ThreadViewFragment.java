@@ -231,7 +231,6 @@ public class ThreadViewFragment extends ListFragment
                 holder = new ViewHolder();
                 holder.content = (TextView)convertView.findViewById(R.id.textPreview);
                 holder.moderation = (View)convertView.findViewById(R.id.postModeration);
-                holder.defaultTextColor = holder.content.getTextColors().getDefaultColor();
                 convertView.setTag(holder);
             }
 

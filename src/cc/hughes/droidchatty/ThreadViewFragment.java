@@ -296,7 +296,6 @@ public class ThreadViewFragment extends ListFragment
         {
             TextView content;
             View moderation;
-            int defaultTextColor;
         }
         
     }

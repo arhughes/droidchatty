@@ -5,8 +5,11 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -51,6 +54,9 @@ public class ShackApi
             String userName = comment.getString("author");
             String body = comment.getString("preview");
             String posted = comment.getString("date");
+            
+            // convert time to local timezone
+            posted = convertTime(posted);
             
             results.add(new SearchResult(id, userName, body, posted));
         }
@@ -103,6 +109,9 @@ public class ShackApi
             int replyCount = comment.getInt("reply_count");
             String category = comment.getString("category");
             boolean replied = comment.getBoolean("replied");
+
+            // convert time to local timezone
+            date = convertTime(date);
             
             Thread thread = new Thread(id, userName, body, date, replyCount, category, replied);
             threads.add(thread);
@@ -140,6 +149,9 @@ public class ShackApi
                 String date = comment.getString("date");
                 String category = comment.getString("category");
                 int depth = comment.getInt("depth");
+                
+                // convert time to local timezone
+                date = convertTime(date);
     
                 Post post = new Post(postId, userName, body, date, depth, category);
                 posts.add(post);
@@ -226,5 +238,23 @@ public class ShackApi
             count += n;
         }
         return output.toString();
+    }
+    
+    static final SimpleDateFormat _shackDateFormat = new SimpleDateFormat("MMM dd, yyyy h:mma zzz");
+    static final DateFormat _displayDateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+    
+    private static String convertTime(String original)
+    {
+        try
+        {
+            Date dt = _shackDateFormat.parse(original);
+            return _displayDateFormat.format(dt);
+        }
+        catch (Exception ex)
+        {
+            Log.e("DroidChatty", "Error parsing date", ex);
+        }
+        
+        return original;
     }
 }

@@ -283,6 +283,7 @@ public class ThreadListFragment extends ListFragment
                 holder.content = (TextView)convertView.findViewById(R.id.textContent);
                 holder.posted = (TextView)convertView.findViewById(R.id.textPostedTime);
                 holder.replyCount = (TextView)convertView.findViewById(R.id.textReplyCount);
+                holder.defaultTimeColor = holder.posted.getTextColors().getDefaultColor();
                 
                 convertView.setTag(holder);
             }
@@ -309,7 +310,7 @@ public class ThreadListFragment extends ListFragment
             if (t.getReplied())
                 holder.posted.setTextColor(getResources().getColor(R.color.user_paricipated));
             else
-                holder.posted.setTextColor(holder.content.getTextColors().getDefaultColor());
+                holder.posted.setTextColor(holder.defaultTimeColor);
 
             // special highlight for employee and mod names
             holder.userName.setTextColor(User.getColor(t.getUserName()));
@@ -358,6 +359,7 @@ public class ThreadListFragment extends ListFragment
             TextView content;
             TextView posted;
             TextView replyCount;
+            int defaultTimeColor;
         }
     }
 

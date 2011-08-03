@@ -36,6 +36,9 @@ public class ShackApi
     static final String USER_AGENT = "DroidChatty/0.6.2";
     
     static final String POST_URL = "http://www.shacknews.com/api/chat/create/17.json";
+    static final String LOL_URL = "http://www.lmnopc.com/greasemonkey/shacklol/report.php";
+    
+    static final String LOL_VERSION = "20090513";
     
     static final String BASE_URL = "http://shackapi.hughes.cc/";
     static final String FAKE_STORY_ID = "17";
@@ -180,8 +183,22 @@ public class ShackApi
         return posts;
     }
     
-
-    private static JSONObject getJson(String url) throws ClientProtocolException, IOException, JSONException
+    public static void tagPost(int postId, String tag, String userName) throws Exception
+    {
+        // construct the lol stuff
+        String url = LOL_URL + "?who=" + URLEncoder.encode(userName, "UTF8") + "&what=" + postId + "&tag=" + URLEncoder.encode(tag, "UTF8") + "&version=" + URLEncoder.encode(LOL_VERSION, "UTF-8");
+        
+        // make things work
+        String content = get(url);
+        
+        Log.d("DroidChatty", "LOL response: " + content);
+        
+        // see if it did work
+        if (!content.startsWith("ok"))
+            throw new Exception(content);
+    }
+    
+    private static String get(String url) throws ClientProtocolException, IOException 
     {
         Log.d("DroidChatty", "Requested: " + url);
         
@@ -190,7 +207,12 @@ public class ShackApi
         HttpGet get = new HttpGet(url);
         get.setHeader("User-Agent", USER_AGENT);
 
-        String content = client.execute(get, response_handler);
+        return client.execute(get, response_handler);
+    }
+
+    private static JSONObject getJson(String url) throws ClientProtocolException, IOException, JSONException
+    {
+        String content = get(url);
         
         return new JSONObject(content);
     }

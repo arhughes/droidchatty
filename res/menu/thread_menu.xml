@@ -6,4 +6,15 @@
 	<item android:id="@+id/reply"
 		  android:icon="@drawable/ic_menu_start_conversation"
 		  android:title="@string/reply" />
+	<item android:id="@+id/tagMenu"
+		  android:icon="@drawable/ic_menu_tag"
+		  android:title="@string/tag">
+		  <menu>
+		  	<item android:id="@+id/lol" android:title="lol" />
+		  	<item android:id="@+id/inf" android:title="inf" />
+		  	<item android:id="@+id/unf" android:title="unf" />
+		  	<item android:id="@+id/tag" android:title="tag" />
+		  	<item android:id="@+id/wtf" android:title="wtf" />
+		  </menu>
+	</item>
 </menu>

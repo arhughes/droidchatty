@@ -158,6 +158,13 @@ public class ThreadViewFragment extends ListFragment
             case R.id.reply:
                 postReply();
                 return true;
+            case R.id.lol:
+            case R.id.inf:
+            case R.id.unf:
+            case R.id.tag:
+            case R.id.wtf:
+                lolPost((String)item.getTitle());
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -169,6 +176,27 @@ public class ThreadViewFragment extends ListFragment
         Intent i = new Intent(getActivity(), ComposePostView.class);
         i.putExtra(SingleThreadView.THREAD_ID, _currentPostId);
         startActivityForResult(i, POST_REPLY);
+    }
+    
+    private void lolPost(String tag)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ThreadViewFragment.this.getActivity());
+        String userName = prefs.getString("userName", "");
+        
+        if (userName.length() == 0)
+        {
+            ErrorDialog.display(getActivity(), "Error", "You must set your username before you can lol.");
+            return;
+        }
+        
+        try
+        {
+            ShackApi.tagPost(_currentPostId, tag, userName);
+        }
+        catch (Exception ex)
+        {
+           ErrorDialog.display(getActivity(), "Error", "Error tagging post:\n" + ex.getMessage()); 
+        }
     }
     
     @Override

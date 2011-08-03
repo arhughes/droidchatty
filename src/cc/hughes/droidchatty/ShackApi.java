@@ -33,6 +33,8 @@ import android.util.Log;
 
 public class ShackApi
 {
+    static final String USER_AGENT = "DroidChatty/0.6.2";
+    
     static final String POST_URL = "http://www.shacknews.com/api/chat/create/17.json";
     
     static final String BASE_URL = "http://shackapi.hughes.cc/";
@@ -177,6 +179,7 @@ public class ShackApi
 
         return posts;
     }
+    
 
     private static JSONObject getJson(String url) throws ClientProtocolException, IOException, JSONException
     {
@@ -185,6 +188,7 @@ public class ShackApi
         BasicResponseHandler response_handler = new BasicResponseHandler();
         DefaultHttpClient client = new DefaultHttpClient();
         HttpGet get = new HttpGet(url);
+        get.setHeader("User-Agent", USER_AGENT);
 
         String content = client.execute(get, response_handler);
         
@@ -197,6 +201,7 @@ public class ShackApi
         
         URL post_url = new URL(url);
         URLConnection con = post_url.openConnection();
+        con.setRequestProperty("User-Agent", USER_AGENT);
         con.setRequestProperty("Authorization", "Basic " + Base64.encodeBytes((userName + ":" + password).getBytes()));
         
         // write our request

@@ -11,8 +11,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
+import android.text.ClipboardManager;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -101,6 +104,7 @@ public class ThreadViewFragment extends ListFragment
         content.setMovementMethod(new LinkMovementMethod());
         
         setHasOptionsMenu(true);
+        registerForContextMenu(content);
     }
 
     @Override
@@ -109,6 +113,34 @@ public class ThreadViewFragment extends ListFragment
         displayPost(position);
     }
     
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.copyUrl:
+                copyPostUrl();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+    
+    void copyPostUrl()
+    {
+        String url = "http://www.shacknews.com/chatty?id=" + _currentPostId;
+        ClipboardManager clipboard = (ClipboardManager)getActivity().getSystemService(Activity.CLIPBOARD_SERVICE);
+        clipboard.setText(url);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);          
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.post_context, menu);
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {

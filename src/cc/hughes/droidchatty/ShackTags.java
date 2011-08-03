@@ -17,9 +17,9 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.QuoteSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
@@ -235,7 +235,7 @@ class TagConverter implements ContentHandler
             else if (obj instanceof Italic)
                 span = new StyleSpan(Typeface.ITALIC);
             else if (obj instanceof Blockquote)
-                span = new QuoteSpan();
+                span = new TypefaceSpan("serif");
             else if (obj instanceof Underline)
                 span = new UnderlineSpan();
             else if (obj instanceof Strikethrough)

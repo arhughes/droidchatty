@@ -3,8 +3,10 @@ package cc.hughes.droidchatty;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -44,6 +46,15 @@ public class ComposePostView extends Activity {
     		    finish();
     		}
         });
+        
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String userName = prefs.getString("userName", "");
+        
+        if (userName.length() == 0)
+        {
+            ErrorDialog.display(this, "Error", "You must set your username before you can post.");
+            return;
+        }
 	}
 	
 	OnClickListener onButtonClick = new OnClickListener()

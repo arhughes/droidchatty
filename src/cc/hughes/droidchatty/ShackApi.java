@@ -33,7 +33,7 @@ import android.util.Log;
 
 public class ShackApi
 {
-    static final String USER_AGENT = "DroidChatty/0.6.2";
+    static final String USER_AGENT = "DroidChatty/0.7";
     
     static final String POST_URL = "http://www.shacknews.com/api/chat/create/17.json";
     static final String LOL_URL = "http://www.lmnopc.com/greasemonkey/shacklol/report.php";

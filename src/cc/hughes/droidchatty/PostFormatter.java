@@ -24,7 +24,12 @@ public class PostFormatter {
     {
         // special case fix for shacknews links
         if (userName.equalsIgnoreCase("shacknews"))
+        {
             content = content.replaceAll("&lt;(/?)a(.*?)&gt;", "<$1a$2>");
+            
+            // make relative link absolute
+            content = content.replaceAll("href=\"/", "href=\"http://www.shacknews.com/");
+        }
         
         return ShackTags.fromHtml(content, view, !multiLine);
     }

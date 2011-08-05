@@ -22,10 +22,12 @@ public class PostFormatter {
 
     public static Spanned formatContent(String userName, String content, final View view, boolean multiLine)
     {
-        // special case fix for shacknews links
         if (userName.equalsIgnoreCase("shacknews"))
         {
+            // fix escaped html
             content = content.replaceAll("&lt;(/?)a(.*?)&gt;", "<$1a$2>");
+            content = content.replaceAll("&lt;br /&gt;", "<br />");
+            content = content.replaceAll("&lt;(/?)span(.*?)&gt;", "<$1span$2>");
             
             // make relative link absolute
             content = content.replaceAll("href=\"/", "href=\"http://www.shacknews.com/");

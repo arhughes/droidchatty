@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.text.ClipboardManager;
@@ -49,20 +50,31 @@ public class ThreadViewFragment extends ListFragment
     int _currentPostId;
     boolean _postDisplayed = false;
     
+    // list view saved state while rotating
+    private Parcelable _listState = null;
+    private int _listPosition = 0;
+    private int _itemPosition = 0;
+    private int _itemChecked = ListView.INVALID_POSITION;
+    
     public int getPostId()
     {
-       return getArguments().getInt("postId"); 
+        return getArguments().getInt("postId");
+    }
+    
+    @Override
+    public void onCreate(Bundle savedInstanceBundle)
+    {
+    	super.onCreate(savedInstanceBundle);
+    	this.setRetainInstance(true);
+    	
+    	if (getArguments() != null)
+    		_rootPostId = getArguments().getInt("postId");
+        _currentPostId = _rootPostId;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-        _rootPostId = getArguments().getInt("postId");
-        _currentPostId = _rootPostId;
-        
-        _adapter = new PostLoadingAdapter(getActivity(), new ArrayList<Post>());
-        setListAdapter(_adapter);
-        
+    {        
         return inflater.inflate(R.layout.thread_view, null);
     }
     
@@ -70,43 +82,77 @@ public class ThreadViewFragment extends ListFragment
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        
+
         getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         
-        Bundle args = getArguments();
-        String action = getActivity().getIntent().getAction();
-        Uri uri = getActivity().getIntent().getData();
+    	// makes links actually clickable
+    	TextView content = (TextView)getView().findViewById(R.id.textContent);
+    	content.setMovementMethod(new LinkMovementMethod());
+    
+    	setHasOptionsMenu(true);
+    	registerForContextMenu(content);
+           
+        if (_adapter == null)
+        {
+        	// first launch, try to set everything up
+        	Bundle args = getArguments();
+        	String action = getActivity().getIntent().getAction();
+        	Uri uri = getActivity().getIntent().getData();
         
-        if (args.containsKey("content"))
-        {
-            String userName = args.getString("userName");
-            String content = args.getString("content");
-            String posted = args.getString("posted");
-            String moderation = args.containsKey("moderation") ? args.getString("moderation") : "";
-            Post post = new Post(_rootPostId, userName, content, posted, 0, moderation);
-            displayPost(post);
-        }
-        else if (action != null && action.equals(Intent.ACTION_VIEW) && uri != null)
-        {
-            String id = uri.getQueryParameter("id");
-            if (id == null)
-            {
-                ErrorDialog.display(getActivity(), "Error", "Invalid URL Found");
-                return;
-            }
+        	if (args.containsKey("content"))
+        	{
+        		String userName = args.getString("userName");
+        		String postContent = args.getString("content");
+        		String posted = args.getString("posted");
+        		String moderation = args.containsKey("moderation") ? args.getString("moderation") : "";
+        		Post post = new Post(_rootPostId, userName, postContent, posted, 0, moderation);
+        		displayPost(post);
+        	}
+        	else if (action != null && action.equals(Intent.ACTION_VIEW) && uri != null)
+        	{
+        		String id = uri.getQueryParameter("id");
+        		if (id == null)
+        		{
+        			ErrorDialog.display(getActivity(), "Error", "Invalid URL Found");
+        			return;
+        		}
             
-            _currentPostId = Integer.parseInt(id);
-            _rootPostId = _currentPostId;
+        		_currentPostId = Integer.parseInt(id);
+        		_rootPostId = _currentPostId;
+        	}
+        
+        	_adapter = new PostLoadingAdapter(getActivity(), new ArrayList<Post>());
+        	setListAdapter(_adapter);
+        }
+        else    
+        {
+       		// user rotated the screen, try to go back to where they where
+       		if (_listState != null)
+       			getListView().onRestoreInstanceState(_listState);
+       		getListView().setSelectionFromTop(_listPosition,  _itemPosition);
+       		
+       		if (_itemChecked != ListView.INVALID_POSITION)
+       			displayPost(_itemChecked);
         }
         
-        // makes links actually clickable
-        TextView content = (TextView)getView().findViewById(R.id.textContent);
-        content.setMovementMethod(new LinkMovementMethod());
-        
-        setHasOptionsMenu(true);
-        registerForContextMenu(content);
+    }
+    
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+    	super.onSaveInstanceState(outState);
+
+    	// we should put this info into the outState, but the compatibility framework
+    	// seems to swallow it somewhere   	
+    	ListView listView = getListView();
+    	_listState = listView.onSaveInstanceState();
+    	_listPosition = listView.getFirstVisiblePosition();
+    	_itemChecked = listView.getCheckedItemPosition();
+    	View itemView = listView.getChildAt(0);
+    	_itemPosition = itemView == null ? 0 : itemView.getTop();    			
     }
 
+    
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {

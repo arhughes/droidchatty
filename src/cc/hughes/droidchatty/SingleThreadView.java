@@ -12,10 +12,13 @@ public class SingleThreadView extends FragmentActivity
     {
         super.onCreate(savedInstanceState);
         
-        // create the fragment, and show it!
-        ThreadViewFragment frag = new ThreadViewFragment();
-        frag.setArguments(getIntent().getExtras());
-        getSupportFragmentManager().beginTransaction().replace(android.R.id.content, frag).commit();
+        if (savedInstanceState == null)
+        {
+        	//create the fragment, and show it!
+        	ThreadViewFragment frag = new ThreadViewFragment();
+        	frag.setArguments(getIntent().getExtras());
+        	getSupportFragmentManager().beginTransaction().replace(android.R.id.content, frag).commit();
+        }
     }
 }
 

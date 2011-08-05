@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.text.Spannable;
@@ -32,6 +33,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -39,23 +42,67 @@ public class ThreadListFragment extends ListFragment
 {
     private boolean _dualPane;
     ThreadLoadingAdapter _adapter;
+
+    // list view saved state while rotating
+    private Parcelable _listState = null;
+    private int _listPosition = 0;
+    private int _itemPosition = 0;
+    private int _itemChecked = ListView.INVALID_POSITION;
+    
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+    	super.onCreate(savedInstanceState);
+    	setRetainInstance(true);
+    }
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        
-        _adapter = new ThreadLoadingAdapter(getActivity(), new ArrayList<Thread>());
-        setListAdapter(_adapter);
-        
-        View singleThread = getActivity().findViewById(R.id.singleThread);
-        _dualPane = singleThread != null && singleThread.getVisibility() == View.VISIBLE;
-        
-        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        
-        setHasOptionsMenu(true);
+
+       	View singleThread = getActivity().findViewById(R.id.singleThread);
+       	_dualPane = singleThread != null && singleThread.getVisibility() == View.VISIBLE;
+       
+       	getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+       
+       	setHasOptionsMenu(true);
+       	
+       	if (_adapter == null)
+       	{
+       		// no adapter? must be a new view
+       		Log.d("DroidChatty", "onActivityCreated adapter was null");
+       		_adapter = new ThreadLoadingAdapter(getActivity(), new ArrayList<Thread>());
+       		setListAdapter(_adapter);
+       	}
+       	else
+       	{
+       		// user rotated the screen, try to go back to where they where
+       		if (_listState != null)
+       			getListView().onRestoreInstanceState(_listState);
+       		getListView().setSelectionFromTop(_listPosition,  _itemPosition);
+       		
+       		if (_itemChecked != ListView.INVALID_POSITION)
+       			getListView().setItemChecked(_itemChecked, true);
+       	}
+       	
     }
     
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+    	super.onSaveInstanceState(outState);
+
+    	// we should put this info into the outState, but the compatibility framework
+    	// seems to swallow it somewhere   	
+    	ListView listView = getListView();
+    	_listState = listView.onSaveInstanceState();
+    	_listPosition = listView.getFirstVisiblePosition();
+    	View itemView = listView.getChildAt(0);
+    	_itemPosition = itemView == null ? 0 : itemView.getTop();
+    	_itemChecked = listView.getCheckedItemPosition();
+    }
+        
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
@@ -364,3 +411,4 @@ public class ThreadListFragment extends ListFragment
     }
 
 }
+

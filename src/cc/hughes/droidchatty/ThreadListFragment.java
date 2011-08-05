@@ -33,8 +33,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -71,7 +69,6 @@ public class ThreadListFragment extends ListFragment
        	if (_adapter == null)
        	{
        		// no adapter? must be a new view
-       		Log.d("DroidChatty", "onActivityCreated adapter was null");
        		_adapter = new ThreadLoadingAdapter(getActivity(), new ArrayList<Thread>());
        		setListAdapter(_adapter);
        	}

@@ -20,4 +20,8 @@
     <string name="preference_username_summary">Shacknews.com username</string>
     <string name="preference_password_title">Password</string>
     <string name="preference_password_summary">Shacknews.com password</string>
+    
+    <string name="preferences_chattypics_login">Chattypics Account Information</string>
+    <string name="preference_chattypics_username_summary">Chattypics username</string>
+    <string name="preference_chattypics_password_summary">Chattypics password</string>
 </resources>

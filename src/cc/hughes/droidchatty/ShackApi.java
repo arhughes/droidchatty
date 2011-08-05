@@ -1,5 +1,7 @@
 package cc.hughes.droidchatty;
 
+import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -18,6 +20,9 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.entity.FileEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -35,6 +40,9 @@ public class ShackApi
 {
     static final String USER_AGENT = "DroidChatty/0.7";
     
+    static final String IMAGE_LOGIN_URL = "http://chattypics.com/users.php?act=login_go";
+    static final String IMAGE_UPLOAD_URL = "http://chattypics.com/upload.php";
+    
     static final String POST_URL = "http://www.shacknews.com/api/chat/create/17.json";
     static final String LOL_URL = "http://www.lmnopc.com/greasemonkey/shacklol/report.php";
     
@@ -43,6 +51,78 @@ public class ShackApi
     static final String BASE_URL = "http://shackapi.hughes.cc/";
     static final String FAKE_STORY_ID = "17";
     static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+    
+    public static String loginToUploadImage(String userName, String password) throws Exception
+    {
+        Log.d("DroidChatty", "Posting to: " + IMAGE_LOGIN_URL);
+        Log.d("DroidChatty", "Loggin in with " + userName + " and " + password);
+        BasicResponseHandler response_handler = new BasicResponseHandler();
+        DefaultHttpClient client = new DefaultHttpClient();
+        HttpPost post = new HttpPost(IMAGE_LOGIN_URL);
+        post.setHeader("User-Agent", USER_AGENT);
+        
+        List<NameValuePair> values = new ArrayList<NameValuePair>();
+        values.add(new BasicNameValuePair("user_name", userName));
+        values.add(new BasicNameValuePair("user_password", password));
+        
+        UrlEncodedFormEntity e = new UrlEncodedFormEntity(values);
+        post.setEntity(e);
+        
+        String content = client.execute(post, response_handler);
+        if (content.contains("successfully been logged in"))
+        {
+            List<Cookie> cookies = client.getCookieStore().getCookies();
+            return cookies.get(0).getName() + "=" + cookies.get(0).getValue();
+        }
+        
+        return null;
+    }
+    
+    public static String uploadImage(String imageLocation, String cookie) throws Exception
+    {
+        File file = new File(imageLocation);
+        String name = file.getName();
+        FileEntity e = new FileEntity(file, "image");
+        
+        String BOUNDARY = "648f67b67d304b01f84ceb0e0c56c8b7";
+        
+        URL post_url = new URL(IMAGE_UPLOAD_URL);
+        URLConnection con = post_url.openConnection();
+        con.setRequestProperty("User-Agent", USER_AGENT);
+        if (cookie != null)
+            con.setRequestProperty("Cookie", cookie);
+        con.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + BOUNDARY);
+        
+        // write our request
+        con.setDoOutput(true);
+        java.io.OutputStream os = con.getOutputStream();
+        try
+        {
+            DataOutputStream dos = new DataOutputStream(os);
+            dos.writeBytes("--" + BOUNDARY + "\r\n");
+            dos.writeBytes("Content-Disposition: form-data; name=\"userfile[]\";filename=\"" + name + "\"\r\n\r\n");
+            
+            e.writeTo(os);
+            
+            dos.writeBytes("\r\n--" + BOUNDARY + "--\r\n");
+            os.flush();
+        }
+        finally
+        {
+            os.close();
+        }
+        
+        // read the response
+        java.io.InputStream input = con.getInputStream();
+        try
+        {
+            return readStream(input);
+        }
+        finally
+        {
+            input.close();
+        }
+    }
     
     public static ArrayList<SearchResult> search(String term, String author, String parentAuthor, int pageNumber) throws Exception
     {

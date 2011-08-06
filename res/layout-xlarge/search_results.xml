@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="horizontal"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+     <fragment class="cc.hughes.droidchatty.SearchResultFragment"
+    	android:id="@+id/searchResults"
+    	android:layout_weight="1"
+    	android:layout_width="0px"
+    	android:layout_height="fill_parent"
+     />
+     <View
+    	android:layout_height="fill_parent"
+    	android:layout_width="3px"
+    	android:background="#333"
+     />
+     <fragment class="cc.hughes.droidchatty.ThreadViewFragment"
+        android:id="@+id/singleThread"
+        android:layout_weight="2"
+        android:layout_width="0px"
+        android:layout_height="fill_parent"
+     />
+  
+</LinearLayout>

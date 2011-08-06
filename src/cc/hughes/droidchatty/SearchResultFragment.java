@@ -24,6 +24,8 @@ public class SearchResultFragment extends ListFragment
     String _parentAuthor;
     
     int _pageNumber = 0;
+    
+    boolean _dualPane = false;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
@@ -45,6 +47,11 @@ public class SearchResultFragment extends ListFragment
             _parentAuthor = intent.getExtras().getString("parentAuthor");
         }
         
+       	View singleThread = getActivity().findViewById(R.id.singleThread);
+       	_dualPane = singleThread != null && singleThread.getVisibility() == View.VISIBLE;
+       
+       	getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        
         _results = new ArrayList<SearchResult>();
         _adapter = new SearchResultsAdapter(this.getActivity(), _results);
         setListAdapter(_adapter);
@@ -62,9 +69,18 @@ public class SearchResultFragment extends ListFragment
     
     private void displayThread(SearchResult result)
     {
-        Intent i = new Intent(this.getActivity(), SingleThreadView.class);
-        i.putExtra("postId", result.getPostId());
-        startActivity(i);
+        if (_dualPane)
+        {
+            ThreadViewFragment view = (ThreadViewFragment)getFragmentManager().findFragmentById(R.id.singleThread);
+            if (view.getPostId() != result.getPostId());
+                view.loadSearchResult(result);
+        }
+        else
+        {
+            Intent i = new Intent(this.getActivity(), SingleThreadView.class);
+            i.putExtra("postId", result.getPostId());
+            startActivity(i);
+        }
     }
     
     private class SearchResultsAdapter extends LoadingAdapter<SearchResult>

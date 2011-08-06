@@ -29,22 +29,6 @@ import android.widget.TextView;
 
 public class ThreadViewFragment extends ListFragment
 {
-    public static ThreadViewFragment newInstance(int postId, String userName, String posted, String content, String moderation)
-    {
-        ThreadViewFragment f = new ThreadViewFragment();
-        
-        Bundle args = new Bundle();
-        args.putInt("postId", postId);
-        args.putString("userName", userName);
-        args.putString("posted", posted);
-        args.putString("content", content);
-        args.putString("moderation", moderation);
-        
-        f.setArguments(args);
-        
-        return f;
-    }
-    
     PostLoadingAdapter _adapter;
     int _rootPostId;
     int _currentPostId;
@@ -58,7 +42,7 @@ public class ThreadViewFragment extends ListFragment
     
     public int getPostId()
     {
-        return getArguments().getInt("postId");
+        return _rootPostId;
     }
     
     @Override
@@ -76,6 +60,19 @@ public class ThreadViewFragment extends ListFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {        
         return inflater.inflate(R.layout.thread_view, null);
+    }
+    
+    public void loadThread(Thread thread)
+    {
+		_currentPostId = thread.getThreadId();
+		_rootPostId = _currentPostId;
+        		
+		// create a "post" to be displayed
+		Post post = new Post(_rootPostId, thread.getUserName(), thread.getContent(), thread.getPosted(), 0, thread.getModeration());
+		displayPost(post);
+		
+		// reset the adapter
+        _adapter.clear();
     }
     
     @Override
@@ -99,28 +96,32 @@ public class ThreadViewFragment extends ListFragment
         	String action = getActivity().getIntent().getAction();
         	Uri uri = getActivity().getIntent().getData();
         
-        	if (args.containsKey("content"))
+        	//  only load this junk if the arguments isn't null
+        	if (args != null)
         	{
-        		String userName = args.getString("userName");
-        		String postContent = args.getString("content");
-        		String posted = args.getString("posted");
-        		String moderation = args.containsKey("moderation") ? args.getString("moderation") : "";
-        		Post post = new Post(_rootPostId, userName, postContent, posted, 0, moderation);
-        		displayPost(post);
+            	if (args.containsKey("content"))
+            	{
+            		String userName = args.getString("userName");
+            		String postContent = args.getString("content");
+            		String posted = args.getString("posted");
+            		String moderation = args.containsKey("moderation") ? args.getString("moderation") : "";
+            		Post post = new Post(_rootPostId, userName, postContent, posted, 0, moderation);
+            		displayPost(post);
+            	}
+            	else if (action != null && action.equals(Intent.ACTION_VIEW) && uri != null)
+            	{
+            		String id = uri.getQueryParameter("id");
+            		if (id == null)
+            		{
+            			ErrorDialog.display(getActivity(), "Error", "Invalid URL Found");
+            			return;
+            		}
+                
+            		_currentPostId = Integer.parseInt(id);
+            		_rootPostId = _currentPostId;
+            	}
         	}
-        	else if (action != null && action.equals(Intent.ACTION_VIEW) && uri != null)
-        	{
-        		String id = uri.getQueryParameter("id");
-        		if (id == null)
-        		{
-        			ErrorDialog.display(getActivity(), "Error", "Invalid URL Found");
-        			return;
-        		}
             
-        		_currentPostId = Integer.parseInt(id);
-        		_rootPostId = _currentPostId;
-        	}
-        
         	_adapter = new PostLoadingAdapter(getActivity(), new ArrayList<Post>());
         	setListAdapter(_adapter);
         }
@@ -325,6 +326,8 @@ public class ThreadViewFragment extends ListFragment
         @Override
         protected boolean getMoreToLoad()
         {
+            if (_rootPostId == 0)
+                return false;
             return !_loaded;
         }
 

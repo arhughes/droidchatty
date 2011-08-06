@@ -190,11 +190,8 @@ public class ThreadListFragment extends ListFragment
         if (_dualPane)
         {
             ThreadViewFragment view = (ThreadViewFragment)getFragmentManager().findFragmentById(R.id.singleThread);
-            if (view == null || view.getPostId() != thread.getThreadId())
-            {
-                view = ThreadViewFragment.newInstance(thread.getThreadId(), thread.getUserName(), thread.getPosted(), thread.getContent(), thread.getModeration());
-                getFragmentManager().beginTransaction().replace(R.id.singleThread, view).commit();
-            }
+            if (view.getPostId() != thread.getThreadId())
+                view.loadThread(thread);
         }
         else
         {

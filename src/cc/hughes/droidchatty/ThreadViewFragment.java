@@ -62,28 +62,11 @@ public class ThreadViewFragment extends ListFragment
         return inflater.inflate(R.layout.thread_view, null);
     }
     
-    public void loadThread(Thread thread)
+    public void loadPost(Post post)
     {
-		_currentPostId = thread.getThreadId();
+		_currentPostId = post.getPostId();
 		_rootPostId = _currentPostId;
         		
-		// create a "post" to be displayed
-		Post post = new Post(_rootPostId, thread.getUserName(), thread.getContent(), thread.getPosted(), 0, thread.getModeration());
-		displayPost(post);
-		
-		_postDisplayed = false;
-		
-		// reset the adapter
-        _adapter.clear();
-    }
-    
-    public void loadSearchResult(SearchResult result)
-    {
-		_currentPostId = result.getPostId();
-		_rootPostId = _currentPostId;
-		
-		// create a "post" to be displayed
-		Post post = new Post(_rootPostId, result.getAuthor(), result.getContent(), result.getPosted(), 0, "");
 		displayPost(post);
 		
 		_postDisplayed = false;

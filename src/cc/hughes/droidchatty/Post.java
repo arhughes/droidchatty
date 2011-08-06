@@ -13,6 +13,16 @@ public class Post {
     private int _order = Integer.MAX_VALUE;
 
     private Spanned _preview;
+    
+    public static Post fromThread(Thread thread)
+    {
+        return new Post(thread.getThreadId(), thread.getUserName(), thread.getContent(), thread.getPosted(), 0, thread.getModeration());
+    }
+    
+    public static Post fromSearchResult(SearchResult result)
+    {
+        return new Post(result.getPostId(), result.getAuthor(), result.getContent(), result.getPosted(), 0, "");
+    }
 
     public Post(int postId, String userName, String content, String posted, int level, String moderation)
     {

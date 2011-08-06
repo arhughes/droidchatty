@@ -73,7 +73,7 @@ public class SearchResultFragment extends ListFragment
         {
             ThreadViewFragment view = (ThreadViewFragment)getFragmentManager().findFragmentById(R.id.singleThread);
             if (view.getPostId() != result.getPostId());
-                view.loadSearchResult(result);
+                view.loadPost(Post.fromSearchResult(result));
         }
         else
         {

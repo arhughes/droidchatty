@@ -191,7 +191,7 @@ public class ThreadListFragment extends ListFragment
         {
             ThreadViewFragment view = (ThreadViewFragment)getFragmentManager().findFragmentById(R.id.singleThread);
             if (view.getPostId() != thread.getThreadId())
-                view.loadThread(thread);
+                view.loadPost(Post.fromThread(thread));
         }
         else
         {

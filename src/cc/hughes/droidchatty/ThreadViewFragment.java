@@ -193,6 +193,24 @@ public class ThreadViewFragment extends ListFragment
     {
         inflater.inflate(R.menu.thread_menu, menu);
     }
+    
+    @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        super.onPrepareOptionsMenu(menu);
+        
+        boolean enabled = (_rootPostId != 0);
+        
+        setMenuItemEnabled(menu, R.id.refreshThread, enabled);
+        setMenuItemEnabled(menu, R.id.reply, enabled);
+        setMenuItemEnabled(menu, R.id.tagMenu, enabled);
+    }
+    
+    void setMenuItemEnabled(Menu menu, int id, boolean enabled)
+    {
+        MenuItem item = menu.findItem(id);
+        item.setEnabled(enabled);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)

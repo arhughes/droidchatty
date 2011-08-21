@@ -35,6 +35,7 @@ public class ThreadViewFragment extends ListFragment
     int _rootPostId;
     int _currentPostId;
     boolean _postDisplayed = false;
+    boolean _initialPostSelected = false;
     
     ProgressDialog _progressDialog;
     
@@ -157,6 +158,28 @@ public class ThreadViewFragment extends ListFragment
     	_itemPosition = itemView == null ? 0 : itemView.getTop();    			
     }
 
+    void ensurePostSelectedAndDisplayed()
+    {
+        int length = _adapter.getCount();
+        for (int i = 0; i < length; i++)
+        {
+            Post post = _adapter.getItem(i);
+            if (post != null && post.getPostId() == _currentPostId)
+            {
+                if (!_postDisplayed)
+                    displayPost(i);
+                
+                if (!_initialPostSelected)
+                {
+                    getListView().setItemChecked(i, true);
+                    getListView().setSelection(i);
+                    _initialPostSelected = true;
+                }
+                    
+                break;
+            }
+        }
+    }
     
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
@@ -233,6 +256,7 @@ public class ThreadViewFragment extends ListFragment
         switch(item.getItemId())
         {
             case R.id.refreshThread:
+                _initialPostSelected = false;
                 _adapter.clear();
                 return true;
             case R.id.reply:
@@ -506,16 +530,7 @@ public class ThreadViewFragment extends ListFragment
         {
             try
             {
-                int length = getCount();
-                for (int i = 0; i < length; i++)
-                {
-                    if (getItem(i).getPostId() == _currentPostId)
-                    {
-                        if (!_postDisplayed)
-                            displayPost(i);
-                        break;
-                    }
-                }
+                ensurePostSelectedAndDisplayed();
             } catch (Exception e)
             {
                 Log.w("DroidChatty", "Error selecting root post", e);

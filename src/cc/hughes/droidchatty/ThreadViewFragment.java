@@ -3,11 +3,13 @@ package cc.hughes.droidchatty;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
@@ -33,6 +35,8 @@ public class ThreadViewFragment extends ListFragment
     int _rootPostId;
     int _currentPostId;
     boolean _postDisplayed = false;
+    
+    ProgressDialog _progressDialog;
     
     // list view saved state while rotating
     private Parcelable _listState = null;
@@ -274,14 +278,9 @@ public class ThreadViewFragment extends ListFragment
             return;
         }
         
-        try
-        {
-            ShackApi.tagPost(_currentPostId, tag, userName);
-        }
-        catch (Exception ex)
-        {
-           ErrorDialog.display(getActivity(), "Error", "Error tagging post:\n" + ex.getMessage()); 
-        }
+        new LolTask().execute(userName, tag);
+        _progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Tagging post as " + tag);
+        
     }
     
     private void modPost(String moderation)
@@ -296,16 +295,78 @@ public class ThreadViewFragment extends ListFragment
             return;
         }
         
-        try
+        new ModTask().execute(userName, password, moderation);
+        _progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Laying down the ban hammer...");
+    }
+    
+    class LolTask extends AsyncTask<String, Void, Void>
+    {
+        Exception _exception;
+        
+        @Override
+        protected Void doInBackground(String... params)
         {
-            int rootPost = _adapter.getItem(0).getPostId();
-            String result = ShackApi.modPost(userName, password, rootPost, _currentPostId, moderation);
-            ErrorDialog.display(getActivity(), "Moderation", result);
-        } catch (Exception e)
-        {
-            Log.e("DroidChatty", "Error modding post", e);
-            ErrorDialog.display(getActivity(), "Error", "Error occured modding post."); 
+            String userName = params[0];
+            String tag = params[1];
+            
+            try
+            {
+                ShackApi.tagPost(_currentPostId, tag, userName);
+            }
+            catch (Exception ex)
+            {
+                Log.e("DroidChatty", "Error tagging post", ex);
+                _exception = ex;
+            }
+            
+            return null;
         }
+        
+        @Override
+        protected void onPostExecute(Void result)
+        {
+            _progressDialog.dismiss();
+            if (_exception != null)
+               ErrorDialog.display(getActivity(), "Error", "Error tagging post:\n" + _exception.getMessage()); 
+        }
+    }
+    
+    class ModTask extends AsyncTask<String, Void, String>
+    {
+        Exception _exception;
+        
+        @Override
+        protected String doInBackground(String... params)
+        {
+            String userName = params[0];
+            String password = params[1];
+            String moderation = params[2];
+            
+            try
+            {
+                int rootPost = _adapter.getItem(0).getPostId();
+                String result = ShackApi.modPost(userName, password, rootPost, _currentPostId, moderation);
+                return result;
+            }
+            catch (Exception e)
+            {
+                _exception = e;
+                Log.e("DroidChatty", "Error modding post", e);
+            }
+            
+            return null;
+        }
+        
+        @Override
+        protected void onPostExecute(String result)
+        {
+            _progressDialog.dismiss();
+            if (_exception != null)
+                ErrorDialog.display(getActivity(), "Error", "Error occured modding post."); 
+            else
+                ErrorDialog.display(getActivity(), "Moderation", result);
+        }
+        
     }
     
     @Override

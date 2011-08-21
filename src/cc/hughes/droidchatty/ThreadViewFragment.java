@@ -192,17 +192,6 @@ public class ThreadViewFragment extends ListFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         inflater.inflate(R.menu.thread_menu, menu);
-        
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        boolean showModTools = prefs.getBoolean("showModTools", false);
-        
-        Log.d("DroidChatty", "Show Mod Tools: " + showModTools);
-        
-        if(showModTools)
-        {
-            MenuItem modMenu = menu.findItem(R.id.modToolsMenu);
-            modMenu.setVisible(true);
-        }
     }
     
     @Override
@@ -216,6 +205,16 @@ public class ThreadViewFragment extends ListFragment
         setMenuItemEnabled(menu, R.id.reply, enabled);
         setMenuItemEnabled(menu, R.id.tagMenu, enabled);
         setMenuItemEnabled(menu, R.id.modToolsMenu, enabled);
+        
+        // show the mod tools if enabled in settings
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean showModTools = prefs.getBoolean("showModTools", false);
+        
+        if(showModTools)
+        {
+            MenuItem modMenu = menu.findItem(R.id.modToolsMenu);
+            modMenu.setVisible(true);
+        }
     }
     
     void setMenuItemEnabled(Menu menu, int id, boolean enabled)

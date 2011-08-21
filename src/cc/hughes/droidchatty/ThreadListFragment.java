@@ -299,17 +299,26 @@ public class ThreadListFragment extends ListFragment
     private class ThreadLoadingAdapter extends LoadingAdapter<Thread>
     {
         private int _pageNumber = 0;
+        private Boolean _showTags;
         
         public ThreadLoadingAdapter(Context context, ArrayList<Thread> items)
         {
             super(context, R.layout.row, R.layout.row_loading, items);
+            setShowTags();
         }
         
         @Override
         public void clear()
         {
             _pageNumber = 0;
+            setShowTags();
             super.clear();
+        }
+        
+        void setShowTags()
+        {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ThreadListFragment.this.getActivity());
+            _showTags = prefs.getBoolean("showTagsInThreadList", true);
         }
 
         @Override
@@ -332,7 +341,7 @@ public class ThreadListFragment extends ListFragment
             // get the thread to display and populate all the data into the layout
             Thread t = getItem(position);
             holder.userName.setText(t.getUserName());
-            holder.content.setText(t.getPreview());
+            holder.content.setText(t.getPreview(_showTags));
             holder.posted.setText(t.getPosted());
             holder.replyCount.setText(formatReplyCount(t));
 

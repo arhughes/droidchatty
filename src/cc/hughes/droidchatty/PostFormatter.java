@@ -12,15 +12,20 @@ public class PostFormatter {
     
     public static Spanned formatContent(Post post, View view, boolean multiLine)
     {
-        return formatContent(post.getUserName(), post.getContent(), view, multiLine);
+        return formatContent(post.getUserName(), post.getContent(), view, multiLine, true);
     }
 
     public static Spanned formatContent(Thread thread, boolean multiLine)
     {
-        return formatContent(thread.getUserName(), thread.getContent(), null, multiLine);
+        return formatContent(thread, multiLine, true);
+    }
+    
+    public static Spanned formatContent(Thread thread, boolean multiLine, boolean showTags)
+    {
+        return formatContent(thread.getUserName(), thread.getContent(), null, multiLine, showTags);
     }
 
-    public static Spanned formatContent(String userName, String content, final View view, boolean multiLine)
+    public static Spanned formatContent(String userName, String content, final View view, boolean multiLine, boolean showTags)
     {
         if (userName.equalsIgnoreCase("shacknews"))
         {
@@ -33,6 +38,6 @@ public class PostFormatter {
             content = content.replaceAll("href=\"/", "href=\"http://www.shacknews.com/");
         }
         
-        return ShackTags.fromHtml(content, view, !multiLine);
+        return ShackTags.fromHtml(content, view, !multiLine, showTags);
     }
 }

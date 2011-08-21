@@ -107,7 +107,7 @@ public class SearchResultFragment extends ListFragment
             // get the thread to display and populate all the data into the layout
             SearchResult t = getItem(position);
             holder.userName.setText(t.getAuthor());
-            holder.content.setText(PostFormatter.formatContent(t.getAuthor(), t.getContent(), null, false));
+            holder.content.setText(PostFormatter.formatContent(t.getAuthor(), t.getContent(), null, false, true));
             holder.posted.setText(t.getPosted());
                     
             return convertView;

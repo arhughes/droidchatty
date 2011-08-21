@@ -27,4 +27,12 @@
   	     android:singleLine="true"
   	     android:password="true"/>
   </PreferenceCategory>
+  <PreferenceCategory android:title="@string/preferences_options">
+  	<CheckBoxPreference
+  	     android:key="showTagsInThreadList"
+  	     android:title="@string/preference_tag_thread_list_title"
+  	     android:summary="@string/preference_tag_thread_list_summary"
+  	     android:defaultValue="true"
+  	     />
+  </PreferenceCategory>
 </PreferenceScreen>

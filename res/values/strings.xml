@@ -24,4 +24,8 @@
     <string name="preferences_chattypics_login">Chattypics Account Information</string>
     <string name="preference_chattypics_username_summary">Chattypics username</string>
     <string name="preference_chattypics_password_summary">Chattypics password</string>
+    
+    <string name="preferences_options">Options</string>
+    <string name="preference_tag_thread_list_title">Show tags in thread list</string>
+    <string name="preference_tag_thread_list_summary"></string>
 </resources>

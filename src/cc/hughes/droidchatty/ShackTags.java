@@ -29,13 +29,13 @@ public class ShackTags
 {
     private static final HTMLSchema schema = new HTMLSchema();
     
-    public static Spanned fromHtml(String source, View owner, Boolean single_line)
+    public static Spanned fromHtml(String source, View owner, Boolean single_line, Boolean showTags)
     {
         Parser parser = new Parser();
         try
         {
             parser.setProperty(Parser.schemaProperty, schema);
-            TagConverter converter = new TagConverter(source, parser, owner, single_line);
+            TagConverter converter = new TagConverter(source, parser, owner, single_line, showTags);
             return converter.convert();
         } catch (Exception e)
         {
@@ -52,13 +52,15 @@ class TagConverter implements ContentHandler
     private SpannableStringBuilder _builder;
     private View _owner;
     private Boolean _singleLine;
+    private Boolean _showTags;
     
-    public TagConverter(String source, Parser parser, View owner, Boolean singleLine)
+    public TagConverter(String source, Parser parser, View owner, Boolean singleLine, Boolean showTags)
     {
         _source = source;
         _reader = parser;
         _owner = owner;
         _singleLine = singleLine;
+        _showTags = showTags;
         _builder = new SpannableStringBuilder();
     }
     
@@ -242,7 +244,7 @@ class TagConverter implements ContentHandler
                 span = new StrikethroughSpan();
             else if (obj instanceof Spoiler)
                 span = new SpoilerSpan(_owner);
-            else if (obj instanceof Font)
+            else if (obj instanceof Font && _showTags)
                 span = new ForegroundColorSpan(getColor(((Font)obj).getColor()) | 0xFF000000);
             
             if (span != null)

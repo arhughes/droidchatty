@@ -22,13 +22,13 @@
 		  android:title="@string/mod"
 		  android:visible="false">
 		  <menu>
-		  	<item android:id="@+id/mod_stupid" android:title="stupid" />
-		  	<item android:id="@+id/mod_offtopic" android:title="offtopic" />
+		  	<item android:id="@+id/mod_interesting" android:title="interesting" />
 		  	<item android:id="@+id/mod_nws" android:title="nws" />
-		  	<item android:id="@+id/mod_political" android:title="political" />
-		  	<item android:id="@+id/mod_nuked" android:title="nuked" />
-		  	<item android:id="@+id/mod_informative" android:title="informative" />
+		  	<item android:id="@+id/mod_stupid" android:title="stupid" />
+		  	<item android:id="@+id/mod_tangent" android:title="tangent" />
 		  	<item android:id="@+id/mod_ontopic" android:title="ontopic" />
+		  	<item android:id="@+id/mod_nuked" android:title="nuked" />
+		  	<item android:id="@+id/mod_political" android:title="political" />
 		  </menu>
 	</item>
 </menu>

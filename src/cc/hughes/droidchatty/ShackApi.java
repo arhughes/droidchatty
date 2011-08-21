@@ -46,7 +46,7 @@ public class ShackApi
     static final String IMAGE_UPLOAD_URL = "http://chattypics.com/upload.php";
     
     static final String LOGIN_URL = "http://www.shacknews.com/login_laryn.x";
-    static final String MOD_URL = "http://www.shacknews.com/mod_laryn.x";
+    static final String MOD_URL = "http://www.shacknews.com/mod_chatty.x";
     static final String POST_URL = "http://www.shacknews.com/api/chat/create/17.json";
     static final String LOL_URL = "http://www.lmnopc.com/greasemonkey/shacklol/report.php";
     
@@ -74,11 +74,15 @@ public class ShackApi
         String content = client.execute(post, response_handler);
         if (content.contains("do_iframe_login"))
         {
-            String mod = MOD_URL + "?root=" + rootPostId + "&id=" + postId + "&mod=" + URLEncoder.encode(moderation, "UTF8");
+            int mod_type_id = getModTypeId(moderation);
+            String mod = MOD_URL + "?root=" + rootPostId + "&id=" + postId + "&mod_type_id=" + mod_type_id;
+            Log.d("DroidChatty", "Modding: " + mod);
             HttpGet get = new HttpGet(mod);
             get.setHeader("User-Agent", USER_AGENT);
             
             content = client.execute(get, response_handler);
+            
+            Log.d("DroidChatty", content);
             
             Pattern p = Pattern.compile("alert\\(\\s*\\\"(.+?)\\\"");
             Matcher match = p.matcher(content);
@@ -90,6 +94,26 @@ public class ShackApi
         }
         
         return "Couldn't login";
+    }
+    
+    static int getModTypeId(String moderation) throws Exception
+    {
+        if (moderation.equalsIgnoreCase("interesting"))
+            return 1;
+        else if (moderation.equalsIgnoreCase("nws"))
+            return 2;
+        else if (moderation.equalsIgnoreCase("stupid"))
+            return 3;
+        else if (moderation.equalsIgnoreCase("tangent"))
+            return 4;
+        else if (moderation.equalsIgnoreCase("ontopic"))
+            return 5;
+        else if (moderation.equalsIgnoreCase("nuked"))
+            return 8;
+        else if (moderation.equalsIgnoreCase("political"))
+            return 9;
+        
+        throw new Exception("Invalid mod type: " + moderation);
     }
     
     public static String loginToUploadImage(String userName, String password) throws Exception

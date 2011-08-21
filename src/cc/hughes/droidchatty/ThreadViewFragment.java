@@ -241,10 +241,10 @@ public class ThreadViewFragment extends ListFragment
             case R.id.wtf:
                 lolPost((String)item.getTitle());
                 return true;
-            case R.id.mod_informative:
+            case R.id.mod_interesting:
             case R.id.mod_nuked:
             case R.id.mod_nws:
-            case R.id.mod_offtopic:
+            case R.id.mod_tangent:
             case R.id.mod_ontopic:
             case R.id.mod_political:
             case R.id.mod_stupid:

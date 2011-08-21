@@ -192,6 +192,17 @@ public class ThreadViewFragment extends ListFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         inflater.inflate(R.menu.thread_menu, menu);
+        
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean showModTools = prefs.getBoolean("showModTools", false);
+        
+        Log.d("DroidChatty", "Show Mod Tools: " + showModTools);
+        
+        if(showModTools)
+        {
+            MenuItem modMenu = menu.findItem(R.id.modToolsMenu);
+            modMenu.setVisible(true);
+        }
     }
     
     @Override
@@ -204,6 +215,7 @@ public class ThreadViewFragment extends ListFragment
         setMenuItemEnabled(menu, R.id.refreshThread, enabled);
         setMenuItemEnabled(menu, R.id.reply, enabled);
         setMenuItemEnabled(menu, R.id.tagMenu, enabled);
+        setMenuItemEnabled(menu, R.id.modToolsMenu, enabled);
     }
     
     void setMenuItemEnabled(Menu menu, int id, boolean enabled)
@@ -229,6 +241,15 @@ public class ThreadViewFragment extends ListFragment
             case R.id.tag:
             case R.id.wtf:
                 lolPost((String)item.getTitle());
+                return true;
+            case R.id.mod_informative:
+            case R.id.mod_nuked:
+            case R.id.mod_nws:
+            case R.id.mod_offtopic:
+            case R.id.mod_ontopic:
+            case R.id.mod_political:
+            case R.id.mod_stupid:
+                modPost((String)item.getTitle());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -261,6 +282,30 @@ public class ThreadViewFragment extends ListFragment
         catch (Exception ex)
         {
            ErrorDialog.display(getActivity(), "Error", "Error tagging post:\n" + ex.getMessage()); 
+        }
+    }
+    
+    private void modPost(String moderation)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ThreadViewFragment.this.getActivity());
+        String userName = prefs.getString("userName", "");
+        String password = prefs.getString("password", "");
+        
+        if (userName.length() == 0)
+        {
+            ErrorDialog.display(getActivity(), "Error", "You must set your username before you can mod stuff.");
+            return;
+        }
+        
+        try
+        {
+            int rootPost = _adapter.getItem(0).getPostId();
+            String result = ShackApi.modPost(userName, password, rootPost, _currentPostId, moderation);
+            ErrorDialog.display(getActivity(), "Moderation", result);
+        } catch (Exception e)
+        {
+            Log.e("DroidChatty", "Error modding post", e);
+            ErrorDialog.display(getActivity(), "Error", "Error occured modding post."); 
         }
     }
     

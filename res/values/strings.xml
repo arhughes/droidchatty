@@ -14,6 +14,7 @@
     <string name="search">Search</string>
     <string name="search_hint">Search all chatty posts</string>
     <string name="tag">LOL</string>
+    <string name="mod">Mod</string>
     
     <string name="preferences_login">Account Information</string>
     <string name="preference_username_title">Username</string>
@@ -28,4 +29,7 @@
     <string name="preferences_options">Options</string>
     <string name="preference_tag_thread_list_title">Show tags in thread list</string>
     <string name="preference_tag_thread_list_summary"></string>
+    
+    <string name="preference_show_mod_tools_title">Show mod tools</string>
+    <string name="preference_show_mod_tools_summary"></string>
 </resources>

@@ -15,6 +15,8 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -43,6 +45,8 @@ public class ShackApi
     static final String IMAGE_LOGIN_URL = "http://chattypics.com/users.php?act=login_go";
     static final String IMAGE_UPLOAD_URL = "http://chattypics.com/upload.php";
     
+    static final String LOGIN_URL = "http://www.shacknews.com/login_laryn.x";
+    static final String MOD_URL = "http://www.shacknews.com/mod_laryn.x";
     static final String POST_URL = "http://www.shacknews.com/api/chat/create/17.json";
     static final String LOL_URL = "http://www.lmnopc.com/greasemonkey/shacklol/report.php";
     
@@ -52,10 +56,44 @@ public class ShackApi
     static final String FAKE_STORY_ID = "17";
     static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     
+    public static String modPost(String userName, String password, int rootPostId, int postId, String moderation) throws Exception
+    {
+        BasicResponseHandler response_handler = new BasicResponseHandler();
+        DefaultHttpClient client = new DefaultHttpClient();
+        HttpPost post = new HttpPost(LOGIN_URL);
+        post.setHeader("User-Agent", USER_AGENT);
+        
+        List<NameValuePair> values = new ArrayList<NameValuePair>();
+        values.add(new BasicNameValuePair("username", userName));
+        values.add(new BasicNameValuePair("password", password));
+        values.add(new BasicNameValuePair("type", "login"));
+        
+        UrlEncodedFormEntity e = new UrlEncodedFormEntity(values);
+        post.setEntity(e);
+        
+        String content = client.execute(post, response_handler);
+        if (content.contains("do_iframe_login"))
+        {
+            String mod = MOD_URL + "?root=" + rootPostId + "&id=" + postId + "&mod=" + URLEncoder.encode(moderation, "UTF8");
+            HttpGet get = new HttpGet(mod);
+            get.setHeader("User-Agent", USER_AGENT);
+            
+            content = client.execute(get, response_handler);
+            
+            Pattern p = Pattern.compile("alert\\(\\s*\\\"(.+?)\\\"");
+            Matcher match = p.matcher(content);
+                            
+            if (match.find())
+                return match.group(1);
+            
+            return "No idea what happened";
+        }
+        
+        return "Couldn't login";
+    }
+    
     public static String loginToUploadImage(String userName, String password) throws Exception
     {
-        Log.d("DroidChatty", "Posting to: " + IMAGE_LOGIN_URL);
-        Log.d("DroidChatty", "Loggin in with " + userName + " and " + password);
         BasicResponseHandler response_handler = new BasicResponseHandler();
         DefaultHttpClient client = new DefaultHttpClient();
         HttpPost post = new HttpPost(IMAGE_LOGIN_URL);
@@ -364,4 +402,5 @@ public class ShackApi
         
         return original;
     }
+
 }

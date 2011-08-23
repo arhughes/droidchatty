@@ -75,7 +75,7 @@ public class ShackApi
         if (content.contains("do_iframe_login"))
         {
             int mod_type_id = getModTypeId(moderation);
-            String mod = MOD_URL + "?root=" + rootPostId + "&id=" + postId + "&mod_type_id=" + mod_type_id;
+            String mod = MOD_URL + "?root=" + rootPostId + "&root_id=" + postId + "&mod_type_id=" + mod_type_id;
             Log.d("DroidChatty", "Modding: " + mod);
             HttpGet get = new HttpGet(mod);
             get.setHeader("User-Agent", USER_AGENT);
@@ -90,7 +90,7 @@ public class ShackApi
             if (match.find())
                 return match.group(1);
             
-            return "No idea what happened";
+            return "Maybe it worked!";
         }
         
         return "Couldn't login";

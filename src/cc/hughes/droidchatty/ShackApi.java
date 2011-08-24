@@ -40,7 +40,7 @@ import android.util.Log;
 
 public class ShackApi
 {
-    static final String USER_AGENT = "DroidChatty/0.8";
+    static final String USER_AGENT = "DroidChatty/0.8.1b";
     
     static final String IMAGE_LOGIN_URL = "http://chattypics.com/users.php?act=login_go";
     static final String IMAGE_UPLOAD_URL = "http://chattypics.com/upload.php";

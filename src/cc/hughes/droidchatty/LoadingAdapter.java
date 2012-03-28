@@ -2,6 +2,7 @@ package cc.hughes.droidchatty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -22,6 +23,7 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
     private int _loadingResource;
     private View _loadingView;
     private boolean _moreToLoad = true;
+    private UUID _uniqueId;
     
     LayoutInflater _inflater;
     
@@ -32,6 +34,7 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
         _normalResource = resource;
         _loadingResource = loadingResource;
         _items = objects;
+        _uniqueId = UUID.randomUUID();
     }
     
     public List<T> getItems()
@@ -84,6 +87,7 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
         super.clear();
         _moreToLoad = true;
         _loadingView = null;
+        _uniqueId = UUID.randomUUID();
     }
     
     protected boolean getMoreToLoad()
@@ -99,7 +103,7 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
             if (_loadingView == null)
             {
                 _loadingView = getLoadingView(parent);
-                new LoadAndAppendTask().execute();
+                new LoadAndAppendTask().execute(_uniqueId);
             }
             return _loadingView;
         }
@@ -115,13 +119,15 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
         return _inflater.inflate(_loadingResource, parent, false);
     }
     
-    class LoadAndAppendTask extends AsyncTask<Void, Void, ArrayList<T>>
+    class LoadAndAppendTask extends AsyncTask<UUID, Void, ArrayList<T>>
     {
         Exception _exception;
+        UUID _loadingId;
         
         @Override
-        protected ArrayList<T> doInBackground(Void... arg0)
+        protected ArrayList<T> doInBackground(UUID... arg0)
         {
+            _loadingId = arg0[0];
             try
             {
                 return loadData();
@@ -138,6 +144,13 @@ public abstract class LoadingAdapter<T> extends ArrayAdapter<T>
         @Override
         protected void onPostExecute(ArrayList<T> result)
         {
+            // user did something to invalidate the previous request
+            if (!_loadingId.equals(_uniqueId))
+            {
+                Log.i("DroidChatty", "Stale unique ID, discarding loaded results.");
+                return;
+            }
+            
             if (_exception != null)
             {
                _moreToLoad = false;

@@ -93,7 +93,7 @@ public class ShackApi
             if (match.find())
                 return match.group(1);
             
-            return "Maybe it worked!";
+            return null;
         }
         
         return "Couldn't login";

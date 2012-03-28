@@ -387,7 +387,7 @@ public class ThreadViewFragment extends ListFragment
             _progressDialog.dismiss();
             if (_exception != null)
                 ErrorDialog.display(getActivity(), "Error", "Error occured modding post."); 
-            else
+            else if (result != null)
                 ErrorDialog.display(getActivity(), "Moderation", result);
         }
         

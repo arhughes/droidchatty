@@ -1,9 +1,12 @@
 package cc.hughes.droidchatty;
 
+import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -340,16 +343,23 @@ public class ShackApi
             throw new Exception(content);
     }
     
-    private static String get(String url) throws ClientProtocolException, IOException 
+    private static String get(String location) throws ClientProtocolException, IOException 
     {
-        Log.d("DroidChatty", "Requested: " + url);
+        Log.d("DroidChatty", "Requested: " + location);
         
-        BasicResponseHandler response_handler = new BasicResponseHandler();
-        DefaultHttpClient client = new DefaultHttpClient();
-        HttpGet get = new HttpGet(url);
-        get.setHeader("User-Agent", USER_AGENT);
-
-        return client.execute(get, response_handler);
+        URL url = new URL(location);
+        
+        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        try
+        {
+            connection.setRequestProperty("User-Agent", USER_AGENT);
+            InputStream in = new BufferedInputStream(connection.getInputStream());
+            return readStream(in);
+        }
+        finally
+        {
+            connection.disconnect();
+        }
     }
 
     private static JSONObject getJson(String url) throws ClientProtocolException, IOException, JSONException

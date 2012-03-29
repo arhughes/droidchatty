@@ -32,4 +32,7 @@
     
     <string name="preference_show_mod_tools_title">Show mod tools</string>
     <string name="preference_show_mod_tools_summary"></string>
+    
+    <string name="preference_use_volume_buttons_title">Use volume buttons</string>
+    <string name="preference_use_volume_buttons_summary">Scroll replies using volume buttons</string>
 </resources>

@@ -19,6 +19,7 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -544,6 +545,32 @@ public class ThreadViewFragment extends ListFragment
             View moderation;
         }
         
+    }
+
+    public void adjustSelected(int movement)
+    {
+        int index = getListView().getCheckedItemPosition() + movement;
+        if (index >= 0 && index < getListView().getCount())
+        {
+            displayPost(index);
+            ensureVisible(index);
+        }
+    }
+    
+    void ensureVisible(int position)
+    {
+        ListView view = getListView();
+        
+        if (position < 0 || position >= view.getCount())
+            return;
+        
+        int first = view.getFirstVisiblePosition();
+        int last = view.getLastVisiblePosition();
+        
+        if (position < first)
+            view.setSelection(position);
+        else if (position >= last)
+            view.setSelection(1 + position - (last - first));
     }
     
 }

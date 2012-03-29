@@ -22,6 +22,7 @@
 	   android:layout_height="wrap_content" 
        android:ellipsize="end"
        android:singleLine="true"
+       android:textSize="14sp"
        android:layout_toRightOf="@id/postModeration"
        android:paddingLeft="2dip"
     />

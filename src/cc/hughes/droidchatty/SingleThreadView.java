@@ -27,7 +27,7 @@ public class SingleThreadView extends FragmentActivity
     @Override
     public boolean dispatchKeyEvent(KeyEvent event)
     {
-        ThreadViewFragment fragment = (ThreadViewFragment)getSupportFragmentManager().findFragmentById(R.id.singleThread);
+        ThreadViewFragment fragment = (ThreadViewFragment)getSupportFragmentManager().findFragmentById(android.R.id.content);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Boolean handleVolume = prefs.getBoolean("useVolumeButtons", false);
         if (fragment != null && handleVolume)

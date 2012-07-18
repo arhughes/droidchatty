@@ -17,18 +17,17 @@ import android.support.v4.app.ListFragment;
 import android.text.ClipboardManager;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ThreadViewFragment extends ListFragment
 {
@@ -89,6 +88,15 @@ public class ThreadViewFragment extends ListFragment
         getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         
     	// makes links actually clickable
+        getView().findViewById(R.id.textPostedTime).setOnTouchListener(new OnTouchListener()
+        {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				copyPostUrl();
+				Toast.makeText(getActivity(), "Copied post URL to clipboard.", Toast.LENGTH_SHORT).show();
+				return true;
+			}        	
+        });
     	TextView content = (TextView)getView().findViewById(R.id.textContent);
     	content.setMovementMethod(new LinkMovementMethod());
     
@@ -188,32 +196,12 @@ public class ThreadViewFragment extends ListFragment
         displayPost(position);
     }
     
-    @Override
-    public boolean onContextItemSelected(MenuItem item)
-    {
-        switch (item.getItemId())
-        {
-            case R.id.copyUrl:
-                copyPostUrl();
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }
     
     void copyPostUrl()
     {
         String url = "http://www.shacknews.com/chatty?id=" + _currentPostId;
         ClipboardManager clipboard = (ClipboardManager)getActivity().getSystemService(Activity.CLIPBOARD_SERVICE);
         clipboard.setText(url);
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
-    {
-        super.onCreateContextMenu(menu, v, menuInfo);          
-        MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.post_context, menu);
     }
 
     @Override

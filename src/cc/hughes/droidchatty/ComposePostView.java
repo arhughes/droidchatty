@@ -320,7 +320,7 @@ public class ComposePostView extends Activity {
                     }
                 }
                 
-                Pattern p = Pattern.compile("http\\:\\/\\/chattypics\\.com\\/viewer\\.php\\?file=(.*?\\.jpg)");
+                Pattern p = Pattern.compile("http\\:\\/\\/chattypics\\.com\\/viewer\\.php\\?file=(.*?)\"");
                 Matcher match = p.matcher(content);
                                 
                 if (match.find())

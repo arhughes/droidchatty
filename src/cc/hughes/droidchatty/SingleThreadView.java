@@ -9,6 +9,7 @@ import android.view.KeyEvent;
 public class SingleThreadView extends FragmentActivity
 {
     public static final String THREAD_ID = "threadId";
+    public static final String IS_NEWS_ITEM = "isNewsItem";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)

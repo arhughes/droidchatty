@@ -57,6 +57,7 @@ public class ShackApi
     
     static final String BASE_URL = "http://shackapi.hughes.cc/";
     static final String FAKE_STORY_ID = "17";
+    static final String FAKE_NEWS_ID = "2";
     static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     
     public static String modPost(String userName, String password, int rootPostId, int postId, String moderation) throws Exception
@@ -214,15 +215,15 @@ public class ShackApi
         return results;
     }
     
-    public static int postReply(Context context, int replyToThreadId, String content) throws Exception
+    public static int postReply(Context context, int replyToThreadId, String content, boolean isNewsItem) throws Exception
     {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String userName = prefs.getString("userName", null);
         String password = prefs.getString("password", null);
         
         List<NameValuePair> values = new ArrayList<NameValuePair>();
-        values.add(new BasicNameValuePair("content_type_id", "17"));
-        values.add(new BasicNameValuePair("content_id", FAKE_STORY_ID));
+        values.add(new BasicNameValuePair("content_type_id", isNewsItem ? FAKE_NEWS_ID : FAKE_STORY_ID));
+        values.add(new BasicNameValuePair("content_id", isNewsItem ? FAKE_NEWS_ID : FAKE_STORY_ID));
         values.add(new BasicNameValuePair("body", content));
         if (replyToThreadId > 0)
             values.add(new BasicNameValuePair("parent_id", Integer.toString(replyToThreadId)));

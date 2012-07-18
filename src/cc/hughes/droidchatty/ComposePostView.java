@@ -37,6 +37,7 @@ public class ComposePostView extends Activity {
 	static final long MAX_SIZE_LOGGED_IN = 6 * 1024 * 1024;
 	static final long MAX_SIZE_NOT_LOGGED_IN = 3 * 1024 * 1024;
 	
+	private boolean _isNewsItem = false;
     private int _replyToPostId = 0;
 	private ProgressDialog _progressDialog;
 	
@@ -53,7 +54,12 @@ public class ComposePostView extends Activity {
         // grab the post being replied to, if this is a reply
         Bundle extras = getIntent().getExtras();
         if (extras != null && extras.containsKey(SingleThreadView.THREAD_ID))
+        {
             _replyToPostId = getIntent().getExtras().getInt(SingleThreadView.THREAD_ID);
+            
+            if (extras.containsKey(SingleThreadView.IS_NEWS_ITEM))
+            	_isNewsItem = extras.getBoolean(SingleThreadView.IS_NEWS_ITEM);
+        }
         
         Button reply_button = (Button)findViewById(R.id.replyButton);
         Button cancel_button = (Button)findViewById(R.id.cancelButton);
@@ -256,9 +262,9 @@ public class ComposePostView extends Activity {
             {
                 String content = params[0];
             
-                int reply_id = ShackApi.postReply(ComposePostView.this, _replyToPostId, content);
+                int reply_id = ShackApi.postReply(ComposePostView.this, _replyToPostId, content, _isNewsItem);
 	    
-                return new Integer(reply_id);
+                return Integer.valueOf(reply_id);
             }
             catch (Exception e)
             {

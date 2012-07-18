@@ -287,8 +287,10 @@ public class ThreadViewFragment extends ListFragment
     private static final int POST_REPLY = 0;
     private void postReply()
     {
+    	boolean isNewsItem = _adapter.getItem(0).getUserName().equalsIgnoreCase("shacknews");
         Intent i = new Intent(getActivity(), ComposePostView.class);
         i.putExtra(SingleThreadView.THREAD_ID, _currentPostId);
+        i.putExtra(SingleThreadView.IS_NEWS_ITEM, isNewsItem);
         startActivityForResult(i, POST_REPLY);
     }
     

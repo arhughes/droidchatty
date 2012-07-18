@@ -11,7 +11,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
 import android.app.Activity;
@@ -298,6 +300,7 @@ public class ThreadListFragment extends ListFragment
     
     private class ThreadLoadingAdapter extends LoadingAdapter<Thread>
     {
+    	private HashSet<Integer> _threadIds = new HashSet<Integer>();
         private int _pageNumber = 0;
         private Boolean _showTags;
         
@@ -311,6 +314,7 @@ public class ThreadListFragment extends ListFragment
         public void clear()
         {
             _pageNumber = 0;
+            _threadIds.clear();
             setShowTags();
             super.clear();
         }
@@ -395,6 +399,12 @@ public class ThreadListFragment extends ListFragment
             // grab threads from the api
             ArrayList<Thread> new_threads = ShackApi.getThreads(_pageNumber + 1, userName);
             _pageNumber++;
+            
+            // remove threads already displayed
+            Iterator<Thread> iter = new_threads.iterator();
+            while (iter.hasNext())
+            	if (!_threadIds.add(iter.next().getThreadId()))
+            		iter.remove();
             
             // update the "new" post counts
             updatePostCounts(new_threads);

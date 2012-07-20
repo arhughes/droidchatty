@@ -17,6 +17,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
@@ -97,6 +98,10 @@ class TagConverter implements ContentHandler
                 start(new Strikethrough());
             else if (c.equalsIgnoreCase("jt_spoiler"))
                 start(new Spoiler());
+            else if (c.equalsIgnoreCase("jt_sample"))
+                start(new Sample());
+            else if (c.equalsIgnoreCase("jt_code"))
+                start(new Code());
             else if (c.equalsIgnoreCase("jt_red"))
                 start(new Font("red"));
             else if (c.equalsIgnoreCase("jt_green"))
@@ -226,7 +231,7 @@ class TagConverter implements ContentHandler
         Object obj = getLast(_builder, Span.class);
         int where = _builder.getSpanStart(obj);
         
-        _builder.removeSpan(where);
+        _builder.removeSpan(obj);
         
         if (where != len)
         {
@@ -244,6 +249,10 @@ class TagConverter implements ContentHandler
                 span = new StrikethroughSpan();
             else if (obj instanceof Spoiler)
                 span = new SpoilerSpan(_owner);
+            else if (obj instanceof Sample)
+                span = new RelativeSizeSpan((float)0.80);
+            else if (obj instanceof Code)
+                span = new TypefaceSpan("monospace");
             else if (obj instanceof Font && _showTags)
                 span = new ForegroundColorSpan(getColor(((Font)obj).getColor()) | 0xFF000000);
             
@@ -324,6 +333,8 @@ class TagConverter implements ContentHandler
     private static class Underline extends Span { }
     private static class Strikethrough extends Span { }
     private static class Spoiler extends Span { }
+    private static class Sample extends Span { }
+    private static class Code extends Span { }
     private static class Font extends Span
     {
         String _color;

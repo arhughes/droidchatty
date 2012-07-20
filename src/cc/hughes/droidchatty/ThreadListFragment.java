@@ -187,6 +187,11 @@ public class ThreadListFragment extends ListFragment
     void showDetails(int index)
     {
         Thread thread = _adapter.getItem(index);
+        
+        // probably clicked the "Loading..." or something
+        if (thread == null)
+            return;
+        
         getListView().setItemChecked(index, true);
         
         if (_dualPane)

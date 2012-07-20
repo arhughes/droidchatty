@@ -407,9 +407,13 @@ public class ThreadViewFragment extends ListFragment
     
     private void displayPost(int position)
     {
-        getListView().setItemChecked(position, true);
         Post post = _adapter.getItem(position);
         
+        // user clicked "Loading..."
+        if (post == null)
+            return;
+        
+        getListView().setItemChecked(position, true);
         if (!_postDisplayed)
             getListView().setSelection(position);
         

@@ -41,9 +41,16 @@
     <string name="preference_tag_thread_list_title">Show tags in thread list</string>
     <string name="preference_tag_thread_list_summary"></string>
     
-    <string name="preference_show_mod_tools_title">Show mod tools</string>
-    <string name="preference_show_mod_tools_summary"></string>
+    <string name="preference_strip_newlines_thread_list_title">Strip newlines</string>
+    <string name="preference_strip_newlines_thread_list_summary">Strip newlines from thread list previews</string>
+    
+    <string name="preference_preview_line_count_title">Preview line count</string>
+    <string name="preference_preview_line_count_summary">Number of lines to display in thread previews.</string>
     
     <string name="preference_use_volume_buttons_title">Use volume buttons</string>
     <string name="preference_use_volume_buttons_summary">Scroll replies using volume buttons</string>
+    
+    <string name="preference_show_mod_tools_title">Show mod tools</string>
+    <string name="preference_show_mod_tools_summary"></string>
+    
 </resources>

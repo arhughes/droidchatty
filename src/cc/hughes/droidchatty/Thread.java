@@ -71,10 +71,10 @@ public class Thread {
         return _replied;
     }
 
-    public Spanned getPreview(boolean showTags)
+    public Spanned getPreview(boolean showTags, boolean stripNewLines)
     {
         if (_preview == null)
-            _preview = PostFormatter.formatContent(this, false, showTags);
+            _preview = PostFormatter.formatContent(this, !stripNewLines, showTags);
         return _preview;
     }
 

@@ -303,6 +303,8 @@ public class ThreadListFragment extends ListFragment
     	private HashSet<Integer> _threadIds = new HashSet<Integer>();
         private int _pageNumber = 0;
         private Boolean _showTags;
+        private Boolean _stripNewLines;
+        private int _previewLines;
         
         public ThreadLoadingAdapter(Context context, ArrayList<Thread> items)
         {
@@ -321,10 +323,16 @@ public class ThreadListFragment extends ListFragment
         
         void setShowTags()
         {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ThreadListFragment.this.getActivity());
-            _showTags = prefs.getBoolean("showTagsInThreadList", true);
+            Activity activity = ThreadListFragment.this.getActivity();
+            if (activity != null)
+            {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+                _showTags = prefs.getBoolean("showTagsInThreadList", true);
+                _stripNewLines = prefs.getBoolean("previewStripNewLines", true);
+                _previewLines = Integer.parseInt(prefs.getString("previewLineCount", "2"));
+            }
         }
-
+        
         @Override
         protected View createView(int position, View convertView, ViewGroup parent)
         {
@@ -345,7 +353,8 @@ public class ThreadListFragment extends ListFragment
             // get the thread to display and populate all the data into the layout
             Thread t = getItem(position);
             holder.userName.setText(t.getUserName());
-            holder.content.setText(t.getPreview(_showTags));
+            holder.content.setMaxLines(_previewLines);
+            holder.content.setText(t.getPreview(_showTags, _stripNewLines));
             holder.posted.setText(t.getPosted());
             holder.replyCount.setText(formatReplyCount(t));
 

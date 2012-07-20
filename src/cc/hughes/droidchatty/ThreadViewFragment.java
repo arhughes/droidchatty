@@ -223,13 +223,17 @@ public class ThreadViewFragment extends ListFragment
         setMenuItemEnabled(menu, R.id.modToolsMenu, enabled);
         
         // show the mod tools if enabled in settings
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        boolean showModTools = prefs.getBoolean("showModTools", false);
-        
-        if(showModTools)
+        Activity activity = getActivity();
+        if (activity != null)
         {
-            MenuItem modMenu = menu.findItem(R.id.modToolsMenu);
-            modMenu.setVisible(true);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+            boolean showModTools = prefs.getBoolean("showModTools", false);
+            
+            if(showModTools)
+            {
+                MenuItem modMenu = menu.findItem(R.id.modToolsMenu);
+                modMenu.setVisible(true);
+            }
         }
     }
     

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="textSize">14sp</dimen>
+    <dimen name="previewTextSize">14sp</dimen>
+    <dimen name="userNameSize">12sp</dimen>
+    <dimen name="replyCountSize">12sp</dimen>
+    <dimen name="postTimeSize">12sp</dimen>
+</resources>

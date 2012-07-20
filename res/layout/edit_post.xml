@@ -10,9 +10,9 @@
 	  android:layout_weight="1"
 	  android:gravity="top"
 	  android:hint="@string/reply_text_hint"
-	  android:inputType="textCapSentences|textMultiLine|textLongMessage"
-	  android:autoText="true"
+	  android:inputType="textCapSentences|textMultiLine|textLongMessage|textAutoCorrect"
 	  android:imeOptions="actionDone"
+	  android:textSize="@dimen/textSize"
    />
   <RelativeLayout
   	android:orientation="horizontal"
@@ -38,6 +38,7 @@
 	  	android:layout_height="wrap_content"
 	  	android:src="@drawable/ic_menu_gallery"
 	  	android:layout_alignParentRight="true"
+	  	android:contentDescription="@string/upload_picture"
 	  />
 	  <ImageButton
 	    android:id="@+id/takePicture"
@@ -45,6 +46,7 @@
 	  	android:layout_height="wrap_content"
 	  	android:src="@drawable/ic_menu_camera"
 	  	android:layout_toLeftOf="@id/uploadPicture"
+	  	android:contentDescription="@string/take_picture"
 	  />
   </RelativeLayout> 
 </LinearLayout>

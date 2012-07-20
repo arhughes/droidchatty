@@ -11,18 +11,19 @@
 	  	android:id="@+id/searchLabel"
 	  	android:layout_height="wrap_content"
 	  	android:layout_width="wrap_content"
-	  	android:text="Search:" />
+	  	android:text="@string/searchLabel" />
 	  </TableRow>
   <TableRow>
 	  <EditText
 	  	android:id="@+id/searchTerm"
 	  	android:layout_height="wrap_content"
 	  	android:layout_width="fill_parent"
+	  	android:inputType="text"
 	  	/>
 	  <Button
 	    android:layout_height="wrap_content"
 	    android:layout_width="wrap_content"
-	    android:text="Me"
+	    android:text="@string/me"
 	    android:onClick="vanitySearch"
 	   />
   </TableRow>
@@ -31,7 +32,7 @@
 	    android:id="@+id/searchAuthorLabel"
 	  	android:layout_height="wrap_content"
 	  	android:layout_width="wrap_content"
-	  	android:text="Author:"
+	  	android:text="@string/authorLabel"
 	  	 />
   </TableRow>
   <TableRow>
@@ -39,11 +40,12 @@
 	  	android:id="@+id/searchAuthor"
 	  	android:layout_height="wrap_content"
 	  	android:layout_width="fill_parent"
+	  	android:inputType="text"
 	  	/>
 	  <Button
 	    android:layout_height="wrap_content"
 	    android:layout_width="wrap_content"
-	    android:text="Me"
+	    android:text="@string/me"
 	    android:onClick="ownSearch"
 	   />
   </TableRow>
@@ -52,7 +54,7 @@
 	  	android:id="@+id/searchParentAuthorLabel"
 	  	android:layout_height="wrap_content"
 	  	android:layout_width="wrap_content"
-	  	android:text="Parent Author:"
+	  	android:text="@string/parentAuthorLabel"
 	  	 />
   </TableRow>
   <TableRow>
@@ -60,11 +62,12 @@
 	  	android:id="@+id/searchParentAuthor"
 	  	android:layout_height="wrap_content"
 	  	android:layout_width="fill_parent"
+	  	android:inputType="text"
 	  	/>
 	  <Button
 	    android:layout_height="wrap_content"
 	    android:layout_width="wrap_content"
-	    android:text="Me"
+	    android:text="@string/me"
 	    android:onClick="parentSearch"
 	   />
   </TableRow>
@@ -73,8 +76,7 @@
   	android:id="@+id/search"
   	android:layout_height="wrap_content"
   	android:layout_width="wrap_content"
-  	android:text="Search"
-  	android:layout_below="@id/searchParentAuthor"
+  	android:text="@string/search"
   />
   </TableRow>
 </TableLayout>

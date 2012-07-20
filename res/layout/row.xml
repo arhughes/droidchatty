@@ -1,55 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<cc.hughes.CheckableRelativeLayout
+<cc.hughes.CheckableLinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
-  android:layout_height="?android:attr/listPreferredItemHeight"
+  android:layout_height="wrap_content"
   android:paddingBottom="4dip"
   android:paddingLeft="2dip"
   android:paddingRight="6dip"
   android:paddingTop="4dip"
   android:background="@color/thread_selector"
+  android:orientation="horizontal"
   >
- 	 <TextView
+ 	 <View
  	 	 android:id="@+id/threadModeration"
  	 	 android:layout_width="4dip"
- 	 	 android:layout_height="?android:attr/listPreferredItemHeight"
- 	 	 android:text=" "
+ 	 	 android:layout_height="fill_parent"
  	 />
-     <TextView
-         android:id="@+id/textUserName"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:textColor="#f3e7b5"
-         android:textSize="12sp"
-         android:layout_toRightOf="@id/threadModeration"
-         android:paddingLeft="2dip"
-     />
-     <TextView
-         android:id="@+id/textReplyCount"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_toRightOf="@id/textUserName"
-         android:paddingLeft="5dip"
-         android:textColor="#888"
-         android:textSize="12sp"
-     />
-     <TextView
-     	 android:id="@+id/textPostedTime"
-     	 android:layout_width="wrap_content"
-     	 android:layout_height="wrap_content"
-     	 android:layout_alignParentRight="true"
-         android:textColor="#666"
-         android:textSize="12sp"
-     />
-     <TextView
-         android:id="@+id/textContent"
-         android:layout_width="fill_parent"
-         android:layout_height="wrap_content"
-         android:layout_below="@id/textUserName"
-         android:layout_toRightOf="@id/threadModeration"
-         android:ellipsize="end"
-         android:maxLines="5"
-         android:textSize="14sp"
-         android:paddingLeft="2dip"
-     />
-</cc.hughes.CheckableRelativeLayout>
+ 	 <RelativeLayout
+ 	     android:layout_width="fill_parent"
+ 	     android:layout_height="wrap_content"
+ 	     >
+	     <TextView
+	         android:id="@+id/textUserName"
+	         android:layout_width="wrap_content"
+	         android:layout_height="wrap_content"
+	         android:textColor="@color/userName"
+	         android:textSize="@dimen/userNameSize"
+	         android:paddingLeft="2dip"
+	     />
+	     <TextView
+	         android:id="@+id/textReplyCount"
+	         android:layout_width="wrap_content"
+	         android:layout_height="wrap_content"
+	         android:layout_toRightOf="@id/textUserName"
+	         android:paddingLeft="5dip"
+	         android:textColor="@color/replyCount"
+	         android:textSize="@dimen/replyCountSize"
+	     />
+	     <TextView
+	     	 android:id="@+id/textPostedTime"
+	     	 android:layout_width="wrap_content"
+	     	 android:layout_height="wrap_content"
+	     	 android:layout_alignParentRight="true"
+	         android:textColor="@color/timePosted"
+	         android:textSize="@dimen/postTimeSize"
+	     />
+	     <TextView
+	         android:id="@+id/textContent"
+	         android:layout_width="fill_parent"
+	         android:layout_height="wrap_content"
+	         android:layout_below="@id/textUserName"
+	         android:ellipsize="end"
+	         android:maxLines="2"
+	         android:textSize="@dimen/previewTextSize"
+	         android:paddingLeft="2dip"
+	     />
+ 	 </RelativeLayout>
+</cc.hughes.CheckableLinearLayout>

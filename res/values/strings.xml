@@ -16,6 +16,17 @@
     <string name="tag">LOL</string>
     <string name="mod">Mod</string>
     
+    <string name="loading">Loading&#8230;</string>
+    
+    <!--  search form -->
+    <string name="me">Me</string>
+    <string name="searchLabel">Text:</string>
+    <string name="authorLabel">Author:</string>
+    <string name="parentAuthorLabel">Parent Author:</string>
+    
+    <string name="upload_picture">Upload picture</string>
+    <string name="take_picture">Take picture</string>
+    
     <string name="preferences_login">Account Information</string>
     <string name="preference_username_title">Username</string>
     <string name="preference_username_summary">Shacknews.com username</string>

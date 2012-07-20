@@ -4,4 +4,8 @@
     <color name="news_post_background">#192635</color>
     <color name="new_post_count">#00ff00</color>
     <color name="user_paricipated">#66ccff</color>
+    <color name="timePosted">#666</color>
+    <color name="replyCount">#888</color>
+    <color name="userName">#f3e7b5</color>
+    <color name="separator">#333</color>
 </resources>

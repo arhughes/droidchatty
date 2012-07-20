@@ -3,9 +3,9 @@ package cc.hughes;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.Checkable;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 
-public class CheckableRelativeLayout extends RelativeLayout implements Checkable
+public class CheckableLinearLayout extends LinearLayout implements Checkable
 {
     private boolean _checked;
     
@@ -14,11 +14,11 @@ public class CheckableRelativeLayout extends RelativeLayout implements Checkable
         android.R.attr.state_checked
     };
     
-    public CheckableRelativeLayout(Context context, AttributeSet attrs)
+    public CheckableLinearLayout(Context context, AttributeSet attrs)
     {
         super(context, attrs);
     }
-    
+
     @Override
     protected int[] onCreateDrawableState(int extraSpace)
     {
@@ -46,6 +46,4 @@ public class CheckableRelativeLayout extends RelativeLayout implements Checkable
             refreshDrawableState();
         }
     }
-    
-
 }

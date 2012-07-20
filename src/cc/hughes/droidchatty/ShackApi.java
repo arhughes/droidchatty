@@ -411,11 +411,9 @@ public class ShackApi
         InputStreamReader input = new InputStreamReader(stream);
 
         char[] buffer = new char[DEFAULT_BUFFER_SIZE];
-        int count = 0;
         int n = 0;
         while (-1 != (n = input.read(buffer))) {
             output.append(buffer, 0, n);
-            count += n;
         }
         return output.toString();
     }
@@ -423,7 +421,7 @@ public class ShackApi
     static final SimpleDateFormat _shackDateFormat = new SimpleDateFormat("MMM dd, yyyy h:mma zzz");
     static final DateFormat _displayDateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
     
-    private static String convertTime(String original)
+    static String convertTime(String original)
     {
         try
         {

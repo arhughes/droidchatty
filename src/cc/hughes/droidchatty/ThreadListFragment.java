@@ -46,7 +46,7 @@ public class ThreadListFragment extends ListFragment {
         /**
          * Callback for when an item has been selected.
          */
-        public void onItemSelected(String id);
+        public void onThreadListItemSelected(String id);
     }
 
     /**
@@ -55,7 +55,7 @@ public class ThreadListFragment extends ListFragment {
      */
     private static Callbacks sDummyCallbacks = new Callbacks() {
         @Override
-        public void onItemSelected(String id) {
+        public void onThreadListItemSelected(String id) {
         }
     };
 
@@ -115,7 +115,7 @@ public class ThreadListFragment extends ListFragment {
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+        mCallbacks.onThreadListItemSelected(DummyContent.ITEMS.get(position).id);
     }
 
     @Override

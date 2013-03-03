@@ -3,6 +3,7 @@ package cc.hughes.droidchatty;
 import com.slidingmenu.lib.SlidingMenu;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -10,7 +11,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.MenuItem;
 
 
@@ -30,8 +30,8 @@ import android.view.MenuItem;
  * {@link ThreadListFragment.Callbacks} interface
  * to listen for item selections.
  */
-public class ThreadListActivity extends FragmentActivity
-        implements ThreadListFragment.Callbacks, ViewPager.OnPageChangeListener {
+public class MainActivity extends FragmentActivity
+        implements ThreadListFragment.Callbacks, ViewPager.OnPageChangeListener, MenuListFragment.Callbacks, MessageListFragment.Callbacks {
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -48,6 +48,8 @@ public class ThreadListActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thread_list);
 
+        ThreadListFragment mainFragment = new ThreadListFragment();
+        
         if (findViewById(R.id.thread_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-large and
@@ -57,9 +59,12 @@ public class ThreadListActivity extends FragmentActivity
 
             // In two-pane mode, list items should be given the
             // 'activated' state when touched.
-            ((ThreadListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.thread_list))
-                    .setActivateOnItemClick(true);
+            
+        	getSupportFragmentManager().beginTransaction()
+				.replace(R.id.thread_list_container, mainFragment)
+				.commit();
+            
+            //mainFragment.setActivateOnItemClick(true);
         }
         else
         {
@@ -67,15 +72,16 @@ public class ThreadListActivity extends FragmentActivity
         	mViewPager = (ViewPager)findViewById(R.id.pager);
         	mViewPager.setOnPageChangeListener(this);
         	mThreadPageAdapter = new ThreadPageAdapter(getSupportFragmentManager(), mViewPager);
+        	
+        	// default to thread list fragment
+        	mThreadPageAdapter.setMainFragment(mainFragment);
         }
 
         // TODO: If exposing deep links into your app, handle intents here.
         mSlidingMenu = new SlidingMenu(this);
         mSlidingMenu.setMode(SlidingMenu.LEFT);
         mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-        mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
-        mSlidingMenu.setShadowDrawable(R.drawable.shadow);
-        mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+        mSlidingMenu.setBehindWidthRes(R.dimen.slidingmenu_width);
         mSlidingMenu.setFadeDegree(0.35f);
         mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
         mSlidingMenu.setMenu(R.layout.menu);
@@ -89,7 +95,7 @@ public class ThreadListActivity extends FragmentActivity
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
     		case android.R.id.home:
-    			if (mViewPager.getCurrentItem() == 1)
+    			if (!mTwoPane && mViewPager.getCurrentItem() == 1)
     	    		mViewPager.setCurrentItem(0, true);
     			else
     				mSlidingMenu.toggle(true);
@@ -104,17 +110,79 @@ public class ThreadListActivity extends FragmentActivity
      * indicating that the item with the given ID was selected.
      */
     @Override
-    public void onItemSelected(String id) {
+    public void onThreadListItemSelected(String id) {
 
         Bundle arguments = new Bundle();
         arguments.putString(ThreadDetailFragment.ARG_ITEM_ID, id);
     	
+        ThreadDetailFragment fragment = new ThreadDetailFragment();
+        fragment.setArguments(arguments);
+        
+        setDetailFragment(fragment);
+    }
+        
+    /**
+     * Callback method from {@link MessageListFragment.Callbacks}
+     * indicating that the item with the given ID was selected.
+     */
+    @Override
+    public void onMessageListItemSelected(String id) {
+
+        Bundle arguments = new Bundle();
+        arguments.putString(ThreadDetailFragment.ARG_ITEM_ID, id);
+    	
+        MessageDetailFragment fragment = new MessageDetailFragment();
+        fragment.setArguments(arguments);
+       
+        setDetailFragment(fragment);       
+    }  
+    
+    /**
+     * Callback method from {@link MenuListFragment.Callbacks}
+     * indicating that the item with the given ID was selected.
+     */
+	@Override
+	public void onMenuItemSelected(String id) {
+
+		// close the menu
+		mSlidingMenu.toggle(true);
+		
+		Fragment fragment = null;
+		
+		// determine the correct main fragment to use
+		if (id == MenuListFragment.ID_HOME) {
+			fragment = new ThreadListFragment();
+		}
+		else if (id == MenuListFragment.ID_MESSAGES) {
+			fragment = new MessageListFragment();
+		}
+		else if (id == MenuListFragment.ID_SETTINGS) {
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
+			return;
+		}
+
+		setMainFragment(fragment);
+	}
+	
+	private void setMainFragment(Fragment fragment)
+	{
+		if (mTwoPane) {			
+			getSupportFragmentManager().beginTransaction()
+				.replace(R.id.thread_list_container, fragment)
+				.commit();
+		}
+		else {
+			mThreadPageAdapter.setMainFragment(fragment);
+		}
+	}
+	
+	private void setDetailFragment(Fragment fragment)
+	{
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
-            // fragment transaction.
-            ThreadDetailFragment fragment = new ThreadDetailFragment();
-            fragment.setArguments(arguments);
+            // fragment transaction.           
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.thread_detail_container, fragment)
                     .commit();
@@ -122,12 +190,11 @@ public class ThreadListActivity extends FragmentActivity
         } else {
         	// In single-pane mode, show the detail in the second pane of
         	// the view pager, and disable the sliding menu.
-        	mThreadPageAdapter.setThreadDetail(arguments);
+        	mThreadPageAdapter.setDetailFragment(fragment);
         	mViewPager.setCurrentItem(1);
         	mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
         }
-        
-    }
+	}
     
 	@Override
 	public void onPageScrollStateChanged(int arg0) {
@@ -147,7 +214,7 @@ public class ThreadListActivity extends FragmentActivity
 		// fragment from the View Pager, and re-enable the sliding menu.
 		if (position == 0)
 		{
-			mThreadPageAdapter.removeThreadDetail();
+			mThreadPageAdapter.removeDetailFragment();
 			mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		}
 	}
@@ -159,7 +226,7 @@ public class ThreadListActivity extends FragmentActivity
     		// If the sliding menu is showing, close it.
     		mSlidingMenu.toggle(true);
     	}
-    	else if (mViewPager.getCurrentItem() == 1) {
+    	else if (!mTwoPane && mViewPager.getCurrentItem() == 1) {
     		// If the thread details are showing, close it
     		mViewPager.setCurrentItem(0, true);
     	}
@@ -170,8 +237,9 @@ public class ThreadListActivity extends FragmentActivity
 
 	public class ThreadPageAdapter extends FragmentStatePagerAdapter  {
 
-    	ThreadListFragment mThreadListFragment = new ThreadListFragment();
-    	ThreadDetailFragment mThreadDetailFragment;
+		Fragment mMainFragment;
+		Fragment mDetailFragment;
+		
     	ViewPager mViewPager;
     	
 		public ThreadPageAdapter(FragmentManager fm, ViewPager pager) {
@@ -180,15 +248,21 @@ public class ThreadListActivity extends FragmentActivity
 			mViewPager.setAdapter(this);
 		}
 		
-		public void setThreadDetail(Bundle args)
+		public void setMainFragment(Fragment fragment)
 		{
-			mThreadDetailFragment = new ThreadDetailFragment();
-			mThreadDetailFragment.setArguments(args);
+			mMainFragment = fragment;
+			mDetailFragment = null;
 			super.notifyDataSetChanged();
 		}
 		
-		public void removeThreadDetail() {
-			mThreadDetailFragment = null;
+		public void setDetailFragment(Fragment fragment)
+		{
+			mDetailFragment = fragment;
+			super.notifyDataSetChanged();
+		}
+		
+		public void removeDetailFragment() {
+			mDetailFragment = null;
 			super.notifyDataSetChanged();			
 		}
 		
@@ -196,9 +270,9 @@ public class ThreadListActivity extends FragmentActivity
 		public Fragment getItem(int i)
 		{
 			if (i == 0)
-				return mThreadListFragment;
+				return mMainFragment;
 			if (i == 1)
-				return mThreadDetailFragment;
+				return mDetailFragment;
 			
 			return null;
 		}
@@ -206,7 +280,7 @@ public class ThreadListActivity extends FragmentActivity
 		@Override 
 		public int getItemPosition(Object object)
 		{
-			if (object == mThreadListFragment)
+			if (object == mMainFragment)
 				return PagerAdapter.POSITION_UNCHANGED;
 			return PagerAdapter.POSITION_NONE;
 		}
@@ -214,9 +288,8 @@ public class ThreadListActivity extends FragmentActivity
 		@Override
 		public int getCount()
 		{
-			return mThreadDetailFragment == null ? 1 : 2;
+			return mDetailFragment == null ? 1 : 2;
 		}
     }
-
 
 }

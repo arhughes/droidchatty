@@ -5,7 +5,7 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     android:baselineAligned="false"
-    tools:context=".ThreadListActivity" >
+    tools:context=".MainActivity" >
     
 	<android.support.v4.view.ViewPager
 	    android:id="@+id/pager"

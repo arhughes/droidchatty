@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="cc.hughes.droidchatty.ThreadListActivity"
+            android:name="cc.hughes.droidchatty.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,12 +23,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="cc.hughes.droidchatty.ThreadDetailActivity"
-            android:label="@string/title_thread_detail"
-            android:parentActivityName=".ThreadListActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ThreadListActivity" />
+            android:name="cc.hughes.droidchatty.SettingsActivity"
+            android:label="@string/title_activity_settings" >
         </activity>
     </application>
 

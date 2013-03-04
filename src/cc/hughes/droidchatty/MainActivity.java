@@ -197,27 +197,22 @@ public class MainActivity extends FragmentActivity
 	}
     
 	@Override
-	public void onPageScrollStateChanged(int arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onPageScrolled(int arg0, float arg1, int arg2) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onPageSelected(int position) {
+	public void onPageScrollStateChanged(int state) {
 		// When the thread list is selected, remove the thread detail
 		// fragment from the View Pager, and re-enable the sliding menu.
-		if (position == 0)
+		if (state == ViewPager.SCROLL_STATE_IDLE && mViewPager.getCurrentItem() == 0)
 		{
 			mThreadPageAdapter.removeDetailFragment();
 			mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 		}
+	
 	}
+
+	@Override
+	public void onPageScrolled(int arg0, float arg1, int arg2) { }
+
+	@Override
+	public void onPageSelected(int position) { }
     
     @Override
 	public void onBackPressed() {

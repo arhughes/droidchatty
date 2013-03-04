@@ -6,4 +6,15 @@
     <string name="title_message_list">Messages</string>
     <string name="title_message_detail">Message Detail</string>
 
+    <string name="validate">Validate</string>
+    <string name="checking">Checking&#8230;</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    
+    <string name="error_validating">Could not validate your credentials.</string>
+    <string name="error_title">Error</string>
+    <string name="ok">OK</string>
+    
+    <string name="pref_default_fontsize">Normal</string>
+    
 </resources>

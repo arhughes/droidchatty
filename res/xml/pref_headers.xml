@@ -4,12 +4,9 @@
 
     <header
         android:fragment="cc.hughes.droidchatty.SettingsActivity$GeneralPreferenceFragment"
-        android:title="@string/pref_header_general" />
+        android:title="@string/pref_header_accounts" />
     <header
         android:fragment="cc.hughes.droidchatty.SettingsActivity$NotificationPreferenceFragment"
-        android:title="@string/pref_header_notifications" />
-    <header
-        android:fragment="cc.hughes.droidchatty.SettingsActivity$DataSyncPreferenceFragment"
-        android:title="@string/pref_header_data_sync" />
+        android:title="@string/pref_header_theme" />
 
 </preference-headers>

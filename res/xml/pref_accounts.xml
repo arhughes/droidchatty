@@ -1,0 +1,19 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <cc.hughes.droidchatty.UserPreference
+        android:key="pref_shacknews_user"
+        android:title="Shacknews"
+        android:positiveButtonText="@string/validate"
+        android:negativeButtonText="@string/cancel"
+        android:dialogLayout="@layout/user_settings_dialog"
+        />
+    
+    <cc.hughes.droidchatty.UserPreference
+        android:key="pref_chattypics_user"
+        android:title="Chattypics"
+        android:positiveButtonText="@string/save"
+        android:negativeButtonText="@string/cancel"
+        android:dialogLayout="@layout/user_settings_dialog"
+        />
+        
+</PreferenceScreen>

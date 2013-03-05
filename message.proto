@@ -1,0 +1,27 @@
+option java_package = "cc.hughes.droidchatty.net";
+option optimize_for = LITE_RUNTIME;
+
+message ThreadList {
+    message RootPost {
+        required string id = 1;
+        required string author = 2;
+        required string date = 3;
+        required int32 replies = 4;
+        required bool replied = 5;
+        required string category = 6;
+        required string body = 7;
+    }
+    repeated RootPost thread = 1;
+}
+
+message Thread {
+    message Reply {
+        required string id = 1;
+        required string author = 2;
+        required string date = 3;
+        required int32 depth = 4;
+        required string categeory = 5;
+        required string body = 6;
+    }
+    repeated Reply reply = 1;
+}

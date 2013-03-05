@@ -16,6 +16,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
+import android.view.MenuItem;
 
 import java.util.List;
 
@@ -81,8 +82,21 @@ public class SettingsActivity extends PreferenceActivity {
 		bindPreferenceSummaryToValue(findPreference("pref_chattypics_user"));
 		bindPreferenceSummaryToValue(findPreference("pref_theme"));
 		bindPreferenceSummaryToValue(findPreference("pref_fontsize"));
+		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    		case android.R.id.home:
+    			finish();
+    			return true;
+    		default:
+    			return super.onOptionsItemSelected(item);
+    	}
+    }
+	
 	/** {@inheritDoc} */
 	@Override
 	public boolean onIsMultiPane() {

@@ -143,9 +143,6 @@ public class MainActivity extends FragmentActivity
      */
 	@Override
 	public void onMenuItemSelected(String id) {
-
-		// close the menu
-		mSlidingMenu.toggle(true);
 		
 		Fragment fragment = null;
 		
@@ -162,6 +159,9 @@ public class MainActivity extends FragmentActivity
 			return;
 		}
 
+		// close the menu
+		mSlidingMenu.toggle(true);
+		
 		setMainFragment(fragment);
 	}
 	

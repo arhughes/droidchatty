@@ -1,4 +1,5 @@
 <resources>
     <color name="menu_background">#FF303030</color>
+    <color name="menu_divider">#FF1E1E1E</color>
     <color name="menu_foreground">#FFFFFFFF</color>
 </resources>

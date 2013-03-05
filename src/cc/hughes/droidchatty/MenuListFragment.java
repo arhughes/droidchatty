@@ -4,6 +4,7 @@ import cc.hughes.droidchatty.MessageListFragment.Callbacks;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -37,7 +38,9 @@ public class MenuListFragment extends ListFragment {
 		super.onActivityCreated(savedInstanceState);
 		
 		getListView().setBackgroundResource(R.color.menu_background);
-		
+		getListView().setDivider(new ColorDrawable(getResources().getColor(R.color.menu_divider)));
+		getListView().setDividerHeight(2);
+				
 		MenuAdapter adapter = new MenuAdapter(getActivity());
 		adapter.add(new MenuListItem("Home", android.R.drawable.ic_menu_info_details, ID_HOME));
 		adapter.add(new MenuListItem("Search", android.R.drawable.ic_menu_search, ID_SEARCH));

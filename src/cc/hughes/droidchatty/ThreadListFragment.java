@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
+import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -20,6 +22,7 @@ import cc.hughes.droidchatty.dummy.DummyContent;
 import cc.hughes.droidchatty.net.ChattyService;
 import cc.hughes.droidchatty.net.Message.ThreadList;
 import cc.hughes.droidchatty.net.Message.ThreadList.RootPost;
+import cc.hughes.droidchatty.util.TimeUtil;
 
 /**
  * A list fragment representing a list of Threads. This fragment
@@ -82,19 +85,7 @@ public class ThreadListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO: replace with a real list adapter.
-        /*
-        setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
-                getActivity(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                DummyContent.ITEMS));
-                */
-        setListAdapter(new ThreadListAdapter(
-                getActivity(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1));
-        
+        setListAdapter(new ThreadListAdapter(getActivity(), R.layout.thread_list_item)); 
     }
 
     @Override
@@ -176,11 +167,14 @@ public class ThreadListFragment extends ListFragment {
     
     class ThreadListAdapter extends ArrayAdapter<RootPost> {
     	
-    	int mTextViewResourceId;
-    	
-    	public ThreadListAdapter(Context context, int resource, int textViewResourceId) {
-			super(context, resource, textViewResourceId);
-			mTextViewResourceId = textViewResourceId;
+        private int mLayoutRes;
+        private LayoutInflater mInflater;
+        
+    	public ThreadListAdapter(Context context, int resource) {
+			super(context, resource);
+			
+			mLayoutRes = resource;
+			mInflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
 
 		ThreadList mThreadList;
@@ -202,18 +196,48 @@ public class ThreadListFragment extends ListFragment {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			View view = super.getView(position, convertView, parent);
+		    ViewHolder holder;
+		    
+		    if (convertView == null) {
+		       convertView = mInflater.inflate(mLayoutRes, null);
+		       holder = new ViewHolder();
+		       holder.threadCategory = (TextView)convertView.findViewById(R.id.thread_category);
+		       holder.authorName = (TextView)convertView.findViewById(R.id.author_name);
+		       holder.postContent = (TextView)convertView.findViewById(R.id.post_content);
+		       holder.threadReplies = (TextView)convertView.findViewById(R.id.thread_replies);
+		       holder.postTime = (TextView)convertView.findViewById(R.id.post_time);
+		       convertView.setTag(holder);
+		    }
+		    else {
+		        holder = (ViewHolder)convertView.getTag();
+		    }
 			
-			TextView tv = (TextView)view.findViewById(mTextViewResourceId);
-            tv.setMaxLines(5);
-            tv.setEllipsize(TruncateAt.END);
-			RootPost item = getItem(position);
-			if (item != null) {
-				tv.setText(Html.fromHtml(item.getBody()));
-			}
-			
-			return view;
+		    RootPost rootPost = getItem(position);
+		    
+		    int replies = rootPost.getReplies() - 1;
+		    String replyText = replies + (replies == 1 ? " reply" : " replies");
+		    
+		    long time = TimeUtil.parseDateTime(rootPost.getDate());
+		    CharSequence timeAgo = DateUtils.getRelativeDateTimeString(getContext(), time, DateUtils.MINUTE_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0);
+		    
+		    holder.threadCategory.setText(rootPost.getCategory());
+		    holder.authorName.setText(rootPost.getAuthor());
+		    holder.postContent.setText(Html.fromHtml(rootPost.getBody()));
+		    holder.threadReplies.setText(replyText);
+		    holder.postTime.setText(timeAgo);
+		    Log.i("DroidChatty", rootPost.getDate());
+		    
+			return convertView;
 		}
+		
+		class ViewHolder {
+		   TextView threadCategory;
+		   TextView authorName;
+		   TextView postContent;
+		   TextView threadReplies;
+		   TextView postTime;
+		}
+		
     }
 
     class ThreadListLoadTask extends AsyncTask<Integer, Void, ThreadList> {

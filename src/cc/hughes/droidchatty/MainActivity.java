@@ -47,7 +47,7 @@ public class MainActivity extends FragmentActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        setTheme(android.R.style.Theme_Holo);
+        //setTheme(android.R.style.Theme_Holo);
         setContentView(R.layout.activity_thread_list);
 
         ThreadListFragment mainFragment = new ThreadListFragment();

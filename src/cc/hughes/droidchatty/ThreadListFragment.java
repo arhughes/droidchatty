@@ -1,20 +1,16 @@
 package cc.hughes.droidchatty;
 
-import java.io.IOException;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.text.Html;
-import android.text.TextUtils.TruncateAt;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -85,7 +81,7 @@ public class ThreadListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setListAdapter(new ThreadListAdapter(getActivity(), R.layout.thread_list_item)); 
+        setListAdapter(new ThreadListAdapter(getActivity(), R.layout.thread_list_item, R.layout.row_loading, R.layout.row_finished));
     }
 
     @Override
@@ -93,16 +89,13 @@ public class ThreadListFragment extends ListFragment {
         super.onViewCreated(view, savedInstanceState);
 
         setActivateOnItemClick(true);
+        getListView().setOnScrollListener((ThreadListAdapter)getListAdapter());
         
         // Restore the previously serialized activated item position.
         if (savedInstanceState != null
                 && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
             setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
         }
-        
-        ThreadListLoadTask task = new ThreadListLoadTask((ThreadListAdapter)getListAdapter());
-        task.execute(1);
-        
     }
 
     @Override
@@ -165,37 +158,45 @@ public class ThreadListFragment extends ListFragment {
         mActivatedPosition = position;
     }
     
-    class ThreadListAdapter extends ArrayAdapter<RootPost> {
+    
+    class ThreadListAdapter extends LoadMoreArrayAdapter<RootPost> {
     	
+        private ChattyService mService;
+        private int mCurrentPage = 0;
         private int mLayoutRes;
         private LayoutInflater mInflater;
+        private List<RootPost> mItemCache;
         
-    	public ThreadListAdapter(Context context, int resource) {
-			super(context, resource);
-			
-			mLayoutRes = resource;
-			mInflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		}
+        public ThreadListAdapter(Context context, int itemResource, int loadingResource, int finishedResource) {
+            super(context, loadingResource, finishedResource);
+            mLayoutRes = itemResource;
+            mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            mService = new ChattyService();
+        }
+        
+        @Override
+        protected boolean loadItems() throws Exception {
+            ThreadList threads = mService.getPage(mCurrentPage + 1);
+            if (threads.getThreadCount() > 0) {
+                mItemCache = threads.getThreadList();
+                mCurrentPage += 1;
+                return true;
+            }
+            
+            mItemCache = null;
+            return false;
+        }
 
-		ThreadList mThreadList;
-    	
-    	public void addThreads(ThreadList list) {
-    		mThreadList = list;
-    		super.notifyDataSetChanged();
-    	}   	
-    	
-		@Override
-		public int getCount() {
-			return mThreadList == null ? 0 : mThreadList.getThreadCount();		
-		}
+        @Override
+        protected void appendItems() {
+            if (mItemCache != null) {
+                super.addAll(mItemCache);
+                mItemCache = null;
+            }
+        }
 
 		@Override
-		public RootPost getItem(int index) {
-			return mThreadList == null ? null : mThreadList.getThread(index);
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getNormalView(int position, View convertView, ViewGroup parent) {
 		    ViewHolder holder;
 		    
 		    if (convertView == null) {
@@ -225,7 +226,6 @@ public class ThreadListFragment extends ListFragment {
 		    holder.postContent.setText(Html.fromHtml(rootPost.getBody()));
 		    holder.threadReplies.setText(replyText);
 		    holder.postTime.setText(timeAgo);
-		    Log.i("DroidChatty", rootPost.getDate());
 		    
 			return convertView;
 		}
@@ -237,38 +237,6 @@ public class ThreadListFragment extends ListFragment {
 		   TextView threadReplies;
 		   TextView postTime;
 		}
-		
-    }
-
-    class ThreadListLoadTask extends AsyncTask<Integer, Void, ThreadList> {
-
-    	ThreadListAdapter mAdapter;
-    	
-    	public ThreadListLoadTask(ThreadListAdapter adapter) {
-    		mAdapter = adapter;
-    	}
-    	
-		@Override
-		protected ThreadList doInBackground(Integer... args) {
-			
-			int page = args[0];
-			
-			ChattyService service = new ChattyService();
-			try {
-				return service.getPage(page);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(ThreadList result) {
-			mAdapter.addThreads(result);
-		}
-    	
     }
     
 }

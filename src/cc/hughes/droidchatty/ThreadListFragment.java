@@ -57,7 +57,7 @@ public class ThreadListFragment extends ListFragment {
         /**
          * Callback for when an item has been selected.
          */
-        public void onThreadListItemSelected(String id);
+        public void onThreadListItemSelected(RootPost rootPost);
     }
 
     /**
@@ -66,7 +66,7 @@ public class ThreadListFragment extends ListFragment {
      */
     private static Callbacks sDummyCallbacks = new Callbacks() {
         @Override
-        public void onThreadListItemSelected(String id) {
+        public void onThreadListItemSelected(RootPost rootPost) {
         }
     };
 
@@ -83,7 +83,7 @@ public class ThreadListFragment extends ListFragment {
 
         setListAdapter(new ThreadListAdapter(getActivity(), R.layout.thread_list_item, R.layout.row_loading, R.layout.row_finished));
     }
-
+    
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -124,7 +124,7 @@ public class ThreadListFragment extends ListFragment {
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onThreadListItemSelected(DummyContent.ITEMS.get(position).id);
+        mCallbacks.onThreadListItemSelected((RootPost)getListAdapter().getItem(position));
     }
 
     @Override

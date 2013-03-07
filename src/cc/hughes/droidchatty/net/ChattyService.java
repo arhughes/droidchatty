@@ -28,5 +28,19 @@ public class ChattyService {
         }
 
     }
+    
+    public Message.Thread getThread(String id) throws IOException {
+
+        URL url = new URL(BASE_URL + "thread.php?id=" + id);
+
+        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        try {
+            connection.setRequestProperty("User-Agent", USER_AGENT);
+            return Message.Thread.parseFrom(connection.getInputStream());
+        } finally {
+            connection.disconnect();
+        }
+        
+    }
 
 }

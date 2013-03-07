@@ -14,6 +14,8 @@ import android.widget.AbsListView.OnScrollListener;
 
 public abstract class LoadMoreArrayAdapter<T> extends ArrayAdapter<T> implements OnScrollListener {
 
+    protected final static int LAYOUT_NONE = -1;
+    
     int mLoadingRes;
     int mFinishedRes;
     
@@ -23,7 +25,7 @@ public abstract class LoadMoreArrayAdapter<T> extends ArrayAdapter<T> implements
     AtomicBoolean mKeepLoading = new AtomicBoolean(true);
     
     public LoadMoreArrayAdapter(Context context, int loadingResource, int finishedResource) {
-        super(context, -1);
+        super(context, LAYOUT_NONE);
         mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mLoadingRes = loadingResource;
         mFinishedRes = finishedResource;
@@ -44,7 +46,9 @@ public abstract class LoadMoreArrayAdapter<T> extends ArrayAdapter<T> implements
     
     @Override
     public int getCount() {
-        return super.getCount() + 1;
+        if (mKeepLoading.get() || mFinishedRes != LAYOUT_NONE)
+            return super.getCount() + 1;
+        return super.getCount();
     }
     
     @Override

@@ -1,5 +1,7 @@
 package cc.hughes.droidchatty;
 
+import cc.hughes.droidchatty.net.Message.ThreadList.RootPost;
+
 import com.slidingmenu.lib.SlidingMenu;
 
 import android.app.ActionBar;
@@ -47,7 +49,6 @@ public class MainActivity extends FragmentActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        //setTheme(android.R.style.Theme_Holo);
         setContentView(R.layout.activity_thread_list);
 
         ThreadListFragment mainFragment = new ThreadListFragment();
@@ -112,14 +113,8 @@ public class MainActivity extends FragmentActivity
      * indicating that the item with the given ID was selected.
      */
     @Override
-    public void onThreadListItemSelected(String id) {
-
-        Bundle arguments = new Bundle();
-        arguments.putString(ThreadDetailFragment.ARG_ITEM_ID, id);
-    	
-        ThreadDetailFragment fragment = new ThreadDetailFragment();
-        fragment.setArguments(arguments);
-        
+    public void onThreadListItemSelected(RootPost rootPost) {
+        ThreadDetailFragment fragment = new ThreadDetailFragment(rootPost);
         setDetailFragment(fragment);
     }
         
@@ -131,7 +126,7 @@ public class MainActivity extends FragmentActivity
     public void onMessageListItemSelected(String id) {
 
         Bundle arguments = new Bundle();
-        arguments.putString(ThreadDetailFragment.ARG_ITEM_ID, id);
+        //arguments.putString(MessageListFragment.ARG_ITEM_ID, id);
     	
         MessageDetailFragment fragment = new MessageDetailFragment();
         fragment.setArguments(arguments);

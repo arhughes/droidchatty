@@ -15,8 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -45,7 +43,6 @@ public class ThreadDetailFragment extends ListFragment {
     private RootPost mRootPost;
     private String mThreadID;
     private int mIndentPx = 15;
-    private int mSelectedItem = ListView.INVALID_POSITION;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the

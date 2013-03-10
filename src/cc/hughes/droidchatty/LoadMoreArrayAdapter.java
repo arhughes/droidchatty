@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -131,6 +132,7 @@ public abstract class LoadMoreArrayAdapter<T> extends ArrayAdapter<T> implements
     
     class LoadItemsTask extends AsyncTask<Void, Void, Exception> {
 
+        private static final String TAG = "LoadItemsTask";
         boolean mLoadMore = false;
         LoadMoreArrayAdapter<?> mAdapter;
         
@@ -144,6 +146,7 @@ public abstract class LoadMoreArrayAdapter<T> extends ArrayAdapter<T> implements
                 mLoadMore = mAdapter.loadItems();
             }
             catch (Exception e) {
+                Log.i(TAG, "Error loading items", e);
                 return e;
             }
             return null;

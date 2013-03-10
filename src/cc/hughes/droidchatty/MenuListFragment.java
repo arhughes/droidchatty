@@ -1,9 +1,10 @@
 package cc.hughes.droidchatty;
 
-import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,14 +24,6 @@ public class MenuListFragment extends ListFragment {
 	public static final String ID_MESSAGES = "messages";
 	public static final String ID_SETTINGS = "settings";
 	
-	Callbacks mCallbacks = sDummyCallbacks;
-	
-	private static Callbacks sDummyCallbacks = new Callbacks() {
-		@Override
-		public void onMenuItemSelected(String id) {
-		}
-	};
-	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState)	{
 		super.onActivityCreated(savedInstanceState);
@@ -43,29 +36,30 @@ public class MenuListFragment extends ListFragment {
 		adapter.add(new MenuListItem("Home", android.R.drawable.ic_menu_info_details, ID_HOME));
 		adapter.add(new MenuListItem("Search", android.R.drawable.ic_menu_search, ID_SEARCH));
 		adapter.add(new MenuListItem("Messages", android.R.drawable.ic_menu_send, ID_MESSAGES));
+		adapter.add(new MenuListItem("View LOLs", android.R.drawable.ic_menu_agenda, ID_MESSAGES));
 		adapter.add(new MenuListItem("Settings", android.R.drawable.ic_menu_preferences, ID_SETTINGS));
 		setListAdapter(adapter);
-	}
-	
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		
-		try
-		{
-			mCallbacks = (Callbacks)activity;
-		}
-		catch (ClassCastException e)
-		{
-			throw new ClassCastException(activity.toString() + " must implement MenuListFragment.Callbacks");
-		}
 	}
 	
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		
 		MenuListItem item = (MenuListItem)getListAdapter().getItem(position);
-		mCallbacks.onMenuItemSelected(item.getID());		
+		
+		Fragment fragment = null;
+		
+		if (item.getID() == ID_HOME) {
+		    fragment = new ThreadListFragment();
+		} else if (item.getID() == ID_MESSAGES) {
+		    fragment = new MessageListFragment();
+		} else if (item.getID() == ID_SETTINGS) {
+			Intent intent = new Intent(getActivity(), SettingsActivity.class);
+			startActivity(intent);
+		    return;
+		}
+		
+		FragmentContextActivity fca = (FragmentContextActivity)getActivity();
+		fca.changeContext(fragment, 0);
 	}
 
 	private class MenuListItem {

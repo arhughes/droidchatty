@@ -2,7 +2,8 @@ package cc.hughes.droidchatty;
 
 import java.util.List;
 
-import android.annotation.SuppressLint;
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -36,13 +37,14 @@ import cc.hughes.droidchatty.util.TimeUtil;
  * in two-pane mode (on tablets) or a {@link ThreadDetailActivity}
  * on handsets.
  */
-@SuppressLint("ValidFragment")
 public class ThreadDetailFragment extends ListFragment {
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.
      */
     public static final String ARG_ROOT_POST = "root_post";
+
+    private static final String TAG = "ThreadDetailFragment";
 
     private RootPost mRootPost;
     private String mThreadID;
@@ -52,16 +54,19 @@ public class ThreadDetailFragment extends ListFragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    @SuppressLint("ValidFragment")
-    public ThreadDetailFragment(RootPost rootPost) {
-        super();
-        mRootPost = rootPost;
-        mThreadID = mRootPost.getId();
+    public ThreadDetailFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        try {
+            mRootPost = RootPost.parseFrom(getArguments().getByteArray(ARG_ROOT_POST));
+            mThreadID = mRootPost.getId();
+        } catch (InvalidProtocolBufferException e) {
+            Log.e(TAG, "Error parsing root post item.", e);
+        }
         
         setListAdapter(new ThreadDetailAdapter(getActivity(), R.layout.thread_detail_item, R.layout.row_loading));
     }

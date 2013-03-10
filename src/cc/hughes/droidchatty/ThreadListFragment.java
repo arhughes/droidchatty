@@ -58,7 +58,10 @@ public class ThreadListFragment extends ListFragment {
         super.onListItemClick(listView, view, position, id);
 
         RootPost rootPost = (RootPost)getListAdapter().getItem(position);
-        ThreadDetailFragment fragment = new ThreadDetailFragment(rootPost);
+        Bundle args = new Bundle();
+        args.putByteArray(ThreadDetailFragment.ARG_ROOT_POST, rootPost.toByteArray());
+        ThreadDetailFragment fragment = new ThreadDetailFragment();
+        fragment.setArguments(args);
         
 		FragmentContextActivity fca = (FragmentContextActivity)getActivity();
 		fca.changeContext(fragment, 1);

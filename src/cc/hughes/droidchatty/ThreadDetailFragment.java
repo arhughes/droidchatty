@@ -6,25 +6,21 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.GradientDrawable.Orientation;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import cc.hughes.droidchatty.dummy.DummyContent;
 import cc.hughes.droidchatty.net.ChattyService;
 import cc.hughes.droidchatty.net.Message;
 import cc.hughes.droidchatty.net.Message.Thread.Reply;
@@ -48,7 +44,8 @@ public class ThreadDetailFragment extends ListFragment {
 
     private RootPost mRootPost;
     private String mThreadID;
-    private int mIndentPx = 5;
+    private int mIndentPx = 15;
+    private int mSelectedItem = ListView.INVALID_POSITION;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -70,25 +67,24 @@ public class ThreadDetailFragment extends ListFragment {
         
         setListAdapter(new ThreadDetailAdapter(getActivity(), R.layout.thread_detail_item, R.layout.row_loading));
     }
-
+    
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        
-        // determine the width of the indent for each comment level
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        mIndentPx = Math.min(display.getWidth(), display.getHeight()) / 50;
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        super.onListItemClick(listView, view, position, id);
+        ((ThreadDetailAdapter)getListAdapter()).setSelected(position);
     }
+    
 
     class ThreadDetailAdapter extends LoadMoreArrayAdapter<Reply> {
 
         final static String CATEGORY_NWS = "nws";
-        
+
         private ChattyService mService;
         private int mLayoutRes;
         private LayoutInflater mInflater;
         private Context mContext;
         private List<Reply> mItemCache;
+        private int mSelected = -1;
         
         public ThreadDetailAdapter(Context context, int itemResource, int loadingResource) {
             super(context, loadingResource, LAYOUT_NONE);
@@ -96,6 +92,27 @@ public class ThreadDetailFragment extends ListFragment {
             mContext = context;
             mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             mService = new ChattyService();
+            
+            // add the root post so it is displayed even while loading
+            if (mRootPost != null) {
+                Reply.Builder builder = Reply.newBuilder();
+                builder.setAuthor(mRootPost.getAuthor());
+                builder.setBody(mRootPost.getBody());
+                builder.setCategeory(mRootPost.getCategory());
+                builder.setDate(mRootPost.getDate());
+                builder.setId(mRootPost.getId());
+                builder.setDepth(0);
+                
+                super.add(builder.build());
+            }
+        }
+        
+        public void setSelected(int position) {
+            if (mSelected == position)
+                mSelected = -1;
+            else
+                mSelected = position;
+            super.notifyDataSetChanged();
         }
 
         @Override
@@ -110,6 +127,8 @@ public class ThreadDetailFragment extends ListFragment {
                 holder.postCategory = (TextView)convertView.findViewById(R.id.post_category);
                 holder.postTime = (TextView)convertView.findViewById(R.id.post_time);
                 holder.spacerContainer = (LinearLayout)convertView.findViewById(R.id.spacer_container);
+                holder.postButtonsBar = convertView.findViewById(R.id.post_buttons_bar);
+                
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder)convertView.getTag();
@@ -122,10 +141,12 @@ public class ThreadDetailFragment extends ListFragment {
             holder.authorName.setText(reply.getAuthor());
             holder.postContent.setText(Html.fromHtml(reply.getBody()));
             holder.postTime.setText(timeAgo);
-            if (reply.getCategeory() == CATEGORY_NWS)
-                holder.postCategory.setText(CATEGORY_NWS);
-            else
-                holder.postCategory.setText("");
+            holder.postCategory.setText(reply.getCategeory());
+            
+            boolean is_nws = reply.getCategeory().equals(CATEGORY_NWS);
+            holder.postCategory.setVisibility(is_nws ? View.VISIBLE : View.GONE);
+            
+            holder.postButtonsBar.setVisibility((position == mSelected) ? View.VISIBLE : View.GONE);
             
             holder.spacerContainer.removeAllViews();
             for (int i = 0; i < reply.getDepth(); i++) {
@@ -144,6 +165,11 @@ public class ThreadDetailFragment extends ListFragment {
         protected boolean loadItems() throws Exception {
             Message.Thread thread = mService.getThread(mThreadID);
             mItemCache = thread.getReplyList();
+            
+            // if root post is already added, don't add it again
+            if (mRootPost != null)
+                mItemCache = mItemCache.subList(1, mItemCache.size());
+            
             return false;
         }
 
@@ -161,8 +187,9 @@ public class ThreadDetailFragment extends ListFragment {
             TextView postCategory;
             TextView postTime;
             LinearLayout spacerContainer;
-            
+            View postButtonsBar;
         }
+
         
     }
  }

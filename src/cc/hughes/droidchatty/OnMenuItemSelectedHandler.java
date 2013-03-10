@@ -1,3 +1,0 @@
-package cc.hughes.droidchatty;
-
-

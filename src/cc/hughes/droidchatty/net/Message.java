@@ -3,6 +3,7 @@
 
 package cc.hughes.droidchatty.net;
 
+@SuppressWarnings("all")
 public final class Message {
   private Message() {}
   public static void registerAllExtensions(

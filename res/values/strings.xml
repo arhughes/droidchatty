@@ -17,4 +17,8 @@
     
     <string name="pref_default_fontsize">Normal</string>
     
+    <string name="reply">Reply</string>
+    <string name="tag">Tag</string>
+    <string name="copy_url">Copy link</string>
+    
 </resources>

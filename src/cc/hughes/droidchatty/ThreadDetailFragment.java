@@ -11,13 +11,18 @@ import android.support.v4.app.ListFragment;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import cc.hughes.droidchatty.net.ChattyService;
 import cc.hughes.droidchatty.net.Message;
@@ -43,6 +48,9 @@ public class ThreadDetailFragment extends ListFragment {
     private RootPost mRootPost;
     private String mThreadID;
     private int mIndentPx = 15;
+    
+    private ActionMode mActionMode;
+    private int mSelectedPosition = ListView.INVALID_POSITION;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -66,11 +74,80 @@ public class ThreadDetailFragment extends ListFragment {
     }
     
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        
+        // set single choice mode to highlight the selected item
+        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+    }
+
+    @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
-        ((ThreadDetailAdapter)getListAdapter()).setSelected(position);
+        
+        if (position == mSelectedPosition) {
+            // un-select the post, kill the contextual action bar
+            mActionMode.finish();
+            getListView().setItemChecked(position, false);
+            mSelectedPosition = ListView.INVALID_POSITION;
+        } else {
+            // if we aren't already showing the contextual action bar, show it now
+            if (mActionMode == null) {
+                mActionMode = getActivity().startActionMode(mActionModeCallback);
+            }
+            
+            // make sure we know what is selected
+            mSelectedPosition = position;
+        }
     }
     
+    
+    ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.menu_post_reply:
+                    Toast.makeText(getActivity(), "This is where a reply would happen!", Toast.LENGTH_SHORT).show();
+                    mode.finish();
+                    return true;
+                case R.id.menu_post_tag:
+                    Toast.makeText(getActivity(), "This is where you would tag the post.", Toast.LENGTH_SHORT).show();
+                    mode.finish();
+                    return true;
+                case R.id.menu_post_copy_url:
+                    Toast.makeText(getActivity(), "This is where the URL would be copied.", Toast.LENGTH_SHORT).show();
+                    mode.finish();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.post_context, menu);
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mActionMode = null;
+            
+            // all done, make sure the item is unselected
+            if (mSelectedPosition != ListView.INVALID_POSITION) {
+                getListView().setItemChecked(mSelectedPosition, false);
+                mSelectedPosition = ListView.INVALID_POSITION;
+            }
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+        
+    };
 
     class ThreadDetailAdapter extends LoadMoreArrayAdapter<Reply> {
 
@@ -81,7 +158,6 @@ public class ThreadDetailFragment extends ListFragment {
         private LayoutInflater mInflater;
         private Context mContext;
         private List<Reply> mItemCache;
-        private int mSelected = -1;
         
         public ThreadDetailAdapter(Context context, int itemResource, int loadingResource) {
             super(context, loadingResource, LAYOUT_NONE);
@@ -104,14 +180,6 @@ public class ThreadDetailFragment extends ListFragment {
             }
         }
         
-        public void setSelected(int position) {
-            if (mSelected == position)
-                mSelected = -1;
-            else
-                mSelected = position;
-            super.notifyDataSetChanged();
-        }
-
         @Override
         protected View getNormalView(int position, View convertView, ViewGroup parent) {
             ViewHolder holder;
@@ -124,8 +192,6 @@ public class ThreadDetailFragment extends ListFragment {
                 holder.postCategory = (TextView)convertView.findViewById(R.id.post_category);
                 holder.postTime = (TextView)convertView.findViewById(R.id.post_time);
                 holder.spacerContainer = (LinearLayout)convertView.findViewById(R.id.spacer_container);
-                holder.postButtonsBar = convertView.findViewById(R.id.post_buttons_bar);
-                
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder)convertView.getTag();
@@ -142,8 +208,6 @@ public class ThreadDetailFragment extends ListFragment {
             
             boolean is_nws = reply.getCategeory().equals(CATEGORY_NWS);
             holder.postCategory.setVisibility(is_nws ? View.VISIBLE : View.GONE);
-            
-            holder.postButtonsBar.setVisibility((position == mSelected) ? View.VISIBLE : View.GONE);
             
             holder.spacerContainer.removeAllViews();
             for (int i = 0; i < reply.getDepth(); i++) {
@@ -184,9 +248,7 @@ public class ThreadDetailFragment extends ListFragment {
             TextView postCategory;
             TextView postTime;
             LinearLayout spacerContainer;
-            View postButtonsBar;
         }
-
         
     }
  }

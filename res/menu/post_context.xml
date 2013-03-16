@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+	<item android:id="@+id/menu_post_reply"
+	      android:icon="@android:drawable/ic_menu_send"
+	      android:title="@string/reply" />
+	<item android:id="@+id/menu_post_tag"
+	      android:icon="@android:drawable/ic_menu_manage"
+	      android:title="@string/tag" />
+	<item android:id="@+id/menu_post_copy_url"
+	      android:icon="@android:drawable/ic_menu_info_details"
+	      android:title="@string/copy_url" />
+</menu>

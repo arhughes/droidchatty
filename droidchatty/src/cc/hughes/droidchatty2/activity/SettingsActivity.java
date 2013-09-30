@@ -1,4 +1,4 @@
-package cc.hughes.droidchatty2;
+package cc.hughes.droidchatty2.activity;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -14,6 +14,8 @@ import android.preference.PreferenceManager;
 import android.view.MenuItem;
 
 import java.util.List;
+
+import cc.hughes.droidchatty2.R;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On

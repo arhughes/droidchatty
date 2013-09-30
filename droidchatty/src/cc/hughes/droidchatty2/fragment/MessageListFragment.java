@@ -1,4 +1,4 @@
-package cc.hughes.droidchatty2;
+package cc.hughes.droidchatty2.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import cc.hughes.droidchatty2.FragmentContextActivity;
 import cc.hughes.droidchatty2.dummy.DummyContent;
 
 /**

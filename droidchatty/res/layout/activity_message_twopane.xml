@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/message_list"
-        android:name="cc.hughes.droidchatty2.MessageListFragment"
+        android:name="cc.hughes.droidchatty2.fragment.MessageListFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"

@@ -1,4 +1,4 @@
-package cc.hughes.droidchatty2;
+package cc.hughes.droidchatty2.activity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,18 +16,22 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 import android.view.View;
 
+import cc.hughes.droidchatty2.FragmentContextActivity;
+import cc.hughes.droidchatty2.R;
+import cc.hughes.droidchatty2.fragment.ThreadListFragment;
+
 
 /**
  * An activity representing a list of Threads. This activity
  * has different presentations for handset and tablet-size devices. On
  * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link ThreadDetailFragment} representing
+ * lead to a {@link cc.hughes.droidchatty2.fragment.ThreadDetailFragment} representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  * <p>
  * The activity makes heavy use of fragments. The list of items is a
- * {@link ThreadListFragment} and the item details
- * (if present) is a {@link ThreadDetailFragment}.
+ * {@link cc.hughes.droidchatty2.fragment.ThreadListFragment} and the item details
+ * (if present) is a {@link cc.hughes.droidchatty2.fragment.ThreadDetailFragment}.
  */
 public class MainActivity extends ActionBarActivity
         implements ViewPager.OnPageChangeListener, FragmentContextActivity {

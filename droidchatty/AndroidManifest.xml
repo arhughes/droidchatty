@@ -17,7 +17,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="cc.hughes.droidchatty2.MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:configChanges="orientation|screenSize">
             <intent-filter>
@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="cc.hughes.droidchatty2.SettingsActivity"
+            android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
     </application>

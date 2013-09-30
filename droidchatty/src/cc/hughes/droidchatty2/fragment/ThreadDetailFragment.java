@@ -1,4 +1,4 @@
-package cc.hughes.droidchatty2;
+package cc.hughes.droidchatty2.fragment;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,6 +22,8 @@ import android.widget.Toast;
 
 import com.squareup.wire.Wire;
 
+import cc.hughes.droidchatty2.LoadMoreArrayAdapter;
+import cc.hughes.droidchatty2.R;
 import cc.hughes.droidchatty2.net.*;
 import cc.hughes.droidchatty2.net.Thread;
 import cc.hughes.droidchatty2.net.Thread.Reply;
@@ -31,9 +33,7 @@ import cc.hughes.droidchatty2.util.TimeUtil;
 
 /**
  * A fragment representing a single Thread detail screen.
- * This fragment is either contained in a {@link MainActivity}
- * in two-pane mode (on tablets) or a {@link ThreadDetailActivity}
- * on handsets.
+ * This fragment is either contained in a {@link cc.hughes.droidchatty2.activity.MainActivity}
  */
 public class ThreadDetailFragment extends ListFragment {
     /**

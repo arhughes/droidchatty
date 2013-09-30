@@ -3,10 +3,10 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="cc.hughes.droidchatty2.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="cc.hughes.droidchatty2.activity.SettingsActivity$GeneralPreferenceFragment"
         android:title="@string/pref_header_accounts" />
     <header
-        android:fragment="cc.hughes.droidchatty2.SettingsActivity$NotificationPreferenceFragment"
+        android:fragment="cc.hughes.droidchatty2.activity.SettingsActivity$NotificationPreferenceFragment"
         android:title="@string/pref_header_theme" />
 
 </preference-headers>

@@ -1,13 +1,10 @@
-package cc.hughes.droidchatty2;
+package cc.hughes.droidchatty2.fragment;
 
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +14,9 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import cc.hughes.droidchatty2.FragmentContextActivity;
+import cc.hughes.droidchatty2.LoadMoreArrayAdapter;
+import cc.hughes.droidchatty2.R;
 import cc.hughes.droidchatty2.net.ChattyService;
 import cc.hughes.droidchatty2.net.ThreadList;
 import cc.hughes.droidchatty2.net.ThreadList.RootPost;

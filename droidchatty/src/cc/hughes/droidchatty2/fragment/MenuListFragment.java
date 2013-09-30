@@ -1,4 +1,4 @@
-package cc.hughes.droidchatty2;
+package cc.hughes.droidchatty2.fragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +12,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import cc.hughes.droidchatty2.FragmentContextActivity;
+import cc.hughes.droidchatty2.R;
+import cc.hughes.droidchatty2.activity.SettingsActivity;
 
 public class MenuListFragment extends ListFragment {
 

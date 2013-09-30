@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Droid Chatty</string>
+    <string name="title_thread_detail">Thread Detail</string>
+    <string name="title_message_list">Messages</string>
+    <string name="title_message_detail">Message Detail</string>
+
+    <string name="validate">Validate</string>
+    <string name="checking">Checking&#8230;</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    
+    <string name="error_validating">Could not validate your credentials.</string>
+    <string name="error_title">Error</string>
+    <string name="ok">OK</string>
+    
+    <string name="pref_default_fontsize">Normal</string>
+    
+    <string name="reply">Reply</string>
+    <string name="tag">Tag</string>
+    <string name="copy_url">Copy link</string>
+
+    <string name="drawer_open">Navigation menu</string>
+    <string name="drawer_close">Main screen</string>
+
+</resources>

@@ -6,9 +6,9 @@
     two-pane version on Large screens.
 
     For more on layout aliases, see:
-    http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
+    http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
+
     -->
-    <item name="activity_thread_list" type="layout">@layout/activity_thread_twopane</item>
-    <item name="activity_message_list" type="layout">@layout/activity_message_twopane</item>
+    <item name="main" type="layout">@layout/main_twopane</item>
 
 </resources>

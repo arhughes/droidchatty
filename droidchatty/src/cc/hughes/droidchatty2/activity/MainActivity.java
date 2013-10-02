@@ -9,6 +9,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -55,7 +56,7 @@ public class MainActivity extends ActionBarActivity
         
         //setTheme(android.R.style.Theme_Holo_Light);
 
-        setContentView(R.layout.activity_thread_list);
+        setContentView(R.layout.main);
 
         ThreadListFragment mainFragment = new ThreadListFragment();
         

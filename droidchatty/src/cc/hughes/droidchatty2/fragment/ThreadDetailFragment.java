@@ -3,8 +3,11 @@ package cc.hughes.droidchatty2.fragment;
 import java.io.IOException;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.ActionMode;
@@ -24,6 +27,7 @@ import com.squareup.wire.Wire;
 
 import cc.hughes.droidchatty2.LoadMoreArrayAdapter;
 import cc.hughes.droidchatty2.R;
+import cc.hughes.droidchatty2.activity.PostActivity;
 import cc.hughes.droidchatty2.net.*;
 import cc.hughes.droidchatty2.net.Thread;
 import cc.hughes.droidchatty2.net.Thread.Reply;
@@ -41,6 +45,8 @@ public class ThreadDetailFragment extends ListFragment {
      * represents.
      */
     public static final String ARG_ROOT_POST = "root_post";
+
+    private static final int REQUEST_POST_REPLY = 0;
 
     private static final String TAG = "ThreadDetailFragment";
 
@@ -92,13 +98,13 @@ public class ThreadDetailFragment extends ListFragment {
             getListView().setItemChecked(position, false);
             mSelectedPosition = ListView.INVALID_POSITION;
         } else {
+            // make sure we know what is selected
+            mSelectedPosition = position;
+
             // if we aren't already showing the contextual action bar, show it now
             if (mActionMode == null) {
                 mActionMode = getActivity().startActionMode(mActionModeCallback);
             }
-            
-            // make sure we know what is selected
-            mSelectedPosition = position;
         }
     }
     
@@ -107,21 +113,59 @@ public class ThreadDetailFragment extends ListFragment {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+            // probably need to know which post we are on
+            Reply reply = (Reply)getListAdapter().getItem(mSelectedPosition);
+
             switch (item.getItemId()) {
                 case R.id.menu_post_reply:
-                    Toast.makeText(getActivity(), "This is where a reply would happen!", Toast.LENGTH_SHORT).show();
+                    replyPost(reply);
                     mode.finish();
                     return true;
                 case R.id.menu_post_tag:
                     Toast.makeText(getActivity(), "This is where you would tag the post.", Toast.LENGTH_SHORT).show();
                     mode.finish();
                     return true;
-                case R.id.menu_post_copy_url:
-                    Toast.makeText(getActivity(), "This is where the URL would be copied.", Toast.LENGTH_SHORT).show();
+                case R.id.menu_post_share:
+                    sharePost(reply);
                     mode.finish();
                     return true;
                 default:
                     return false;
+            }
+        }
+
+        void replyPost(Reply reply) {
+
+            boolean isNewsThread = ((Reply)getListAdapter().getItem(0)).author.equalsIgnoreCase("shacknews");
+            Intent intent = new Intent(getActivity(), PostActivity.class);
+            intent.putExtra(PostActivity.PARENT_ID, reply.id);
+            intent.putExtra(PostActivity.IS_NEWS_THREAD, isNewsThread);
+            startActivityForResult(intent, REQUEST_POST_REPLY);
+        }
+
+        void sharePost(Reply reply) {
+            String url = "http://www.shacknews.com/chatty?id=" + reply.id;
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_TEXT, url);
+
+            startActivity(Intent.createChooser(intent, "Share link"));
+        }
+
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            switch (requestCode) {
+                case REQUEST_POST_REPLY:
+                    if (resultCode == Activity.RESULT_OK) {
+                        int id = data.getExtras().getInt(PostActivity.RESULT_POST_ID);
+                        // just reload for now
+                        //TODO: force scroll to new post
+                        //mThreadID = Integer.toString(id);
+                        ((ThreadDetailAdapter)getListAdapter()).clear();
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 

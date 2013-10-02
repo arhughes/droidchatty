@@ -26,6 +26,7 @@ public class MenuListFragment extends ListFragment {
 	public static final String ID_HOME = "home";
 	public static final String ID_SEARCH = "search";
 	public static final String ID_MESSAGES = "messages";
+    public static final String ID_TAGS = "tags";
 	public static final String ID_SETTINGS = "settings";
 	
 	@Override
@@ -38,10 +39,10 @@ public class MenuListFragment extends ListFragment {
 				
 		MenuAdapter adapter = new MenuAdapter(getActivity());
 		adapter.add(new MenuListItem("Home", android.R.drawable.ic_menu_info_details, ID_HOME));
-		adapter.add(new MenuListItem("Search", android.R.drawable.ic_menu_search, ID_SEARCH));
-		adapter.add(new MenuListItem("Messages", android.R.drawable.ic_menu_send, ID_MESSAGES));
-		adapter.add(new MenuListItem("View LOLs", android.R.drawable.ic_menu_agenda, ID_MESSAGES));
-		adapter.add(new MenuListItem("Settings", android.R.drawable.ic_menu_preferences, ID_SETTINGS));
+		adapter.add(new MenuListItem("Search", R.drawable.ic_action_search, ID_SEARCH));
+		adapter.add(new MenuListItem("Messages", R.drawable.ic_action_email, ID_MESSAGES));
+		adapter.add(new MenuListItem("View LOLs", R.drawable.ic_action_labels, ID_TAGS));
+		adapter.add(new MenuListItem("Settings", R.drawable.ic_action_settings, ID_SETTINGS));
 		setListAdapter(adapter);
 	}
 	
@@ -56,11 +57,15 @@ public class MenuListFragment extends ListFragment {
 		    fragment = new ThreadListFragment();
 		} else if (item.getID() == ID_MESSAGES) {
 		    fragment = new MessageListFragment();
-		} else if (item.getID() == ID_SETTINGS) {
+        } else if (item.getID() == ID_SETTINGS) {
 			Intent intent = new Intent(getActivity(), SettingsActivity.class);
 			startActivity(intent);
 		    return;
-		}
+		} else {
+            // not implemented yet
+            return;
+        }
+
 		
 		FragmentContextActivity fca = (FragmentContextActivity)getActivity();
 		fca.changeContext(fragment, 0);

@@ -50,7 +50,7 @@ public class MessageDetailFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_message_detail,
+		View rootView = inflater.inflate(R.layout.message_detail,
 				container, false);
 
 		// Show the dummy content as text in a TextView.

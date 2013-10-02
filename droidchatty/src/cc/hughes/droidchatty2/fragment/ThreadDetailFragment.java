@@ -77,6 +77,7 @@ public class ThreadDetailFragment extends ListFragment {
             e.printStackTrace();
         }
 
+        setHasOptionsMenu(true);
         setListAdapter(new ThreadDetailAdapter(getActivity(), R.layout.thread_detail_item, R.layout.row_loading));
     }
     
@@ -86,6 +87,23 @@ public class ThreadDetailFragment extends ListFragment {
         
         // set single choice mode to highlight the selected item
         getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.thread_detail_options, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.thread_detail_refresh:
+                ((ThreadDetailAdapter)getListAdapter()).clear();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -212,6 +230,10 @@ public class ThreadDetailFragment extends ListFragment {
             mService = new ChattyService();
             
             // add the root post so it is displayed even while loading
+            addRootPost();
+        }
+
+        private void addRootPost() {
             if (mRootPost != null) {
                 Reply.Builder builder = new Reply.Builder()
                     .author(mRootPost.author)
@@ -224,7 +246,7 @@ public class ThreadDetailFragment extends ListFragment {
                 super.add(builder.build());
             }
         }
-        
+
         @Override
         protected View getNormalView(int position, View convertView, ViewGroup parent) {
             ViewHolder holder;
@@ -265,6 +287,14 @@ public class ThreadDetailFragment extends ListFragment {
             }
             
             return convertView;
+        }
+
+        @Override
+        public void clear() {
+            // clear the existing posts, add the root post back, and tell the adapter to load
+            super.clear();
+            addRootPost();
+            setKeepLoading(true);
         }
 
         @Override

@@ -112,6 +112,10 @@ public abstract class LoadMoreArrayAdapter<T> extends ArrayAdapter<T> implements
        view.setOnClickListener(mFinishedOnClickListener);
        return view;
     }
+
+    protected void setKeepLoading(boolean value) {
+        mKeepLoading.set(value);
+    }
     
     OnClickListener mFinishedOnClickListener = new OnClickListener() {
         @Override

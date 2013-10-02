@@ -226,7 +226,7 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
         fragment.setArguments(args);
 
         FragmentContextActivity fca = (FragmentContextActivity)getActivity();
-        fca.changeContext(fragment, 1);
+        fca.changeContext(fragment, 2);
     }
 
     class ThreadDetailAdapter extends LoadMoreArrayAdapter<Reply> {

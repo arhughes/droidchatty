@@ -17,6 +17,8 @@ import android.widget.TextView;
 import cc.hughes.droidchatty2.FragmentContextActivity;
 import cc.hughes.droidchatty2.LoadMoreArrayAdapter;
 import cc.hughes.droidchatty2.R;
+import cc.hughes.droidchatty2.ViewInjected;
+import cc.hughes.droidchatty2.ViewInjector;
 import cc.hughes.droidchatty2.net.ChattyService;
 import cc.hughes.droidchatty2.net.ThreadList;
 import cc.hughes.droidchatty2.net.ThreadList.RootPost;
@@ -152,11 +154,7 @@ public class ThreadListFragment extends ListFragment {
 		    if (convertView == null) {
 		       convertView = mInflater.inflate(mLayoutRes, null);
 		       holder = new ViewHolder();
-		       holder.threadCategory = (TextView)convertView.findViewById(R.id.thread_category);
-		       holder.authorName = (TextView)convertView.findViewById(R.id.author_name);
-		       holder.postContent = (TextView)convertView.findViewById(R.id.post_content);
-		       holder.threadReplies = (TextView)convertView.findViewById(R.id.thread_replies);
-		       holder.postTime = (TextView)convertView.findViewById(R.id.post_time);
+               ViewInjector.inject(holder, convertView);
 		       convertView.setTag(holder);
 		    }
 		    else {
@@ -179,10 +177,19 @@ public class ThreadListFragment extends ListFragment {
 		}
 		
 		class ViewHolder {
+           @ViewInjected(R.id.thread_category)
 		   TextView threadCategory;
+
+           @ViewInjected(R.id.author_name)
 		   TextView authorName;
+
+           @ViewInjected(R.id.post_content)
 		   TextView postContent;
+
+           @ViewInjected(R.id.thread_replies)
 		   TextView threadReplies;
+
+           @ViewInjected(R.id.post_time)
 		   TextView postTime;
 		}
     }

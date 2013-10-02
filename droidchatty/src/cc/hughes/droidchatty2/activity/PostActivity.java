@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import cc.hughes.droidchatty2.R;
+import cc.hughes.droidchatty2.ViewInjected;
+import cc.hughes.droidchatty2.ViewInjector;
 import cc.hughes.droidchatty2.net.ChattyService;
 
 public class PostActivity extends Activity {
@@ -26,10 +28,20 @@ public class PostActivity extends Activity {
     private int mParentId = 0;
     private boolean mIsNewsThread = false;
 
+    @ViewInjected(R.id.edit_post_reply)
+    Button mReplyButton;
+
+    @ViewInjected(R.id.edit_post_cancel)
+    Button mCancelButton;
+
+    @ViewInjected(R.id.edit_post_content)
+    EditText mEditor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+        ViewInjector.inject(this);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -37,12 +49,8 @@ public class PostActivity extends Activity {
             mIsNewsThread = extras.getBoolean(IS_NEWS_THREAD, false);
         }
 
-        Button reply_button = (Button)findViewById(R.id.edit_post_reply);
-        Button cancel_button = (Button)findViewById(R.id.edit_post_cancel);
-
-        reply_button.setOnClickListener(mReplyButtonClick);
-        cancel_button.setOnClickListener(mCancelButtonClick);
-
+        mReplyButton.setOnClickListener(mReplyButtonClick);
+        mCancelButton.setOnClickListener(mCancelButtonClick);
     }
 
     void displayError(Exception ex) {
@@ -63,8 +71,7 @@ public class PostActivity extends Activity {
     View.OnClickListener mReplyButtonClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            EditText editor = (EditText)findViewById(R.id.edit_post_content);
-            String content = editor.getText().toString();
+            String content = mEditor.getText().toString();
 
             new PostTask().execute(content);
         }

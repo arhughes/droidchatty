@@ -27,6 +27,8 @@ import com.squareup.wire.Wire;
 
 import cc.hughes.droidchatty2.LoadMoreArrayAdapter;
 import cc.hughes.droidchatty2.R;
+import cc.hughes.droidchatty2.ViewInjected;
+import cc.hughes.droidchatty2.ViewInjector;
 import cc.hughes.droidchatty2.activity.PostActivity;
 import cc.hughes.droidchatty2.net.*;
 import cc.hughes.droidchatty2.net.Thread;
@@ -254,11 +256,7 @@ public class ThreadDetailFragment extends ListFragment {
             if (convertView == null) {
                 convertView = mInflater.inflate(mLayoutRes, null);
                 holder = new ViewHolder();
-                holder.authorName = (TextView)convertView.findViewById(R.id.author_name);
-                holder.postContent = (TextView)convertView.findViewById(R.id.post_content);
-                holder.postCategory = (TextView)convertView.findViewById(R.id.post_category);
-                holder.postTime = (TextView)convertView.findViewById(R.id.post_time);
-                holder.spacerContainer = (LinearLayout)convertView.findViewById(R.id.spacer_container);
+                ViewInjector.inject(holder, convertView);
                 //holder.postContent.setMovementMethod(LinkMovementMethod.getInstance());
                 convertView.setTag(holder);
             } else {
@@ -318,10 +316,15 @@ public class ThreadDetailFragment extends ListFragment {
         }
         
         class ViewHolder {
+            @ViewInjected(R.id.author_name)
             TextView authorName;
+            @ViewInjected(R.id.post_content)
             TextView postContent;
+            @ViewInjected(R.id.post_category)
             TextView postCategory;
+            @ViewInjected(R.id.post_time)
             TextView postTime;
+            @ViewInjected(R.id.spacer_container)
             LinearLayout spacerContainer;
         }
         

@@ -2,10 +2,14 @@
 // Source file: c:\apps\protoc\message.proto
 package cc.hughes.droidchatty2.net;
 
+import android.text.Spanned;
+
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoField;
 import java.util.Collections;
 import java.util.List;
+
+import cc.hughes.droidchatty2.text.TagParser;
 
 import static com.squareup.wire.Message.Datatype.INT32;
 import static com.squareup.wire.Message.Datatype.STRING;
@@ -88,6 +92,8 @@ public final class Thread extends Message {
     @ProtoField(tag = 6, type = STRING, label = REQUIRED)
     public final String body;
 
+    public final Spanned bodyParsed;
+
     private Reply(Builder builder) {
       super(builder);
       this.id = builder.id;
@@ -96,6 +102,7 @@ public final class Thread extends Message {
       this.depth = builder.depth;
       this.categeory = builder.categeory;
       this.body = builder.body;
+      this.bodyParsed = TagParser.fromHtml(builder.body);
     }
 
     @Override

@@ -267,7 +267,7 @@ public class ThreadDetailFragment extends ListFragment {
             String timeAgo = TimeUtil.format(getContext(), reply.date);
 		    
             holder.authorName.setText(reply.author);
-            holder.postContent.setText(TagParser.fromHtml(reply.body));
+            holder.postContent.setText(reply.bodyParsed);
             holder.postTime.setText(timeAgo);
             holder.postCategory.setText(reply.categeory);
             

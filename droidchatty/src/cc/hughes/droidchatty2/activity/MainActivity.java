@@ -128,8 +128,8 @@ public class MainActivity extends ActionBarActivity
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
     		case android.R.id.home:
-    			if (!mTwoPane && mViewPager.getCurrentItem() == 1)
-    	    		mViewPager.setCurrentItem(0, true);
+    			if (!mTwoPane && mViewPager.getCurrentItem() >= 1)
+    	    		mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1, true);
     			else if (mDrawerLayout.isDrawerOpen(mDrawerMenu))
                     mDrawerLayout.closeDrawer(mDrawerMenu);
                 else
@@ -194,9 +194,9 @@ public class MainActivity extends ActionBarActivity
     		// If the sliding menu is showing, close it.
             mDrawerLayout.closeDrawer(mDrawerMenu);
     	}
-    	else if (!mTwoPane && mViewPager.getCurrentItem() == 1) {
+    	else if (!mTwoPane && mViewPager.getCurrentItem() >= 1) {
     		// If the thread details are showing, close it
-    		mViewPager.setCurrentItem(0, true);
+    		mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1, true);
     	}
     	else {
     		super.onBackPressed();

@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.text.Spanned;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 
 import com.squareup.wire.Wire;
 
+import cc.hughes.droidchatty2.FragmentContextActivity;
 import cc.hughes.droidchatty2.LoadMoreArrayAdapter;
 import cc.hughes.droidchatty2.R;
 import cc.hughes.droidchatty2.ViewInjected;
@@ -34,6 +36,7 @@ import cc.hughes.droidchatty2.net.*;
 import cc.hughes.droidchatty2.net.Thread;
 import cc.hughes.droidchatty2.net.Thread.Reply;
 import cc.hughes.droidchatty2.net.ThreadList.RootPost;
+import cc.hughes.droidchatty2.text.InternalURLSpan;
 import cc.hughes.droidchatty2.text.TagParser;
 import cc.hughes.droidchatty2.util.TimeUtil;
 
@@ -41,7 +44,7 @@ import cc.hughes.droidchatty2.util.TimeUtil;
  * A fragment representing a single Thread detail screen.
  * This fragment is either contained in a {@link cc.hughes.droidchatty2.activity.MainActivity}
  */
-public class ThreadDetailFragment extends ListFragment {
+public class ThreadDetailFragment extends ListFragment implements InternalURLSpan.LinkListener {
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.
@@ -214,6 +217,18 @@ public class ThreadDetailFragment extends ListFragment {
         
     };
 
+    @Override
+    public void onLinkClicked(String href) {
+        Bundle args = new Bundle();
+        args.putString(BrowserFragment.ARG_URL, href);
+
+        BrowserFragment fragment = new BrowserFragment();
+        fragment.setArguments(args);
+
+        FragmentContextActivity fca = (FragmentContextActivity)getActivity();
+        fca.changeContext(fragment, 1);
+    }
+
     class ThreadDetailAdapter extends LoadMoreArrayAdapter<Reply> {
 
         final static String CATEGORY_NWS = "nws";
@@ -265,7 +280,9 @@ public class ThreadDetailFragment extends ListFragment {
             
             Reply reply = getItem(position);
             String timeAgo = TimeUtil.format(getContext(), reply.date);
-		    
+
+            handleLinks(reply.bodyParsed);
+
             holder.authorName.setText(reply.author);
             holder.postContent.setText(reply.bodyParsed);
             holder.postTime.setText(timeAgo);
@@ -285,6 +302,13 @@ public class ThreadDetailFragment extends ListFragment {
             }
             
             return convertView;
+        }
+
+        private void handleLinks(Spanned body) {
+            InternalURLSpan spans[] = body.getSpans(0, body.length(), InternalURLSpan.class);
+            for (InternalURLSpan span : spans) {
+                span.setLinkListener(ThreadDetailFragment.this);
+            }
         }
 
         @Override

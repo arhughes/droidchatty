@@ -119,7 +119,7 @@ public class TagParser implements ContentHandler {
 			Href h = (Href) obj;
 
 			if (h.mHref != null) {
-				text.setSpan(new URLSpan(h.mHref), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				text.setSpan(new InternalURLSpan(h.mHref), where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			}
 		}
 	}

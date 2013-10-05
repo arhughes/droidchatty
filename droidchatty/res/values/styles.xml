@@ -16,5 +16,12 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
-    
+
+    <style name="SolidActionBarAppTheme" parent="AppTheme">
+        <item name="android:actionBarStyle">@style/SolidActionBar</item>
+    </style>
+
+    <style name="SolidActionBar" parent="Widget.AppCompat.ActionBar.Solid">
+
+    </style>
 </resources>

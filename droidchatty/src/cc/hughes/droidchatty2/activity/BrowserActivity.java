@@ -1,10 +1,11 @@
-package cc.hughes.droidchatty2.fragment;
+package cc.hughes.droidchatty2.activity;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,7 +23,7 @@ import cc.hughes.droidchatty2.R;
 import cc.hughes.droidchatty2.ViewInjected;
 import cc.hughes.droidchatty2.ViewInjector;
 
-public class BrowserFragment extends Fragment implements View.OnKeyListener {
+public class BrowserActivity extends ActionBarActivity implements View.OnKeyListener {
     public static final String ARG_URL = "URL";
 
     @ViewInjected(R.id.browser_webview)
@@ -34,16 +35,11 @@ public class BrowserFragment extends Fragment implements View.OnKeyListener {
     boolean mIsLoading = false;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.browser, container, false);
-        ViewInjector.inject(this, view);
+        setContentView(R.layout.browser);
+        ViewInjector.inject(this);
 
         // initial setup
         mWebView.setOnKeyListener(this);
@@ -56,15 +52,19 @@ public class BrowserFragment extends Fragment implements View.OnKeyListener {
         settings.setBuiltInZoomControls(true);
 
         // now load the url
-        String url = getArguments().getString(ARG_URL);
-        mWebView.loadUrl(url);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            String url = extras.getString(ARG_URL);
+            mWebView.loadUrl(url);
+        }
 
-        return view;
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.browser_options, menu);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.browser_options, menu);
 
         MenuItem back = menu.findItem(R.id.browser_back);
         MenuItem forward = menu.findItem(R.id.browser_forward);
@@ -78,11 +78,16 @@ public class BrowserFragment extends Fragment implements View.OnKeyListener {
         // cancel when loading, refresh when not
         refresh.setVisible(!mIsLoading);
         cancel.setVisible(mIsLoading);
+
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
             case R.id.browser_back:
                 mWebView.goBack();
                 return true;
@@ -155,8 +160,7 @@ public class BrowserFragment extends Fragment implements View.OnKeyListener {
             if (progress < 100 && !mIsLoading)
             {
                 mIsLoading = true;
-                mProgressBar.setVisibility(View.VISIBLE);
-                getActivity().invalidateOptionsMenu();
+                invalidateOptionsMenu();
             }
 
             mProgressBar.setProgress(progress);
@@ -164,10 +168,13 @@ public class BrowserFragment extends Fragment implements View.OnKeyListener {
             if (progress == 100)
             {
                 mIsLoading = false;
-                mProgressBar.setVisibility(View.GONE);
-                getActivity().invalidateOptionsMenu();
+                invalidateOptionsMenu();
             }
         }
 
+        @Override
+        public void onReceivedTitle(WebView view, String title) {
+            getSupportActionBar().setTitle(title);
+        }
     }
 }

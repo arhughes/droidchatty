@@ -34,6 +34,12 @@
             android:label="@string/title_activity_post"
             android:exported="false">
         </activity>
+        <activity
+            android:name=".activity.BrowserActivity"
+            android:label="@string/title_activity_browser"
+            android:theme="@style/SolidActionBarAppTheme"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>

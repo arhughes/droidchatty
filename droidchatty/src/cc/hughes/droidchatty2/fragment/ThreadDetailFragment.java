@@ -26,11 +26,11 @@ import android.widget.Toast;
 
 import com.squareup.wire.Wire;
 
-import cc.hughes.droidchatty2.FragmentContextActivity;
 import cc.hughes.droidchatty2.LoadMoreArrayAdapter;
 import cc.hughes.droidchatty2.R;
 import cc.hughes.droidchatty2.ViewInjected;
 import cc.hughes.droidchatty2.ViewInjector;
+import cc.hughes.droidchatty2.activity.BrowserActivity;
 import cc.hughes.droidchatty2.activity.PostActivity;
 import cc.hughes.droidchatty2.net.*;
 import cc.hughes.droidchatty2.net.Thread;
@@ -219,14 +219,9 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
 
     @Override
     public void onLinkClicked(String href) {
-        Bundle args = new Bundle();
-        args.putString(BrowserFragment.ARG_URL, href);
-
-        BrowserFragment fragment = new BrowserFragment();
-        fragment.setArguments(args);
-
-        FragmentContextActivity fca = (FragmentContextActivity)getActivity();
-        fca.changeContext(fragment, 2);
+        Intent intent = new Intent(getActivity(), BrowserActivity.class);
+        intent.putExtra(BrowserActivity.ARG_URL, href);
+        startActivity(intent);
     }
 
     class ThreadDetailAdapter extends LoadMoreArrayAdapter<Reply> {

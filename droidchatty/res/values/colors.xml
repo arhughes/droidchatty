@@ -2,4 +2,7 @@
     <color name="menu_background">#FF303030</color>
     <color name="menu_divider">#FF1E1E1E</color>
     <color name="menu_foreground">#FFFFFFFF</color>
+
+    <color name="blue_accent">#ff33b5e5</color>
+    <color name="light_gray">#ff414141</color>
 </resources>

@@ -1,10 +1,13 @@
 package cc.hughes.droidchatty2.fragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.squareup.wire.Wire;
 
 import cc.hughes.droidchatty2.FragmentContextActivity;
 import cc.hughes.droidchatty2.LoadMoreArrayAdapter;
@@ -37,7 +42,13 @@ import cc.hughes.droidchatty2.util.TimeUtil;
 public class ThreadListFragment extends ListFragment {
 
     final static String TAG = "ThreadListFragment";
-    
+
+    final static String STATE_LIST = "ThreadList";
+    final static String STATE_PAGE = "CurrentPage";
+    final static String STATE_LIST_VIEW = "ListView";
+
+    private ThreadListAdapter mAdapter;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -50,12 +61,52 @@ public class ThreadListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
-        setListAdapter(new ThreadListAdapter(getActivity(), R.layout.thread_list_item, R.layout.row_loading, R.layout.row_finished));
+
+        List<RootPost> threads = new ArrayList<RootPost>();
+        int page = 0;
+        if (savedInstanceState != null) {
+            Log.i(TAG, "Loading saved state.");
+            byte[] threadList = savedInstanceState.getByteArray(STATE_LIST);
+
+            try {
+                Wire wire = new Wire();
+                // can't use the list directly, because you can't add to it later
+                List<RootPost> threadsParsed = wire.parseFrom(threadList, ThreadList.class).thread;
+                threads.addAll(threadsParsed);
+                page = savedInstanceState.getInt(STATE_PAGE);
+            } catch (Exception ex) {
+                Log.e(TAG, "Error loading thread list from state", ex);
+            }
+        }
+
+        mAdapter = new ThreadListAdapter(threads, page, getActivity(), R.layout.thread_list_item, R.layout.row_loading, R.layout.row_finished);
+        mAdapter.mCurrentPage = page;
+
+        setListAdapter(mAdapter);
     }
-    
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Log.i(TAG, "Saving instance state.");
+        ThreadList.Builder builder = new ThreadList.Builder();
+        builder.thread(mAdapter.getItems());
+        ThreadList list = builder.build();
+
+        outState.putByteArray(STATE_LIST, list.toByteArray());
+        outState.putInt(STATE_PAGE, mAdapter.mCurrentPage);
+        outState.putParcelable(STATE_LIST_VIEW, getListView().onSaveInstanceState());
+    }
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        //super.onViewCreated(view, savedInstanceState);
+        super.onViewCreated(view, savedInstanceState);
+
+        if (savedInstanceState != null) {
+            getListView().onRestoreInstanceState(savedInstanceState.getParcelable(STATE_LIST_VIEW));
+        }
+
         getListView().setOnScrollListener((ThreadListAdapter)getListAdapter());
         setActivateOnItemClick(true);
     }
@@ -113,11 +164,12 @@ public class ThreadListFragment extends ListFragment {
         private LayoutInflater mInflater;
         private List<RootPost> mItemCache;
         
-        public ThreadListAdapter(Context context, int itemResource, int loadingResource, int finishedResource) {
-            super(context, loadingResource, finishedResource);
+        public ThreadListAdapter(List<RootPost> threads, int page, Context context, int itemResource, int loadingResource, int finishedResource) {
+            super(context, loadingResource, finishedResource, threads);
             mLayoutRes = itemResource;
             mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             mService = new ChattyService();
+            mCurrentPage = page;
         }
 
         @Override
@@ -129,7 +181,7 @@ public class ThreadListFragment extends ListFragment {
         @Override
         protected boolean loadItems() throws Exception {
             ThreadList threads = mService.getPage(mCurrentPage + 1);
-            if (threads.thread.size() > 0) {
+            if (threads != null && threads.thread.size() > 0) {
                 mItemCache = threads.thread;
                 mCurrentPage += 1;
                 return true;

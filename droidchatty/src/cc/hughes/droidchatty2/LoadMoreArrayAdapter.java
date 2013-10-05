@@ -1,5 +1,8 @@
 package cc.hughes.droidchatty2;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.Context;
@@ -12,11 +15,18 @@ import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.BaseAdapter;
 
-public abstract class LoadMoreArrayAdapter<T> extends ArrayAdapter<T> implements OnScrollListener {
+public abstract class LoadMoreArrayAdapter<T> extends BaseAdapter implements OnScrollListener {
 
     protected final static int LAYOUT_NONE = -1;
-    
+
+    private Context mContext;
+    private List<T> mObjects;
+    private boolean mNotifyOnChange = true;
+
+    private final Object mLock = new Object();
+
     int mLoadingRes;
     int mFinishedRes;
     
@@ -24,12 +34,56 @@ public abstract class LoadMoreArrayAdapter<T> extends ArrayAdapter<T> implements
     View mLoadingView;
     
     AtomicBoolean mKeepLoading = new AtomicBoolean(true);
-    
+
     public LoadMoreArrayAdapter(Context context, int loadingResource, int finishedResource) {
-        super(context, LAYOUT_NONE);
+        this(context, loadingResource, finishedResource, new ArrayList<T>());
+    }
+
+    public LoadMoreArrayAdapter(Context context, int loadingResource, int finishedResource, List<T> items) {
+        mContext = context;
         mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mLoadingRes = loadingResource;
         mFinishedRes = finishedResource;
+        mObjects = items;
+    }
+
+    public Context getContext() {
+        return mContext;
+    }
+
+    public List<T> getItems() {
+        return mObjects;
+    }
+
+    public void add(T item) {
+        synchronized (mLock) {
+            mObjects.add(item);
+        }
+        if (mNotifyOnChange) notifyDataSetChanged();
+    }
+
+    public void addAll(Collection<? extends T> items) {
+        synchronized (mLock) {
+            mObjects.addAll(items);
+        }
+        if (mNotifyOnChange) notifyDataSetChanged();
+    }
+
+    public void clear() {
+        synchronized (mLock) {
+            mObjects.clear();
+        }
+        if (mNotifyOnChange) notifyDataSetChanged();
+    }
+
+    public void setNotifyOnChange(boolean notifyOnChange) {
+        mNotifyOnChange = notifyOnChange;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        mNotifyOnChange = true;
     }
     
     @Override
@@ -48,13 +102,13 @@ public abstract class LoadMoreArrayAdapter<T> extends ArrayAdapter<T> implements
     @Override
     public int getCount() {
         if (mKeepLoading.get() || mFinishedRes != LAYOUT_NONE)
-            return super.getCount() + 1;
-        return super.getCount();
+            return mObjects.size() + 1;
+        return mObjects.size();
     }
     
     @Override
     public int getItemViewType(int position) {
-        if (position == super.getCount())
+        if (position == mObjects.size())
             return IGNORE_ITEM_VIEW_TYPE;
         return super.getItemViewType(position);
     }
@@ -66,9 +120,14 @@ public abstract class LoadMoreArrayAdapter<T> extends ArrayAdapter<T> implements
     
     @Override
     public T getItem(int position) {
-        if (position >= super.getCount())
+        if (position >= mObjects.size())
             return null;
-        return super.getItem(position);
+        return mObjects.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
     
     @Override
@@ -80,7 +139,7 @@ public abstract class LoadMoreArrayAdapter<T> extends ArrayAdapter<T> implements
     public boolean isEnabled(int position) {
         
         // disable the loading item, but enable the finished item
-        if (position >= super.getCount())
+        if (position >= mObjects.size())
             return !mKeepLoading.get();
         
         return super.isEnabled(position);
@@ -88,7 +147,7 @@ public abstract class LoadMoreArrayAdapter<T> extends ArrayAdapter<T> implements
     
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (position == super.getCount()) {
+        if (position == mObjects.size()) {
             if (mKeepLoading.get()) {
                 if (mLoadingView == null) {
                     mLoadingView = getLoadingView(parent);
@@ -115,6 +174,7 @@ public abstract class LoadMoreArrayAdapter<T> extends ArrayAdapter<T> implements
 
     protected void setKeepLoading(boolean value) {
         mKeepLoading.set(value);
+        if (mNotifyOnChange) super.notifyDataSetChanged();
     }
     
     OnClickListener mFinishedOnClickListener = new OnClickListener() {

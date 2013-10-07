@@ -25,5 +25,10 @@
 
     <string name="drawer_open">Navigation menu</string>
     <string name="drawer_close">Main screen</string>
+    <string name="me">Me</string>
+    <string name="search">Search</string>
+    <string name="parent_author_label">Parent author</string>
+    <string name="author_label">Author</string>
+    <string name="search_label">Search</string>
 
 </resources>

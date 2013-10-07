@@ -50,6 +50,7 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
      * represents.
      */
     public static final String ARG_ROOT_POST = "root_post";
+    public static final String ARG_POST_ID = "POST_ID";
 
     private static final int REQUEST_POST_REPLY = 0;
 
@@ -72,14 +73,19 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        Wire wire = new Wire();
 
-        try {
-            mRootPost = wire.parseFrom(getArguments().getByteArray(ARG_ROOT_POST), RootPost.class);
-            mThreadID = mRootPost.id;
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        if (getArguments().containsKey(ARG_ROOT_POST)) {
+            Wire wire = new Wire();
+
+            try {
+                mRootPost = wire.parseFrom(getArguments().getByteArray(ARG_ROOT_POST), RootPost.class);
+                mThreadID = mRootPost.id;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            mThreadID = getArguments().getString(ARG_POST_ID);
         }
 
         setHasOptionsMenu(true);

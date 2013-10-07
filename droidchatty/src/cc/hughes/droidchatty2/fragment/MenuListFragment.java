@@ -57,6 +57,8 @@ public class MenuListFragment extends ListFragment {
 		    fragment = new ThreadListFragment();
 		} else if (item.getID() == ID_MESSAGES) {
 		    fragment = new MessageListFragment();
+        } else if (item.getID() == ID_SEARCH) {
+            fragment = new SearchFragment();
         } else if (item.getID() == ID_SETTINGS) {
 			Intent intent = new Intent(getActivity(), SettingsActivity.class);
 			startActivity(intent);

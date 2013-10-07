@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,6 +77,22 @@ public class ChattyService {
             connection.disconnect();
         }
         
+    }
+
+    public ThreadList search(int page, String terms, String author, String parentAuthor) throws IOException {
+
+        URL url = new URL(BASE_URL + "search.php?page=" + page + "&terms=" + URLEncoder.encode(terms, "UTF-8"));
+
+        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        try {
+            connection.setRequestProperty("User-Agent", USER_AGENT);
+
+            Wire wire = new Wire();
+            return wire.parseFrom(connection.getInputStream(), ThreadList.class);
+        } finally {
+            connection.disconnect();
+        }
+
     }
 
     public int post(int parentId, String content, boolean isNewsThread) throws Exception {

@@ -139,6 +139,9 @@ public class BrowserActivity extends ActionBarActivity implements View.OnKeyList
     @Override
     public void onDestroy() {
         if (mWebView != null) {
+            // fix crash #1: if zoom controls are visible when destroyed they will crash the app
+            // when their timer expires to hide them again
+            mWebView.setVisibility(View.GONE);
             mWebView.destroy();
             mWebView = null;
         }

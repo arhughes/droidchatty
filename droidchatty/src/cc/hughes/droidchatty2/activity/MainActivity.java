@@ -4,8 +4,11 @@ import com.crashlytics.android.Crashlytics;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -59,6 +62,14 @@ public class MainActivity extends ActionBarActivity
         //setTheme(android.R.style.Theme_Holo_Light);
 
         setContentView(R.layout.main);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (Integer.parseInt(prefs.getString("pref_theme_background_color", "0")) == 1)
+        {
+            View v = findViewById(R.id.drawer);
+            v.setBackgroundColor(Color.BLACK);
+        }
 
         ThreadListFragment mainFragment = new ThreadListFragment();
         

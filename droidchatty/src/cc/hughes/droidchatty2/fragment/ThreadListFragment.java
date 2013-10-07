@@ -174,8 +174,8 @@ public class ThreadListFragment extends ListFragment {
 
         @Override
         public void clear() {
-            super.clear();
             mCurrentPage = 0;
+            super.clear();
         }
 
         @Override

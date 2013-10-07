@@ -40,6 +40,7 @@
             android:theme="@style/SolidActionBarAppTheme"
             android:exported="false">
         </activity>
+        <meta-data android:name="com.crashlytics.ApiKey" android:value="5285d8b573edae9852810cd0e701cc5499ed4425"/>
     </application>
 
 </manifest>

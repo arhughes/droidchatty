@@ -1,5 +1,6 @@
 package cc.hughes.droidchatty2.activity;
 
+import com.crashlytics.android.Crashlytics;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +54,7 @@ public class MainActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Crashlytics.start(this);
         
         //setTheme(android.R.style.Theme_Holo_Light);
 

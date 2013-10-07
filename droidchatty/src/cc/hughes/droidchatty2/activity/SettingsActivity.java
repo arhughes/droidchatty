@@ -78,8 +78,8 @@ public class SettingsActivity extends PreferenceActivity {
 		// to reflect the new value, per the Android Design guidelines.
 		bindPreferenceSummaryToValue(findPreference("pref_shacknews_user"));
 		bindPreferenceSummaryToValue(findPreference("pref_chattypics_user"));
-		bindPreferenceSummaryToValue(findPreference("pref_theme"));
-		bindPreferenceSummaryToValue(findPreference("pref_fontsize"));
+		bindPreferenceSummaryToValue(findPreference("pref_theme_background_color"));
+		bindPreferenceSummaryToValue(findPreference("pref_theme_fontsize"));
 		
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}

@@ -72,6 +72,7 @@ public abstract class LoadMoreArrayAdapter<T> extends BaseAdapter implements OnS
     public void clear() {
         synchronized (mLock) {
             mObjects.clear();
+            mKeepLoading.set(true);
         }
         if (mNotifyOnChange) notifyDataSetChanged();
     }

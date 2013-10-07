@@ -59,17 +59,7 @@ public class MainActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         Crashlytics.start(this);
         
-        //setTheme(android.R.style.Theme_Holo_Light);
-
         setContentView(R.layout.main);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        if (Integer.parseInt(prefs.getString("pref_theme_background_color", "0")) == 1)
-        {
-            View v = findViewById(R.id.drawer);
-            v.setBackgroundColor(Color.BLACK);
-        }
 
         ThreadListFragment mainFragment = new ThreadListFragment();
         
@@ -117,6 +107,17 @@ public class MainActivity extends ActionBarActivity
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        Integer background = Integer.parseInt(prefs.getString("pref_theme_background_color", "0"));
+        View v = findViewById(R.id.drawer);
+        v.setBackgroundColor(background == 1 ? Color.BLACK : Color.TRANSPARENT);
     }
 
     /** Sets whether the drawer is enabled or not */

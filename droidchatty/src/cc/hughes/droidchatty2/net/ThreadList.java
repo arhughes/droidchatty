@@ -93,6 +93,8 @@ public final class ThreadList extends Message {
     @ProtoField(tag = 7, type = STRING, label = REQUIRED)
     public final String body;
 
+    public int newReplies;
+
     private RootPost(Builder builder) {
       super(builder);
       this.id = builder.id;

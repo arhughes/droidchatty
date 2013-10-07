@@ -1,12 +1,17 @@
 package cc.hughes.droidchatty2.fragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +29,7 @@ import cc.hughes.droidchatty2.LoadMoreArrayAdapter;
 import cc.hughes.droidchatty2.R;
 import cc.hughes.droidchatty2.ViewInjected;
 import cc.hughes.droidchatty2.ViewInjector;
+import cc.hughes.droidchatty2.data.PostCountDatabase;
 import cc.hughes.droidchatty2.net.ChattyService;
 import cc.hughes.droidchatty2.net.ThreadList;
 import cc.hughes.droidchatty2.net.ThreadList.RootPost;
@@ -182,6 +188,7 @@ public class ThreadListFragment extends ListFragment {
         protected boolean loadItems() throws Exception {
             ThreadList threads = mService.getPage(mCurrentPage + 1);
             if (threads != null && threads.thread.size() > 0) {
+                updatePostCounts(threads);
                 mItemCache = threads.thread;
                 mCurrentPage += 1;
                 return true;
@@ -199,7 +206,32 @@ public class ThreadListFragment extends ListFragment {
             }
         }
 
-		@Override
+        private void updatePostCounts(ThreadList threads) {
+            try {
+                PostCountDatabase handler = new PostCountDatabase(getContext());
+
+                Map<Integer, Integer> counts = handler.getCounts(threads.thread);
+                Map<Integer, Integer> new_counts = new HashMap<Integer, Integer>(counts.size());
+
+                for (RootPost thread : threads.thread) {
+                    Integer id = Integer.parseInt(thread.id);
+                    Integer old_count = counts.get(id);
+                    if (old_count == null) old_count = 0;
+
+                    thread.newReplies = thread.replies - old_count;
+                    if (thread.newReplies > 0)
+                        new_counts.put(id, thread.replies);
+                }
+
+                if (new_counts.size() > 0)
+                    handler.updateCounts(new_counts);
+            } catch (Exception ex) {
+                Log.i(TAG, "Error updating post counts.", ex);
+            }
+        }
+
+
+        @Override
 		public View getNormalView(int position, View convertView, ViewGroup parent) {
 		    ViewHolder holder;
 		    
@@ -216,17 +248,33 @@ public class ThreadListFragment extends ListFragment {
 		    RootPost rootPost = getItem(position);
 		    
 		    int replies = rootPost.replies - 1;
-		    String replyText = replies + (replies == 1 ? " reply" : " replies");
 		    String timeAgo = TimeUtil.format(getContext(), rootPost.date);
 		    		    
 		    holder.threadCategory.setText(rootPost.category);
 		    holder.authorName.setText(rootPost.author);
 		    holder.postContent.setText(TagParser.fromHtml(rootPost.body));
-		    holder.threadReplies.setText(replyText);
+		    holder.threadReplies.setText(buildReplyCount(rootPost.replies, rootPost.newReplies));
 		    holder.postTime.setText(timeAgo);
 		    
 			return convertView;
 		}
+
+        private Spanned buildReplyCount(int replies, int newReplies) {
+
+            String first = String.valueOf(replies) + (replies == 1 ? " reply" : " replies");
+            String second = "";
+
+            if (newReplies > 0) {
+                first += ", ";
+                second = newReplies + " new";
+            }
+
+            SpannableString formatted = new SpannableString(first + second);
+            if (newReplies > 0)
+                formatted.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.new_post_count)), first.length(), first.length() + second.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            return formatted;
+        }
 		
 		class ViewHolder {
            @ViewInjected(R.id.thread_category)

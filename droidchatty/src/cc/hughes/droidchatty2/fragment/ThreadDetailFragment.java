@@ -308,10 +308,16 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
 
         @Override
         public void clear() {
+            // don't try to refresh the view while we are mucking with it
+            setNotifyOnChange(false);
+
             // clear the existing posts, add the root post back, and tell the adapter to load
             super.clear();
             addRootPost();
             setKeepLoading(true);
+
+            // tell list view we are updated
+            notifyDataSetChanged();
         }
 
         @Override

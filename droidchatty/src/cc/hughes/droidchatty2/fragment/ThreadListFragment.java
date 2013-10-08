@@ -70,7 +70,7 @@ public class ThreadListFragment extends ListFragment {
 
         List<RootPost> threads = new ArrayList<RootPost>();
         int page = 0;
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_LIST)) {
             Log.i(TAG, "Loading saved state.");
             byte[] threadList = savedInstanceState.getByteArray(STATE_LIST);
 
@@ -109,7 +109,7 @@ public class ThreadListFragment extends ListFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_LIST_VIEW)) {
             getListView().onRestoreInstanceState(savedInstanceState.getParcelable(STATE_LIST_VIEW));
         }
 

@@ -2,13 +2,17 @@ package cc.hughes.droidchatty2.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import cc.hughes.droidchatty2.R;
+import cc.hughes.droidchatty2.ViewInjected;
+import cc.hughes.droidchatty2.ViewInjector;
 import cc.hughes.droidchatty2.dummy.DummyContent;
+import cc.hughes.droidchatty2.net.Message;
 
 /**
  * A fragment representing a single Message detail screen. This fragment is
@@ -16,16 +20,12 @@ import cc.hughes.droidchatty2.dummy.DummyContent;
  * tablets) or a {@link MessageDetailActivity} on handsets.
  */
 public class MessageDetailFragment extends Fragment {
-	/**
-	 * The fragment argument representing the item ID that this fragment
-	 * represents.
-	 */
-	public static final String ARG_ITEM_ID = "item_id";
+	public static final String ARG_MESSAGE = "message";
 
-	/**
-	 * The dummy content this fragment is presenting.
-	 */
-	private DummyContent.DummyItem mItem;
+	private Message mMessage;
+
+    @ViewInjected(R.id.message_detail)
+    TextView mMessageView;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -38,27 +38,18 @@ public class MessageDetailFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (getArguments().containsKey(ARG_ITEM_ID)) {
-			// Load the dummy content specified by the fragment
-			// arguments. In a real-world scenario, use a Loader
-			// to load content from a content provider.
-			mItem = DummyContent.ITEM_MAP.get(getArguments().getString(
-					ARG_ITEM_ID));
-		}
+		if (getArguments().containsKey(ARG_MESSAGE)) {
+            mMessage = (Message)getArguments().getSerializable(ARG_MESSAGE);
+        }
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.message_detail,
-				container, false);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.message_detail, container, false);
+        ViewInjector.inject(this, view);
 
-		// Show the dummy content as text in a TextView.
-		if (mItem != null) {
-			((TextView) rootView.findViewById(R.id.message_detail))
-					.setText(mItem.content);
-		}
+        mMessageView.setText(mMessage.Body);
 
-		return rootView;
+		return view;
 	}
 }

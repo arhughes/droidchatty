@@ -2,6 +2,7 @@ package cc.hughes.droidchatty2.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -29,12 +30,16 @@ public class SearchResultFragment extends ListFragment {
     public static final String ARG_PARENT_AUTHOR = "PARENT_AUTHOR";
 
     private String mSearchTerms;
+    private String mSearchAuthor;
+    private String mSearchParentAuthor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mSearchTerms = getArguments().getString(ARG_TERM);
+        mSearchAuthor = getArguments().getString(ARG_AUTHOR);
+        mSearchParentAuthor = getArguments().getString(ARG_PARENT_AUTHOR);
 
         setListAdapter(new SearchResultsAdapter(getActivity()));
     }
@@ -67,7 +72,7 @@ public class SearchResultFragment extends ListFragment {
         public SearchResultsAdapter(Context context) {
             super(context, R.layout.row_loading, R.layout.row_finished);
             mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            mService = new ChattyService();
+            mService = new ChattyService(PreferenceManager.getDefaultSharedPreferences(context));
         }
 
         @Override
@@ -97,7 +102,7 @@ public class SearchResultFragment extends ListFragment {
 
         @Override
         protected boolean loadItems() throws Exception {
-            ThreadList threads = mService.search(mCurrentPage + 1, mSearchTerms, "", "");
+            ThreadList threads = mService.search(mCurrentPage + 1, mSearchTerms, mSearchAuthor, mSearchParentAuthor);
             if (threads != null && threads.thread.size() > 0) {
                 mItemCache = threads.thread;
                 mCurrentPage += 1;

@@ -41,6 +41,13 @@ public class ChattyService {
 
     public ChattyService(SharedPreferences preferences) {
         mPreferences = preferences;
+
+        // ensure we are saving cookies
+        mCookieManager = (CookieManager)CookieHandler.getDefault();
+        if (mCookieManager == null) {
+            mCookieManager = new CookieManager();
+            CookieHandler.setDefault(mCookieManager);
+        }
     }
 
     public ThreadList getPage() throws IOException {

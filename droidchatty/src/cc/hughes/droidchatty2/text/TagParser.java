@@ -311,6 +311,7 @@ public class TagParser implements ContentHandler {
 		map.put("jt_blue", 0x44AEDF);
 		map.put("jt_lime", 0xC0FFC0);
 		map.put("jt_orange", 0xF7941C);
+        map.put("jt_wtf242", 0x808080);
 		return map;
 	}
 	

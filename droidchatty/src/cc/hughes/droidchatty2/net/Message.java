@@ -2,7 +2,9 @@ package cc.hughes.droidchatty2.net;
 
 import android.text.Spanned;
 
-public class Message {
+import java.io.Serializable;
+
+public class Message implements Serializable {
     public static final String FOLDER_INBOX = "inbox";
     public static final String FOLDER_SENT = "sent";
 

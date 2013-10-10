@@ -1,6 +1,7 @@
 package cc.hughes.droidchatty2.fragment;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
@@ -10,6 +11,9 @@ import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -54,11 +58,12 @@ public class MessageListFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
+
         List<Message> messages = new ArrayList<Message>();
         int page = 0;
-        mAdapter = new MessageListAdapter(messages, page, getActivity(), R.layout.thread_list_item, R.layout.row_loading, R.layout.row_finished);
+        mAdapter = new MessageListAdapter(messages, page, getActivity(), R.layout.message_list_item, R.layout.row_loading, R.layout.row_finished);
         setListAdapter(mAdapter);
-
 	}
 
 	@Override
@@ -66,7 +71,23 @@ public class MessageListFragment extends ListFragment {
 		super.onViewCreated(view, savedInstanceState);
 	}
 
-	@Override
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.message_list_options, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.message_list_refresh:
+                mAdapter.clear();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
 	public void onListItemClick(ListView listView, View view, int position, long id) {
 		super.onListItemClick(listView, view, position, id);
 
@@ -142,29 +163,28 @@ public class MessageListFragment extends ListFragment {
             Message message = getItem(position);
 
             //String timeAgo = TimeUtil.format(getContext(), rootPost.date);
-            holder.authorName.setText(message.OtherUser);
-            holder.postTime.setText(message.Date);
-            holder.postContent.setText(message.Body);
-            holder.threadCategory.setText(message.Read ? "Read" : "Unread");
+            holder.messageAuthor.setText(message.OtherUser);
+            holder.messageTime.setText(TimeUtil.format(getContext(), message.Date));
+            holder.messageContent.setText(message.Body);
+            holder.messageSubject.setText(message.Subject);
+
+            convertView.setBackgroundColor(message.Read ? Color.TRANSPARENT : Color.GRAY);
 
             return convertView;
         }
 
         class ViewHolder {
-            @ViewInjected(R.id.thread_category)
-            TextView threadCategory;
-
             @ViewInjected(R.id.author_name)
-            TextView authorName;
+            TextView messageAuthor;
 
-            @ViewInjected(R.id.post_content)
-            TextView postContent;
+            @ViewInjected(R.id.message_subject)
+            TextView messageSubject;
 
-            @ViewInjected(R.id.thread_replies)
-            TextView threadReplies;
+            @ViewInjected(R.id.message_content)
+            TextView messageContent;
 
-            @ViewInjected(R.id.post_time)
-            TextView postTime;
+            @ViewInjected(R.id.message_time)
+            TextView messageTime;
         }
     }
 }

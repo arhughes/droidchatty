@@ -39,23 +39,12 @@ public class ChattyService {
     SharedPreferences mPreferences;
     CookieManager mCookieManager;
 
-    public ChattyService() {
-        mCookieManager = new CookieManager();
-        CookieHandler.setDefault(mCookieManager);
-    }
-
     public ChattyService(SharedPreferences preferences) {
-        this();
         mPreferences = preferences;
     }
 
     public ThreadList getPage() throws IOException {
         return getPage(1);
-    }
-
-    private void requirePreferences() throws Exception {
-        if (mPreferences == null)
-            throw new Exception("Preferences must be supplied.");
     }
 
     public ThreadList getPage(int page) throws IOException {
@@ -103,8 +92,6 @@ public class ChattyService {
     }
 
     public int post(int parentId, String content, boolean isNewsThread) throws Exception {
-        requirePreferences();
-
         Http.RequestSettings settings = new Http.RequestSettings();
 
         settings.Url = SHACKNEWS_POST_URL;
@@ -130,7 +117,6 @@ public class ChattyService {
     }
 
     public List<Message> getMessages(String folder, int page) throws Exception {
-        requirePreferences();
 
         // make sure we are trying for the right thing
         if (!folder.equals(Message.FOLDER_INBOX) && !folder.equals(Message.FOLDER_SENT))
@@ -148,7 +134,6 @@ public class ChattyService {
     }
 
     private boolean login() throws Exception {
-        requirePreferences();
 
         // already have a login cookie?
         HttpCookie loginCookie = getCookie(SHACKNEWS_SIGN_IN, "_shack_li_");

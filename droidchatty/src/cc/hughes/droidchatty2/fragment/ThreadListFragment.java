@@ -7,6 +7,7 @@ import java.util.Map;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -174,7 +175,7 @@ public class ThreadListFragment extends ListFragment {
             super(context, loadingResource, finishedResource, threads);
             mLayoutRes = itemResource;
             mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            mService = new ChattyService();
+            mService = new ChattyService(PreferenceManager.getDefaultSharedPreferences(getActivity()));
             mCurrentPage = page;
         }
 

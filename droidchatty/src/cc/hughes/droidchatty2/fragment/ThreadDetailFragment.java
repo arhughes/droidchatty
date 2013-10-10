@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.text.Spanned;
 import android.view.ActionMode;
@@ -245,7 +246,7 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
             mLayoutRes = itemResource;
             mContext = context;
             mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            mService = new ChattyService();
+            mService = new ChattyService(PreferenceManager.getDefaultSharedPreferences(context));
             
             // add the root post so it is displayed even while loading
             addRootPost();

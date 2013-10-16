@@ -100,9 +100,25 @@ public class BrowserActivity extends ActionBarActivity implements View.OnKeyList
             case R.id.browser_cancel:
                 mWebView.stopLoading();
                 return true;
+            case R.id.browser_share:
+                shareLink(mWebView.getUrl());
+            case R.id.browser_open:
+                openLink(mWebView.getUrl());
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void shareLink(String url) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, url);
+        startActivity(Intent.createChooser(intent, "Share link"));
+    }
+
+    private void openLink(String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(intent);
     }
 
     private void setMenuEnabled(MenuItem item, boolean enabled) {

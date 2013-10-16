@@ -10,7 +10,7 @@ import android.util.Log;
 public class TimeUtil {
     
     static final SimpleDateFormat mShackDateFormat = new SimpleDateFormat("MMM dd, yyyy h:mma zzz", Locale.US);
-    static final SimpleDateFormat mShackMessageDateFormat = new SimpleDateFormat("MMM dd, yyyy, h:mm a", Locale.US);
+    static final SimpleDateFormat mShackMessageDateFormat = new SimpleDateFormat("MMMM d, yyyy, h:mm a", Locale.US);
 
     static long parseDateTime(String dateTime, SimpleDateFormat format)
     {

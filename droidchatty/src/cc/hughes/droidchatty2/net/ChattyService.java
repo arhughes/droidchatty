@@ -140,6 +140,36 @@ public class ChattyService {
         return parser.parse();
     }
 
+    public void markMessageAsRead(String id) throws Exception {
+        login();
+
+        Http.RequestSettings settings = new Http.RequestSettings();
+        settings.Url = SHACKNEWS_MESSAGE_GET + "read";
+
+        List<NameValuePair> values = new ArrayList<NameValuePair>();
+        values.add(new BasicNameValuePair("mid", id));
+        settings.PostContent = new UrlEncodedFormEntity(values);
+
+        // should probably check to make sure it was successful
+        Http.request(settings);
+    }
+
+    public void sendMessage(String to, String subject, String message) throws Exception {
+        login();
+
+        Http.RequestSettings settings = new Http.RequestSettings();
+        settings.Url = SHACKNEWS_MESSAGE_GET + "send";
+
+        List<NameValuePair> values = new ArrayList<NameValuePair>();
+        values.add(new BasicNameValuePair("to", to));
+        values.add(new BasicNameValuePair("subject", subject));
+        values.add(new BasicNameValuePair("message", message));
+        settings.PostContent = new UrlEncodedFormEntity(values);
+
+        // should probably check to make sure it was successful
+        Http.request(settings);
+    }
+
     private boolean login() throws Exception {
 
         // already have a login cookie?

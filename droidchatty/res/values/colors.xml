@@ -7,4 +7,5 @@
     <color name="light_gray">#ff414141</color>
 
     <color name="new_post_count">#00ff00</color>
+    <color name="message_unread">#222</color>
 </resources>

@@ -10,4 +10,10 @@
           android:icon="@drawable/ic_action_refresh"
           android:title="Refresh"
           resauto:showAsAction="always"/>
+    <item android:id="@+id/message_list_inbox"
+          android:title="Show Inbox"
+          resauto:showAsAction="never"/>
+    <item android:id="@+id/message_list_sent"
+          android:title="Show Sent"
+          resauto:showAsAction="never"/>
 </menu>

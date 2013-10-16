@@ -2,6 +2,8 @@ package cc.hughes.droidchatty2.fragment;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
@@ -19,6 +21,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.crashlytics.android.Crashlytics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,11 +80,29 @@ public class MessageListFragment extends ListFragment {
         inflater.inflate(R.menu.message_list_options, menu);
     }
 
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        MenuItem inbox = menu.findItem(R.id.message_list_inbox);
+        MenuItem sent = menu.findItem(R.id.message_list_sent);
+
+        inbox.setVisible(mAdapter.getFolder() != Message.FOLDER_INBOX);
+        sent.setVisible(mAdapter.getFolder() != Message.FOLDER_SENT);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.message_list_refresh:
                 mAdapter.clear();
+                return true;
+            case R.id.message_list_inbox:
+                mAdapter.setFolder(Message.FOLDER_INBOX);
+                return true;
+            case R.id.message_list_sent:
+                mAdapter.setFolder(Message.FOLDER_SENT);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -100,7 +122,31 @@ public class MessageListFragment extends ListFragment {
 
 		FragmentContextActivity fca = (FragmentContextActivity)getActivity();
 		fca.changeContext(fragment, 1);
+
+        if (!message.Read) {
+            message.Read = true;
+            mAdapter.notifyDataSetChanged();
+
+            ReadMessageTask markRead = new ReadMessageTask();
+            markRead.execute(message.Id);
+        }
+
 	}
+
+    class ReadMessageTask extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... values) {
+            String id = values[0];
+
+            try {
+                mAdapter.mService.markMessageAsRead(id);
+            } catch (Exception ex) {
+                Crashlytics.logException(ex);
+            }
+            return null;
+        }
+    }
 
     class MessageListAdapter extends LoadMoreArrayAdapter<Message> {
 
@@ -117,6 +163,15 @@ public class MessageListFragment extends ListFragment {
             mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             mService = new ChattyService(PreferenceManager.getDefaultSharedPreferences(getActivity()));
             mCurrentPage = page;
+        }
+
+        public String getFolder() {
+            return mFolder;
+        }
+
+        public void setFolder(String value) {
+            mFolder = value;
+            clear();
         }
 
         @Override
@@ -168,7 +223,15 @@ public class MessageListFragment extends ListFragment {
             holder.messageContent.setText(message.Body);
             holder.messageSubject.setText(message.Subject);
 
-            convertView.setBackgroundColor(message.Read ? Color.TRANSPARENT : Color.GRAY);
+            if (message.Read) {
+                convertView.setBackgroundColor(Color.TRANSPARENT);
+                holder.messageSubject.setTypeface(null, Typeface.NORMAL);
+                holder.messageContent.setTypeface(null, Typeface.NORMAL);
+            } else {
+                convertView.setBackgroundResource(R.color.message_unread);
+                holder.messageSubject.setTypeface(null, Typeface.BOLD);
+                holder.messageContent.setTypeface(null, Typeface.BOLD);
+            }
 
             return convertView;
         }

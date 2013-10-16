@@ -1,6 +1,7 @@
 package cc.hughes.droidchatty2.net;
 
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.Log;
 
 import com.squareup.wire.Wire;
@@ -83,8 +84,16 @@ public class ChattyService {
     }
 
     public ThreadList search(int page, String terms, String author, String parentAuthor) throws IOException {
+
+        Uri.Builder builder = Uri.parse(BASE_URL).buildUpon();
+        builder.appendPath("search.php");
+        builder.appendQueryParameter("page", String.valueOf(page));
+        builder.appendQueryParameter("terms", terms);
+        builder.appendQueryParameter("author", author);
+        builder.appendQueryParameter("parentAuthor", parentAuthor);
+
         Http.RequestSettings settings = new Http.RequestSettings();
-        settings.Url = BASE_URL + "search.php?page=" + page + "&terms=" + URLEncoder.encode(terms, "UTF-8");
+        settings.Url = builder.build().toString();
 
         HttpURLConnection connection = Http.open(settings);
         try {

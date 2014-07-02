@@ -1,2 +1,12 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"></PreferenceScreen>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="pref_internal_browser"
+        android:title="Use internal browser"
+        android:defaultValue="true"
+        android:summaryOn="Links will open using the in-app browser"
+        android:summaryOff="Links will open using the default browser"
+        />
+
+</PreferenceScreen>
     

@@ -14,6 +14,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.util.TimingLogger;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,8 +24,6 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.squareup.wire.Wire;
-
 import cc.hughes.droidchatty2.FragmentContextActivity;
 import cc.hughes.droidchatty2.LoadMoreArrayAdapter;
 import cc.hughes.droidchatty2.R;
@@ -32,8 +31,7 @@ import cc.hughes.droidchatty2.ViewInjected;
 import cc.hughes.droidchatty2.ViewInjector;
 import cc.hughes.droidchatty2.data.PostCountDatabase;
 import cc.hughes.droidchatty2.net.ChattyService;
-import cc.hughes.droidchatty2.net.ThreadList;
-import cc.hughes.droidchatty2.net.ThreadList.RootPost;
+import cc.hughes.droidchatty2.net.RootPost;
 import cc.hughes.droidchatty2.text.TagParser;
 import cc.hughes.droidchatty2.util.TimeUtil;
 
@@ -69,25 +67,19 @@ public class ThreadListFragment extends ListFragment {
 
         setHasOptionsMenu(true);
 
-        List<RootPost> threads = new ArrayList<RootPost>();
-        int page = 0;
-        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_LIST)) {
-            Log.i(TAG, "Loading saved state.");
-            byte[] threadList = savedInstanceState.getByteArray(STATE_LIST);
+        if (mAdapter == null) {
+            List<RootPost> threads = new ArrayList<RootPost>();
+            int page = 0;
+            if (savedInstanceState != null && savedInstanceState.containsKey(STATE_LIST)) {
+                Log.i(TAG, "Loading saved state.");
 
-            try {
-                Wire wire = new Wire();
-                // can't use the list directly, because you can't add to it later
-                List<RootPost> threadsParsed = wire.parseFrom(threadList, ThreadList.class).thread;
-                threads.addAll(threadsParsed);
+                threads = (List<RootPost>)savedInstanceState.getSerializable(STATE_LIST);
                 page = savedInstanceState.getInt(STATE_PAGE);
-            } catch (Exception ex) {
-                Log.e(TAG, "Error loading thread list from state", ex);
             }
-        }
 
-        mAdapter = new ThreadListAdapter(threads, page, getActivity(), R.layout.thread_list_item, R.layout.row_loading, R.layout.row_finished);
-        mAdapter.mCurrentPage = page;
+            mAdapter = new ThreadListAdapter(threads, page, getActivity(), R.layout.thread_list_item, R.layout.row_loading, R.layout.row_finished);
+            mAdapter.mCurrentPage = page;
+        }
 
         setListAdapter(mAdapter);
     }
@@ -97,11 +89,7 @@ public class ThreadListFragment extends ListFragment {
         super.onSaveInstanceState(outState);
 
         Log.i(TAG, "Saving instance state.");
-        ThreadList.Builder builder = new ThreadList.Builder();
-        builder.thread(mAdapter.getItems());
-        ThreadList list = builder.build();
-
-        outState.putByteArray(STATE_LIST, list.toByteArray());
+        outState.putSerializable(STATE_LIST, (ArrayList<RootPost>)mAdapter.getItems());
         outState.putInt(STATE_PAGE, mAdapter.mCurrentPage);
         outState.putParcelable(STATE_LIST_VIEW, getListView().onSaveInstanceState());
     }
@@ -143,7 +131,7 @@ public class ThreadListFragment extends ListFragment {
 
         RootPost rootPost = (RootPost)getListAdapter().getItem(position);
         Bundle args = new Bundle();
-        args.putByteArray(ThreadDetailFragment.ARG_ROOT_POST, rootPost.toByteArray());
+        args.putSerializable(ThreadDetailFragment.ARG_ROOT_POST, rootPost);
         ThreadDetailFragment fragment = new ThreadDetailFragment();
         fragment.setArguments(args);
         
@@ -187,14 +175,14 @@ public class ThreadListFragment extends ListFragment {
 
         @Override
         protected boolean loadItems() throws Exception {
-            ThreadList threads = mService.getPage(mCurrentPage + 1);
-            if (threads != null && threads.thread.size() > 0) {
+            List<RootPost> threads = mService.getPage(mCurrentPage + 1);
+            if (threads != null && threads.size() > 0) {
                 updatePostCounts(threads);
-                mItemCache = threads.thread;
+                mItemCache = threads;
                 mCurrentPage += 1;
                 return true;
             }
-            
+
             mItemCache = null;
             return false;
         }
@@ -207,15 +195,15 @@ public class ThreadListFragment extends ListFragment {
             }
         }
 
-        private void updatePostCounts(ThreadList threads) {
+        private void updatePostCounts(List<RootPost> threads) {
             try {
                 PostCountDatabase handler = new PostCountDatabase(getContext());
 
-                Map<Integer, Integer> counts = handler.getCounts(threads.thread);
+                Map<Integer, Integer> counts = handler.getCounts(threads);
                 Map<Integer, Integer> new_counts = new HashMap<Integer, Integer>(counts.size());
 
-                for (RootPost thread : threads.thread) {
-                    Integer id = Integer.parseInt(thread.id);
+                for (RootPost thread : threads) {
+                    Integer id = thread.id;
                     Integer old_count = counts.get(id);
                     if (old_count == null) old_count = 0;
 
@@ -248,12 +236,11 @@ public class ThreadListFragment extends ListFragment {
 			
 		    RootPost rootPost = getItem(position);
 		    
-		    int replies = rootPost.replies - 1;
 		    String timeAgo = TimeUtil.format(getContext(), rootPost.date);
 		    		    
 		    holder.threadCategory.setText(rootPost.category);
 		    holder.authorName.setText(rootPost.author);
-		    holder.postContent.setText(TagParser.fromHtml(rootPost.body));
+		    holder.postContent.setText(rootPost.bodyParsed());
 		    holder.threadReplies.setText(buildReplyCount(rootPost.replies, rootPost.newReplies));
 		    holder.postTime.setText(timeAgo);
 		    

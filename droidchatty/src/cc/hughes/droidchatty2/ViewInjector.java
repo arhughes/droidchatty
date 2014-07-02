@@ -37,11 +37,14 @@ public class ViewInjector {
                 // find the correct view, and inject it into the patient
                 ViewInjected injected = field.getAnnotation(ViewInjected.class);
                 View view = finder.findViewById(injected.value());
-                if (view == null)
-                    throw new Exception("Could not find view with id `" + finder.getResources().getResourceName(injected.value()) + "`");
 
-                field.setAccessible(true);
-                field.set(patient, view);
+                //if (view == null)
+                //    throw new Exception("Could not find view with id `" + finder.getResources().getResourceName(injected.value()) + "`");
+
+                if (view != null) {
+                    field.setAccessible(true);
+                    field.set(patient, view);
+                }
             } catch (Exception ex) {
                 throw new ViewInjectorException("Error injecting `" + field.getName() + "`: " + ex.getMessage(), ex);
             }

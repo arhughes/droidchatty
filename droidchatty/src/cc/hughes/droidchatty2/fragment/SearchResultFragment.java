@@ -19,7 +19,7 @@ import cc.hughes.droidchatty2.R;
 import cc.hughes.droidchatty2.ViewInjected;
 import cc.hughes.droidchatty2.ViewInjector;
 import cc.hughes.droidchatty2.net.ChattyService;
-import cc.hughes.droidchatty2.net.ThreadList;
+import cc.hughes.droidchatty2.net.RootPost;
 import cc.hughes.droidchatty2.text.TagParser;
 import cc.hughes.droidchatty2.util.TimeUtil;
 
@@ -48,10 +48,10 @@ public class SearchResultFragment extends ListFragment {
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
 
-        ThreadList.RootPost rootPost = (ThreadList.RootPost)getListAdapter().getItem(position);
+        RootPost rootPost = (RootPost)getListAdapter().getItem(position);
         Bundle args = new Bundle();
 
-        args.putString(ThreadDetailFragment.ARG_POST_ID, rootPost.id);
+        args.putInt(ThreadDetailFragment.ARG_POST_ID, rootPost.id);
         ThreadDetailFragment fragment = new ThreadDetailFragment();
         fragment.setArguments(args);
 
@@ -59,7 +59,7 @@ public class SearchResultFragment extends ListFragment {
         fca.changeContext(fragment, 2);
     }
 
-    private class SearchResultsAdapter extends LoadMoreArrayAdapter<ThreadList.RootPost> {
+    private class SearchResultsAdapter extends LoadMoreArrayAdapter<RootPost> {
 
         private int mCurrentPage = 0;
         private int mLayoutRes = R.layout.search_result_item;
@@ -67,7 +67,7 @@ public class SearchResultFragment extends ListFragment {
         private LayoutInflater mInflater;
         private ChattyService mService;
 
-        private List<ThreadList.RootPost> mItemCache;
+        private List<RootPost> mItemCache;
 
         public SearchResultsAdapter(Context context) {
             super(context, R.layout.row_loading, R.layout.row_finished);
@@ -89,7 +89,7 @@ public class SearchResultFragment extends ListFragment {
                 holder = (ViewHolder)convertView.getTag();
             }
 
-            ThreadList.RootPost rootPost = getItem(position);
+            RootPost rootPost = getItem(position);
 
             String timeAgo = TimeUtil.format(getContext(), rootPost.date);
 
@@ -102,9 +102,9 @@ public class SearchResultFragment extends ListFragment {
 
         @Override
         protected boolean loadItems() throws Exception {
-            ThreadList threads = mService.search(mCurrentPage + 1, mSearchTerms, mSearchAuthor, mSearchParentAuthor);
-            if (threads != null && threads.thread.size() > 0) {
-                mItemCache = threads.thread;
+            List<RootPost> threads = mService.search(mCurrentPage + 1, mSearchTerms, mSearchAuthor, mSearchParentAuthor);
+            if (threads != null && threads.size() > 0) {
+                mItemCache = threads;
                 mCurrentPage += 1;
                 return true;
             }

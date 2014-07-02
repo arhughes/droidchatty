@@ -58,16 +58,22 @@ public class SettingsActivity extends PreferenceActivity {
 		// In the simplified UI, fragments are not used at all and we instead
 		// use the older PreferenceActivity APIs.
 
-		// Add 'general' preferences.
-		addPreferencesFromResource(R.xml.pref_general);
-		
+		// Add 'blank' preferences.
+		addPreferencesFromResource(R.xml.pref_blank);
+
 		// Add 'accounts' preferences
 		PreferenceCategory fakeHeader1 = new PreferenceCategory(this);
 		fakeHeader1.setTitle(R.string.pref_header_accounts);
 		getPreferenceScreen().addPreference(fakeHeader1);
 		addPreferencesFromResource(R.xml.pref_accounts);
 
-		// Add 'notifications' preferences, and a corresponding header.
+        // Add 'general' preferences, and a corresponding header.
+        PreferenceCategory fakeHeader2 = new PreferenceCategory(this);
+        fakeHeader2.setTitle(R.string.pref_header_general);
+        getPreferenceScreen().addPreference(fakeHeader2);
+        addPreferencesFromResource(R.xml.pref_general);
+
+		// Add 'theme' preferences, and a corresponding header.
 		PreferenceCategory fakeHeader = new PreferenceCategory(this);
 		fakeHeader.setTitle(R.string.pref_header_theme);
 		getPreferenceScreen().addPreference(fakeHeader);
@@ -188,7 +194,7 @@ public class SettingsActivity extends PreferenceActivity {
 	 * activity is showing a two-pane settings UI.
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public static class GeneralPreferenceFragment extends PreferenceFragment {
+	public static class AccountsPreferenceFragment extends PreferenceFragment {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
@@ -203,13 +209,21 @@ public class SettingsActivity extends PreferenceActivity {
 		}
 	}
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class GeneralPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_general);
+        }
+    }
+
 	/**
 	 * This fragment shows notification preferences only. It is used when the
 	 * activity is showing a two-pane settings UI.
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public static class NotificationPreferenceFragment extends
-			PreferenceFragment {
+	public static class ThemePreferenceFragment extends PreferenceFragment {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);

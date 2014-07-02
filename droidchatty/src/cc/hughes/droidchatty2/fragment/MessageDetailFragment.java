@@ -65,10 +65,10 @@ public class MessageDetailFragment extends Fragment {
 		View view = inflater.inflate(R.layout.message_detail_item, container, false);
         ViewInjector.inject(this, view);
 
-        mMessageAuthor.setText(mMessage.OtherUser);
-        mMessageSubject.setText(mMessage.Subject);
-        mMessageTime.setText(mMessage.Date);
-        mMessageContent.setText(mMessage.Body);
+        mMessageAuthor.setText(mMessage.from);
+        mMessageSubject.setText(mMessage.subject);
+        mMessageTime.setText(mMessage.date);
+        mMessageContent.setText(mMessage.bodyParsed());
 
 		return view;
 	}

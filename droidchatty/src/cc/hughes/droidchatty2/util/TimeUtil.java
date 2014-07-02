@@ -2,6 +2,7 @@ package cc.hughes.droidchatty2.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import android.content.Context;
 import android.text.format.DateUtils;
@@ -9,8 +10,13 @@ import android.util.Log;
 
 public class TimeUtil {
     
-    static final SimpleDateFormat mShackDateFormat = new SimpleDateFormat("MMM dd, yyyy h:mma zzz", Locale.US);
+    //static final SimpleDateFormat mShackDateFormat = new SimpleDateFormat("MMM dd, yyyy h:mma zzz", Locale.US);
+    static final SimpleDateFormat mShackDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
     static final SimpleDateFormat mShackMessageDateFormat = new SimpleDateFormat("MMMM d, yyyy, h:mm a", Locale.US);
+
+    static {
+        mShackDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
 
     static long parseDateTime(String dateTime, SimpleDateFormat format)
     {

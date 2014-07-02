@@ -8,4 +8,8 @@
 
     <color name="new_post_count">#00ff00</color>
     <color name="message_unread">#222</color>
+
+    <color name="author_name">#f3e7b5</color>
+    <color name="author_name_op">#ffff00</color>
+    <color name="background_expanded_post">#202224</color>
 </resources>

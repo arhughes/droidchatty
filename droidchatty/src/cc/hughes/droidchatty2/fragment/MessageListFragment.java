@@ -38,7 +38,6 @@ import cc.hughes.droidchatty2.data.PostCountDatabase;
 import cc.hughes.droidchatty2.dummy.DummyContent;
 import cc.hughes.droidchatty2.net.ChattyService;
 import cc.hughes.droidchatty2.net.Message;
-import cc.hughes.droidchatty2.net.ThreadList;
 import cc.hughes.droidchatty2.text.TagParser;
 import cc.hughes.droidchatty2.util.TimeUtil;
 
@@ -123,21 +122,21 @@ public class MessageListFragment extends ListFragment {
 		FragmentContextActivity fca = (FragmentContextActivity)getActivity();
 		fca.changeContext(fragment, 1);
 
-        if (!message.Read) {
-            message.Read = true;
+        if (message.unread) {
+            message.unread = false;
             mAdapter.notifyDataSetChanged();
 
             ReadMessageTask markRead = new ReadMessageTask();
-            markRead.execute(message.Id);
+            markRead.execute(message.id);
         }
 
 	}
 
-    class ReadMessageTask extends AsyncTask<String, Void, Void> {
+    class ReadMessageTask extends AsyncTask<Integer, Void, Void> {
 
         @Override
-        protected Void doInBackground(String... values) {
-            String id = values[0];
+        protected Void doInBackground(Integer... values) {
+            Integer id = values[0];
 
             try {
                 mAdapter.mService.markMessageAsRead(id);
@@ -218,19 +217,19 @@ public class MessageListFragment extends ListFragment {
             Message message = getItem(position);
 
             //String timeAgo = TimeUtil.format(getContext(), rootPost.date);
-            holder.messageAuthor.setText(message.OtherUser);
-            holder.messageTime.setText(TimeUtil.format(getContext(), message.Date));
-            holder.messageContent.setText(message.Body);
-            holder.messageSubject.setText(message.Subject);
+            holder.messageAuthor.setText(mFolder == Message.FOLDER_INBOX ? message.from : message.to);
+            holder.messageTime.setText(TimeUtil.format(getContext(), message.date));
+            holder.messageContent.setText(message.bodyParsed());
+            holder.messageSubject.setText(message.subject);
 
-            if (message.Read) {
-                convertView.setBackgroundColor(Color.TRANSPARENT);
-                holder.messageSubject.setTypeface(null, Typeface.NORMAL);
-                holder.messageContent.setTypeface(null, Typeface.NORMAL);
-            } else {
+            if (message.unread) {
                 convertView.setBackgroundResource(R.color.message_unread);
                 holder.messageSubject.setTypeface(null, Typeface.BOLD);
                 holder.messageContent.setTypeface(null, Typeface.BOLD);
+            } else {
+                convertView.setBackgroundColor(Color.TRANSPARENT);
+                holder.messageSubject.setTypeface(null, Typeface.NORMAL);
+                holder.messageContent.setTypeface(null, Typeface.NORMAL);
             }
 
             return convertView;

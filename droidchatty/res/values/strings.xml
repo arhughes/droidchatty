@@ -30,5 +30,6 @@
     <string name="parent_author_label">Parent author</string>
     <string name="author_label">Author</string>
     <string name="search_label">Search</string>
+    <string name="pref_header_general">General</string>
 
 </resources>

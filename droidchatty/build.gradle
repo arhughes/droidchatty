@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.6.+'
+        classpath 'com.android.tools.build:gradle:0.7.+'
         classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
     }
 }
@@ -20,13 +20,13 @@ repositories {
 dependencies {
     compile "com.android.support:support-v4:18.0.+"
     compile "com.android.support:appcompat-v7:18.0.+"
-    compile 'com.squareup.wire:wire-runtime:1.0.+'
     compile 'com.crashlytics.android:crashlytics:1.+'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.+'
 }
 
 android {
     compileSdkVersion 17
-    buildToolsVersion "18.1.0"
+    buildToolsVersion "19.0.1"
 
     sourceSets {
         main {

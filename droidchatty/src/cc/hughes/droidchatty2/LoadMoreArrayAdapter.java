@@ -34,6 +34,7 @@ public abstract class LoadMoreArrayAdapter<T> extends BaseAdapter implements OnS
     View mLoadingView;
     
     AtomicBoolean mKeepLoading = new AtomicBoolean(true);
+    AtomicBoolean mIsLoading = new AtomicBoolean(false);
 
     public LoadMoreArrayAdapter(Context context, int loadingResource, int finishedResource) {
         this(context, loadingResource, finishedResource, new ArrayList<T>());
@@ -186,9 +187,12 @@ public abstract class LoadMoreArrayAdapter<T> extends BaseAdapter implements OnS
         }
     };
     
-    void startLoadingItems() {
-        LoadItemsTask task = new LoadItemsTask(this);
-        task.execute();
+    public void startLoadingItems() {
+        // only start if we aren't already loading
+        if (mIsLoading.getAndSet(true) == false) {
+            LoadItemsTask task = new LoadItemsTask(this);
+            task.execute();
+        }
     }
     
     abstract protected View getNormalView(int position, View convertView, ViewGroup parent);
@@ -226,6 +230,7 @@ public abstract class LoadMoreArrayAdapter<T> extends BaseAdapter implements OnS
             
             mAdapter.mLoadingView = null;
             mAdapter.notifyDataSetChanged();
+            mIsLoading.set(false);
         }
     }
 }

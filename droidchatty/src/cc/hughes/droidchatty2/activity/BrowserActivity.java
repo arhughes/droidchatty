@@ -1,8 +1,10 @@
 package cc.hughes.droidchatty2.activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -49,7 +51,8 @@ public class BrowserActivity extends ActionBarActivity implements View.OnKeyList
         settings.setJavaScriptEnabled(true);
         settings.setSupportZoom(true);
         settings.setLoadWithOverviewMode(true);
-        settings.setBuiltInZoomControls(true);
+        settings.setUseWideViewPort(true);
+        settings.setBuiltInZoomControls(false);
 
         // now load the url
         Bundle extras = getIntent().getExtras();
@@ -155,9 +158,6 @@ public class BrowserActivity extends ActionBarActivity implements View.OnKeyList
     @Override
     public void onDestroy() {
         if (mWebView != null) {
-            // fix crash #1: if zoom controls are visible when destroyed they will crash the app
-            // when their timer expires to hide them again
-            mWebView.setVisibility(View.GONE);
             mWebView.destroy();
             mWebView = null;
         }

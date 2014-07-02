@@ -102,6 +102,8 @@ public class LinkifiedTextView extends TextView {
                 	}
                 }
                                 	
+            } else {
+                mSelectedSpan = null;
             }
         }
         

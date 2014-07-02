@@ -1,17 +1,21 @@
 package cc.hughes.droidchatty2.fragment;
 
-import java.io.IOException;
 import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,20 +29,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.wire.Wire;
+import com.crashlytics.android.Crashlytics;
 
 import cc.hughes.droidchatty2.LoadMoreArrayAdapter;
 import cc.hughes.droidchatty2.R;
 import cc.hughes.droidchatty2.ViewInjected;
 import cc.hughes.droidchatty2.ViewInjector;
 import cc.hughes.droidchatty2.activity.BrowserActivity;
+import cc.hughes.droidchatty2.activity.MainActivity;
 import cc.hughes.droidchatty2.activity.PostActivity;
 import cc.hughes.droidchatty2.net.*;
-import cc.hughes.droidchatty2.net.Thread;
-import cc.hughes.droidchatty2.net.Thread.Reply;
-import cc.hughes.droidchatty2.net.ThreadList.RootPost;
+import cc.hughes.droidchatty2.net.Reply;
+import cc.hughes.droidchatty2.net.RootPost;
 import cc.hughes.droidchatty2.text.InternalURLSpan;
-import cc.hughes.droidchatty2.text.TagParser;
+import cc.hughes.droidchatty2.util.AppUtil;
 import cc.hughes.droidchatty2.util.TimeUtil;
 
 /**
@@ -58,10 +62,8 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
     private static final String TAG = "ThreadDetailFragment";
 
     private RootPost mRootPost;
-    private String mThreadID;
-    private int mIndentPx = 15;
-    
-    private ActionMode mActionMode;
+    private int mThreadID;
+
     private int mSelectedPosition = ListView.INVALID_POSITION;
 
     /**
@@ -77,20 +79,18 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
 
 
         if (getArguments().containsKey(ARG_ROOT_POST)) {
-            Wire wire = new Wire();
-
-            try {
-                mRootPost = wire.parseFrom(getArguments().getByteArray(ARG_ROOT_POST), RootPost.class);
-                mThreadID = mRootPost.id;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            mRootPost = (RootPost)getArguments().getSerializable(ARG_ROOT_POST);
+            mThreadID = mRootPost.id;
         } else {
-            mThreadID = getArguments().getString(ARG_POST_ID);
+            mThreadID = getArguments().getInt(ARG_POST_ID);
         }
 
+        Crashlytics.log(Log.DEBUG, TAG, "Viewing thread with id: " + mThreadID);
+
         setHasOptionsMenu(true);
-        setListAdapter(new ThreadDetailAdapter(getActivity(), R.layout.thread_detail_item, R.layout.row_loading));
+        ThreadDetailAdapter adapter = new ThreadDetailAdapter(getActivity(), R.layout.thread_detail_item, R.layout.thread_detail_item_expanded, R.layout.row_loading);
+        setListAdapter(adapter);
+        adapter.startLoadingItems();
     }
     
     @Override
@@ -121,21 +121,7 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
-        
-        if (position == mSelectedPosition) {
-            // un-select the post, kill the contextual action bar
-            mActionMode.finish();
-            getListView().setItemChecked(position, false);
-            mSelectedPosition = ListView.INVALID_POSITION;
-        } else {
-            // make sure we know what is selected
-            mSelectedPosition = position;
-
-            // if we aren't already showing the contextual action bar, show it now
-            if (mActionMode == null) {
-                mActionMode = getActivity().startActionMode(mActionModeCallback);
-            }
-        }
+        ((ThreadDetailAdapter)getListAdapter()).setExpanded(position);
     }
     
     
@@ -187,7 +173,7 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
             switch (requestCode) {
                 case REQUEST_POST_REPLY:
                     if (resultCode == Activity.RESULT_OK) {
-                        int id = data.getExtras().getInt(PostActivity.RESULT_POST_ID);
+                        //int id = data.getExtras().getInt(PostActivity.RESULT_POST_ID);
                         // just reload for now
                         //TODO: force scroll to new post
                         //mThreadID = Integer.toString(id);
@@ -208,8 +194,7 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            mActionMode = null;
-            
+
             // all done, make sure the item is unselected
             if (mSelectedPosition != ListView.INVALID_POSITION) {
                 getListView().setItemChecked(mSelectedPosition, false);
@@ -226,9 +211,49 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
 
     @Override
     public void onLinkClicked(String href) {
-        Intent intent = new Intent(getActivity(), BrowserActivity.class);
-        intent.putExtra(BrowserActivity.ARG_URL, href);
+
+        Uri uri = Uri.parse(href);
+        if (uri.getHost().endsWith("shacknews.com") && uri.getQueryParameterNames().contains("id")) {
+            // chatty link
+            Bundle args = new Bundle();
+            args.putInt(ARG_POST_ID, Integer.parseInt(uri.getQueryParameter("id").trim()));
+
+            ThreadDetailFragment fragment = new ThreadDetailFragment();
+            fragment.setArguments(args);
+            ((MainActivity)getActivity()).changeContext(fragment, this);
+            return;
+        }
+
+        Intent intent;
+        if (!useInAppBrowser() || linkIsSpecial(uri)) {
+            // show outside app
+            intent = new Intent(Intent.ACTION_VIEW, uri);
+        } else {
+            // show inside app
+            intent = new Intent(getActivity(), BrowserActivity.class);
+            intent.putExtra(BrowserActivity.ARG_URL, href);
+        }
         startActivity(intent);
+    }
+
+    private boolean useInAppBrowser() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        return prefs.getBoolean("pref_internal_browser", true);
+    }
+
+    private boolean linkIsSpecial(Uri uri) {
+
+        if (AppUtil.isInstalled("com.google.android.youtube", getActivity()) && (uri.getHost().equals("youtu.be") || uri.getHost().equals("www.youtube.com"))) {
+            return true;
+        }
+        else if (uri.getHost().startsWith("play.google")) {
+            return true;
+        }
+        else if (AppUtil.isInstalled("com.vimeo.android.videoapp", getActivity()) && uri.getHost().equals("vimeo.com")) {
+            return true;
+        }
+
+        return false;
     }
 
     class ThreadDetailAdapter extends LoadMoreArrayAdapter<Reply> {
@@ -237,13 +262,18 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
 
         private ChattyService mService;
         private int mLayoutRes;
+        private int mLayoutExpandedRes;
         private LayoutInflater mInflater;
         private Context mContext;
         private List<Reply> mItemCache;
+        private int mExpandedPosition = 0;
+
+        private String mOriginalPoster = "";
         
-        public ThreadDetailAdapter(Context context, int itemResource, int loadingResource) {
+        public ThreadDetailAdapter(Context context, int itemResource, int itemResourceExpanded, int loadingResource) {
             super(context, loadingResource, LAYOUT_NONE);
             mLayoutRes = itemResource;
+            mLayoutExpandedRes = itemResourceExpanded;
             mContext = context;
             mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             mService = new ChattyService(PreferenceManager.getDefaultSharedPreferences(context));
@@ -254,24 +284,39 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
 
         private void addRootPost() {
             if (mRootPost != null) {
-                Reply.Builder builder = new Reply.Builder()
-                    .author(mRootPost.author)
-                    .body(mRootPost.body)
-                    .categeory(mRootPost.category)
-                    .date(mRootPost.date)
-                    .id(mRootPost.id)
-                    .depth(0);
-
-                super.add(builder.build());
+                Reply root = Reply.fromRootPost(mRootPost);
+                super.add(root);
+                mOriginalPoster = mRootPost.author;
             }
+        }
+
+        public void setExpanded(int position) {
+            mExpandedPosition = position;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return super.getViewTypeCount() + 1;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            int type = super.getItemViewType(position);
+            if (type != IGNORE_ITEM_VIEW_TYPE && (position == 0 || position == mExpandedPosition))
+                return 1;
+
+            return type;
         }
 
         @Override
         protected View getNormalView(int position, View convertView, ViewGroup parent) {
             ViewHolder holder;
+
+            boolean is_expanded = position == 0 || position == mExpandedPosition;
             
             if (convertView == null) {
-                convertView = mInflater.inflate(mLayoutRes, null);
+                convertView = mInflater.inflate(is_expanded ? mLayoutExpandedRes : mLayoutRes, null);
                 holder = new ViewHolder();
                 ViewInjector.inject(holder, convertView);
                 //holder.postContent.setMovementMethod(LinkMovementMethod.getInstance());
@@ -279,31 +324,57 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
             } else {
                 holder = (ViewHolder)convertView.getTag();
             }
-            
+
             Reply reply = getItem(position);
-            String timeAgo = TimeUtil.format(getContext(), reply.date);
-
-            handleLinks(reply.bodyParsed);
-
             holder.authorName.setText(reply.author);
-            holder.postContent.setText(reply.bodyParsed);
-            holder.postTime.setText(timeAgo);
-            holder.postCategory.setText(reply.categeory);
-            
-            boolean is_nws = reply.categeory.equals(CATEGORY_NWS);
-            holder.postCategory.setVisibility(is_nws ? View.VISIBLE : View.GONE);
-            
-            holder.spacerContainer.removeAllViews();
-            for (int i = 0; i < reply.depth; i++) {
-                View spacer = new View(mContext);
-                spacer.setLayoutParams(new LinearLayout.LayoutParams(mIndentPx, LayoutParams.MATCH_PARENT));
-                               
-                int color = Math.min(8 * (i+5), 200);
-                spacer.setBackgroundColor(Color.rgb(color, color, color));
-                holder.spacerContainer.addView(spacer, i);
+            holder.postContent.setText(is_expanded ? reply.bodyParsed() : reply.bodyParsedPreview());
+
+            LayerDrawable branches = getTreeBranches(reply.bullets);
+
+            if (is_expanded)
+            {
+                String timeAgo = TimeUtil.format(getContext(), reply.date);
+                handleLinks(reply.bodyParsed());
+
+                holder.postTime.setText(timeAgo);
+                holder.postCategory.setText(reply.category);
+                boolean is_nws = reply.category.equals(CATEGORY_NWS);
+                holder.postCategory.setVisibility(is_nws ? View.VISIBLE : View.GONE);
+                holder.authorName.setCompoundDrawablesWithIntrinsicBounds(branches, null, null, null);
             }
-            
+            else
+            {
+                holder.postContent.setCompoundDrawablesWithIntrinsicBounds(branches, null, null, null);
+
+                // highlight new posts
+                int newness_color = (17 * reply.newness) + 85;
+                holder.postContent.setTextColor(Color.argb(255, newness_color, newness_color, newness_color));
+            }
+
+            // highlight op's name
+            if (position != 0 && reply.author.equals(mOriginalPoster))
+                holder.authorName.setTextColor(getResources().getColor(R.color.author_name_op));
+            else
+                holder.authorName.setTextColor(getResources().getColor(R.color.author_name));
+
             return convertView;
+        }
+
+        private LayerDrawable getTreeBranches(TreeBullet[] bullets) {
+            int n = bullets.length;
+            Drawable[] d = new Drawable[n];
+            for (int i = 0; i < n; i++)
+                d[i] = getResources().getDrawable(bullets[i].getResource());
+
+            int width = 0;
+            if (n > 0)
+                width = d[0].getIntrinsicWidth();
+
+            LayerDrawable l = new LayerDrawable(d);
+            for (int i = 0; i < n; i++) {
+                l.setLayerInset(i, i * width, 0, ((n - 1)-i) * width, 0);
+            }
+            return l;
         }
 
         private void handleLinks(Spanned body) {
@@ -329,13 +400,15 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
 
         @Override
         protected boolean loadItems() throws Exception {
-            Thread thread = mService.getThread(mThreadID);
-            mItemCache = thread.reply;
+            List<Reply> replies = mService.getThread(mThreadID);
+            mItemCache = replies;
             
             // if root post is already added, don't add it again
             if (mRootPost != null)
                 mItemCache = mItemCache.subList(1, mItemCache.size());
-            
+            else if (mItemCache.size() > 0)
+                mOriginalPoster = mItemCache.get(0).author;
+
             return false;
         }
 
@@ -356,8 +429,6 @@ public class ThreadDetailFragment extends ListFragment implements InternalURLSpa
             TextView postCategory;
             @ViewInjected(R.id.post_time)
             TextView postTime;
-            @ViewInjected(R.id.spacer_container)
-            LinearLayout spacerContainer;
         }
         
     }

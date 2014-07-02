@@ -15,6 +15,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import android.graphics.Typeface;
 import android.text.Html;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.CharacterStyle;
@@ -23,39 +24,53 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
-import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+
 public class TagParser implements ContentHandler {
-	
+
+    private static final String TAG = "TagParser";
+    private static final String SOURCE = "HTML_SOURCE";
+
 	SpannableStringBuilder mSpannableStringBuilder;
+    boolean mMultiline;
 	
-	private TagParser() {
+	private TagParser(boolean multiline) {
 		mSpannableStringBuilder = new SpannableStringBuilder();
+        mMultiline = multiline;
 	}
-	
-	public static Spanned fromHtml(String source) {
+
+    public static Spanned fromHtml(String source) {
+        return fromHtml(source, true);
+    }
+
+	public static Spanned fromHtml(String source, boolean multiline) {
 		
-		TagParser tagParser = new TagParser();
+		TagParser tagParser = new TagParser(multiline);
 		
 		try {
-			XMLReader parser = XMLReaderFactory.createXMLReader("org.ccil.cowan.tagsoup.Parser");
+            XMLReader parser = new org.ccil.cowan.tagsoup121.Parser();
 		
 			parser.setContentHandler(tagParser);
 			parser.parse(new InputSource(new StringReader(source)));
-			
+
 			return tagParser.mSpannableStringBuilder;
 			
-		} catch (SAXException e) {
-			Log.e("TagParser", "Error parsing tags.", e);
-			e.printStackTrace();
-		} catch (IOException e) {
-			Log.e("TagParser", "Error parsing tags.", e);
+		} catch (Exception e) {
+            Crashlytics.logException(e);
 		}
-		
-		// fall back to basic HTML parser!
-		return Html.fromHtml(source);
+
+        try {
+		    // fall back to basic HTML parser!
+		    return Html.fromHtml(source);
+        } catch (Exception e) {
+            Log.e(TAG, "Error parsing tags with Html.", e);
+        }
+
+        // okay, just show the whole damn HTML I guess
+        return new SpannableString(source);
 	}
 	
 	void handleStartTag(String tag, Attributes attributes) {
@@ -188,25 +203,28 @@ public class TagParser implements ContentHandler {
 		text.setSpan(new Href(href), len, len, Spannable.SPAN_MARK_MARK);
 	}
 	
-	static void handleBr(SpannableStringBuilder text) {
-		text.append("\n");
+	void handleBr(SpannableStringBuilder text) {
+        if (mMultiline)
+		    text.append("\n");
 	}
 	
-	static void handleP(SpannableStringBuilder text) {
-		int len = text.length();
+	void handleP(SpannableStringBuilder text) {
+        if (mMultiline) {
+            int len = text.length();
 
-		if (len >= 1 && text.charAt(len - 1) == '\n') {
-			if (len >= 2 && text.charAt(len - 2) == '\n') {
-				return;
-			}
+            if (len >= 1 && text.charAt(len - 1) == '\n') {
+                if (len >= 2 && text.charAt(len - 2) == '\n') {
+                    return;
+                }
 
-			text.append("\n");
-			return;
-		}
+                text.append("\n");
+                return;
+            }
 
-		if (len != 0) {
-			text.append("\n\n");
-		}
+            if (len != 0) {
+                text.append("\n\n");
+            }
+        }
 	}
 
 	@Override

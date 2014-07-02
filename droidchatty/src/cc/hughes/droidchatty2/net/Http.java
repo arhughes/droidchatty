@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class Http {
 
-    public static final String USER_AGENT = "DroidChatty/1.0";
+    public static final String USER_AGENT = "DroidChatty/2.0";
 
     public static class RequestSettings {
         public String Url;

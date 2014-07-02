@@ -18,12 +18,15 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Html;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
 import cc.hughes.droidchatty2.FragmentContextActivity;
 import cc.hughes.droidchatty2.R;
 import cc.hughes.droidchatty2.fragment.ThreadListFragment;
+import cc.hughes.droidchatty2.text.TagParser;
 
 
 /**
@@ -118,6 +121,9 @@ public class MainActivity extends ActionBarActivity
         Integer background = Integer.parseInt(prefs.getString("pref_theme_background_color", "0"));
         View v = findViewById(R.id.drawer);
         v.setBackgroundColor(background == 1 ? Color.BLACK : Color.TRANSPARENT);
+
+        String username = prefs.getString("pref_shacknews_user", null);
+        Crashlytics.setUserName(username);
     }
 
     /** Sets whether the drawer is enabled or not */
@@ -180,6 +186,16 @@ public class MainActivity extends ActionBarActivity
             mDrawerLayout.closeDrawer((mDrawerMenu));
 
 	}
+
+    @Override
+    public void changeContext(Fragment fragment, Fragment parent) {
+        for (int i = 0; i < mThreadPageAdapter.getCount(); i++) {
+            if (mThreadPageAdapter.getItem(i) == parent) {
+                changeContext(fragment, i + 1);
+                return;
+            }
+        }
+    }
 	
 	@Override
 	public void onPageScrollStateChanged(int state) {
@@ -212,8 +228,12 @@ public class MainActivity extends ActionBarActivity
     		// If the thread details are showing, close it
     		mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1, true);
     	}
-    	else {
-    		super.onBackPressed();
+        else if (mThreadPageAdapter.getItem(mViewPager.getCurrentItem()) instanceof ThreadListFragment) {
+            // already on thread list, exit or whatever
+            super.onBackPressed();
+        } else {
+    		// on something else (messages, settings, etc.) show the threadlist instead
+            changeContext(new ThreadListFragment(), 0);
     	}
 	}
 

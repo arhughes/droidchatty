@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cc.hughes.droidchatty2.net.ThreadList;
+import cc.hughes.droidchatty2.net.RootPost;
 
 public class PostCountDatabase extends SQLiteOpenHelper {
 
@@ -45,7 +45,7 @@ public class PostCountDatabase extends SQLiteOpenHelper {
         // pass
     }
 
-    public Map<Integer, Integer> getCounts(List<ThreadList.RootPost> threads) {
+    public Map<Integer, Integer> getCounts(List<RootPost> threads) {
         SQLiteDatabase db = getReadableDatabase();
 
         Log.d(TAG, "Fetching counts for " + threads.size() + " threads.");

@@ -10,7 +10,7 @@ public class MessageParser extends Parser {
     public MessageParser(String content) {
         super(content);
     }
-
+/*
     public List<Message> parse() throws Exception {
 
         List<Message> messages = new ArrayList<Message>();
@@ -32,5 +32,5 @@ public class MessageParser extends Parser {
         }
         return messages;
     }
-
+*/
 }

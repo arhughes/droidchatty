@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -26,7 +27,6 @@ public class PostActivity extends Activity {
     public static final String RESULT_POST_ID = "RESULT_POST_ID";
 
     private int mParentId = 0;
-    private boolean mIsNewsThread = false;
 
     @ViewInjected(R.id.edit_post_reply)
     Button mReplyButton;
@@ -46,8 +46,9 @@ public class PostActivity extends Activity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             mParentId = extras.getInt(PARENT_ID, 0);
-            mIsNewsThread = extras.getBoolean(IS_NEWS_THREAD, false);
         }
+
+        Log.i("PostActivity", "Replying to post: " + mParentId);
 
         mReplyButton.setOnClickListener(mReplyButtonClick);
         mCancelButton.setOnClickListener(mCancelButtonClick);
@@ -61,10 +62,11 @@ public class PostActivity extends Activity {
         builder.create().show();
     }
 
-    void returnPost(int postId) {
-        Intent result = new Intent();
-        result.putExtra(RESULT_POST_ID, postId);
-        setResult(RESULT_OK, result);
+    void returnPost() {
+        //Intent result = new Intent();
+        //result.putExtra(RESULT_POST_ID, postId);
+        setResult(RESULT_OK);
+        //setResult(RESULT_OK, result);
         finish();
     }
 
@@ -84,7 +86,7 @@ public class PostActivity extends Activity {
         }
     };
 
-    class PostTask extends AsyncTask<String, Void, Integer> {
+    class PostTask extends AsyncTask<String, Void, Void> {
 
         Exception mException;
         ProgressDialog mProgressDialog;
@@ -96,13 +98,13 @@ public class PostActivity extends Activity {
         }
 
         @Override
-        protected Integer doInBackground(String... params) {
+        protected Void doInBackground(String... params) {
             String content = params[0];
 
             try {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(PostActivity.this);
                 ChattyService service = new ChattyService(prefs);
-                return service.post(mParentId, content, mIsNewsThread);
+                service.post(mParentId, content);
             } catch (Exception ex) {
                 mException = ex;
             }
@@ -111,15 +113,15 @@ public class PostActivity extends Activity {
         }
 
         @Override
-        protected void onPostExecute(Integer postId) {
-            super.onPostExecute(postId);
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
 
             mProgressDialog.dismiss();
 
             if (mException != null)
                 displayError(mException);
             else
-                returnPost(postId);
+                returnPost();
         }
     }
 
